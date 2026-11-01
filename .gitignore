@@ -1,0 +1,30 @@
+# Unreal Engine generated folders
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+Platforms/
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
+
+# Packaged builds (upload these to itch.io, don't commit them)
+Packaged/
+Builds/
+*.zip
+
+# IDE / build files
+.vs/
+.vscode/
+.idea/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini

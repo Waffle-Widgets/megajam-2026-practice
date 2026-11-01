@@ -1,0 +1,40 @@
+# MegaJam 2026 — Practice & Setup
+
+This is our **practice repo** for the 2026 Epic AI MegaJam. We use it to get Unreal Engine 5.8, Claude Code,
+Gemini, MCP, Git LFS and packaging working, and to run our practice jams (Nov 7–8), *before* the real jam.
+
+**This is not our jam entry.** On Nov 11 we create a fresh repo for the real game and copy over only the
+setup files (see "Starting the real jam repo" below). Break things here freely.
+
+## Where things are
+
+| File | What it is |
+| --- | --- |
+| `docs/PLAN.md` | Team plan: roles, tools, setup checklist, schedule |
+| `docs/PITCH.md` | The current practice game's idea |
+| `docs/RULES.md` | Official jam rules, pasted from itch.io |
+| `docs/DEVLOG.md` | Running devlog notes for the Glass Box category |
+| `CREDITS.md` | Every asset we didn't make, with source and license |
+| `CLAUDE.md` / `GEMINI.md` | Standing instructions for our AI agents |
+
+## Editing these files without Git
+
+Open the file on GitHub, click the pencil icon, make your change, then click **Commit changes**.
+
+## Adding the Unreal project
+
+Create the Unreal project somewhere else first, close Unreal, then copy everything from that project folder
+(the `.uproject` file, `Config/`, `Content/`, `Source/`, etc.) into the root of this repo and commit.
+The `.gitignore` already skips Unreal's large generated folders.
+
+## Starting the real jam repo (Nov 11)
+
+Create a new private repo (e.g. `megajam-2026`) in waffle-widgets and copy these files into it, improved by
+whatever we learned here:
+
+- `CLAUDE.md`, `GEMINI.md`, `.gitignore`, `.gitattributes`
+- `docs/PLAN.md`, `docs/RULES.md`, `docs/DEVLOG.md` (the devlog continues)
+- An empty `CREDITS.md` and `docs/PITCH.md`
+
+Do **not** copy practice Unreal content into the jam repo. Starting clean keeps it obvious that the game was
+made during the jam, which matters for the rules and for the Glass Box devlog.
