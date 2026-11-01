@@ -23,7 +23,9 @@
 - Explain every change in plain language: what you made, where it lives in the Content Browser, and why.
 - Before a big or risky change, tell us the plan and wait for "go".
 - If something fails, tell us the actual error and your best guess at the cause. Don't silently retry many times.
-- Remind us to commit in GitHub Desktop after each working feature.
+- Once we confirm a feature works in Play mode, save all assets in the editor, then commit and push to GitHub yourself
+  with a short plain-language message. Tell us what you committed. Don't commit work we haven't tested.
+- We often prompt you remotely from another machine, so send screenshots of the editor or results when they help us follow along.
 - Keep the project tidy: put our content under `Content/Game/` in folders by type (Blueprints, Maps, Materials, Audio, UI).
 - Use clear names: `BP_` for Blueprints, `M_` for materials, `MI_` for material instances, `WBP_` for widgets, `SFX_` for sounds.
 
