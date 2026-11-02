@@ -65,3 +65,14 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - The save reported success but nothing changed on disk. The cause: our Git LFS setup makes committed Unreal files read-only until someone locks them. Claude ran `git lfs lock` on `BP_Frog`, saved, committed, then unlocked.
 - **What we learned:** Lock an asset before editing it. Always check the file actually changed after saving. We added these lessons to CLAUDE.md.
 - **Media:** [Fixed camera in Play mode](media/2026-11-01-fixed-camera.png)
+
+### 2026-11-01 — A frog that looks like a frog (sort of)
+- **What we tried:** Swap the mannequin for a placeholder frog that fits our "chunky, toy-like" art style.
+- **Prompt(s) we gave the agent:** "Yes, placeholder frog"
+- **What happened:**
+  - Claude locked `BP_Frog` first (the lesson from last time), then built a frog out of 10 basic shapes: body, head, two eyes with pupils, and four legs.
+  - It made 4 color materials (`MI_FrogGreen`, `MI_FrogDarkGreen`, `MI_FrogEyeWhite`, `MI_FrogPupil`) from Unreal's basic shape material, just changing the color.
+  - It turned collision off on all the shapes so the hop still only uses the invisible capsule, and hid the mannequin instead of deleting it.
+  - The first Play-mode screenshot came out black because it was taken before the first frame was drawn. Taking it again worked.
+- **What we learned:** Placeholder art from basic shapes is fast and good enough to judge size and feel. Hiding the old mesh is safer than deleting it when template code still uses it.
+- **Media:** [Placeholder frog](media/2026-11-01-placeholder-frog.png)
