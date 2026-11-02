@@ -76,3 +76,15 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - The first Play-mode screenshot came out black because it was taken before the first frame was drawn. Taking it again worked.
 - **What we learned:** Placeholder art from basic shapes is fast and good enough to judge size and feel. Hiding the old mesh is safer than deleting it when template code still uses it.
 - **Media:** [Placeholder frog](media/2026-11-01-placeholder-frog.png)
+
+### 2026-11-01 — Cars! The frog can die now
+- **What we tried:** The first hazard: three lanes of cars that send the frog back to the start if they hit it.
+- **Prompt(s) we gave the agent:** "Yes, plan the cars" / "do all the steps and then i will test it"
+- **What happened:**
+  - Claude planned three small steps (cars that drive, getting hit, filling the road). We told it to build all three before we tested, to save round trips.
+  - It made `BP_Car` (blocky car plus an invisible hitbox that detects the frog without blocking it) with Speed, direction and color settings on each placed car. Cars that drive off one end of the road reappear at the other.
+  - It added `Die` and `SaveStart` to `BP_Frog`, and laid out a road with 3 lanes and 9 cars (red, yellow, blue, getting faster).
+  - Its tool's list of Blueprint functions didn't show the brand-new `Die` yet, but writing the call directly still worked.
+  - Claude can't press keys in Play mode, but it *can* move the frog: it dropped the frog in front of a car (sent back to start) and on a safe row (stayed put) to check before handing it to us.
+- **What we learned:** Batching small planned steps is fine when the plan is clear. The agent can test some things in Play mode by moving actors directly, even though it can't play.
+- **Media:** [Road and cars](media/2026-11-01-road-and-cars.png)
