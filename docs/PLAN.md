@@ -69,7 +69,7 @@ Setup is done when a packaged build made by the agent runs on Gaming PC 2.
 
 - [ ] New project: Games → Third Person (or Top Down), C++ project, saved on an SSD
 - [x] Edit → Plugins: enable Model Context Protocol (Unreal MCP), All Toolsets, Toolset Registry, Unreal Terminal; restart
-- [x] Start the MCP server (Epic's default endpoint: http://127.0.0.1:8000/mcp). It does not start by itself: type `ModelContextProtocol.StartServer` in the editor's Cmd box. Auto-start is now set in `Config/DefaultEditorPerProjectUserSettings.ini` (`bAutoStartServer=True`), because the setting doesn't show up in the editor's settings windows. Stuck? Try the "Unreal MCP Setup Assistant" on Fab (third-party, early version)
+- [x] Start the MCP server (Epic's default endpoint: http://127.0.0.1:8000/mcp). It's off by default; to start it by hand, type `ModelContextProtocol.StartServer` in the editor's Cmd box. Auto-start is set in `Config/DefaultEditorPerProjectUserSettings.ini` (`bAutoStartServer=True`), because the setting doesn't show up in the editor's settings windows. Stuck? Try the "Unreal MCP Setup Assistant" on Fab (third-party, early version)
 - [x] Connect Claude Code to that endpoint as an HTTP MCP server
 - [ ] Test: ask Claude Code to list the actors in the level
 
