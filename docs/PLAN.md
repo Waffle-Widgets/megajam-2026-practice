@@ -61,16 +61,16 @@ Setup is done when a packaged build made by the agent runs on Gaming PC 2.
 
 **Install on Gaming PC 1 (start the Unreal download first; it's huge)**
 
-- [ ] Epic Games Launcher + Unreal Engine 5.8
+- [x] Epic Games Launcher + Unreal Engine 5.8
 - [ ] Visual Studio 2022 with the "Game development with C++" workload
 - [ ] Node.js LTS, GitHub Desktop, Claude Code, Gemini CLI
 
 **First project**
 
 - [ ] New project: Games → Third Person (or Top Down), C++ project, saved on an SSD
-- [ ] Edit → Plugins: enable Model Context Protocol (Unreal MCP), All Toolsets, Toolset Registry, Unreal Terminal; restart
-- [ ] Start the MCP server (Epic's default endpoint: http://127.0.0.1:8000/mcp). Stuck? Try the "Unreal MCP Setup Assistant" on Fab (third-party, early version)
-- [ ] Connect Claude Code to that endpoint as an HTTP MCP server
+- [x] Edit → Plugins: enable Model Context Protocol (Unreal MCP), All Toolsets, Toolset Registry, Unreal Terminal; restart
+- [x] Start the MCP server (Epic's default endpoint: http://127.0.0.1:8000/mcp). It does not start by itself: type `ModelContextProtocol.StartServer` in the editor's Cmd box, or tick Edit → Editor Preferences → Plugins → Model Context Protocol → Auto Start Server. Stuck? Try the "Unreal MCP Setup Assistant" on Fab (third-party, early version)
+- [x] Connect Claude Code to that endpoint as an HTTP MCP server
 - [ ] Test: ask Claude Code to list the actors in the level
 
 **Smoke test**
@@ -82,8 +82,8 @@ Setup is done when a packaged build made by the agent runs on Gaming PC 2.
 
 **Workflow**
 
-- [ ] CLAUDE.md is in the repo root (done when the Unreal project is added)
-- [ ] Practice repo (waffle-widgets/megajam-2026-practice) with Git LFS; first commit
+- [x] CLAUDE.md is in the repo root (done when the Unreal project is added)
+- [x] Practice repo (waffle-widgets/megajam-2026-practice) with Git LFS; first commit
 - [ ] Nov 11: fresh jam repo created; setup files copied over (see README)
 - [ ] Devlog started (screenshots of setup, including what went wrong)
 
