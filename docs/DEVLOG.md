@@ -88,3 +88,15 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Claude can't press keys in Play mode, but it *can* move the frog: it dropped the frog in front of a car (sent back to start) and on a safe row (stayed put) to check before handing it to us.
 - **What we learned:** Batching small planned steps is fine when the plan is clear. The agent can test some things in Play mode by moving actors directly, even though it can't play.
 - **Media:** [Road and cars](media/2026-11-01-road-and-cars.png)
+
+### 2026-11-01 — The river: ride the logs or drown
+- **What we tried:** The second half of the board: a river with drifting logs. Land on a log and you ride it; land in the water and you're back to the start.
+- **Prompt(s) we gave the agent:** "Yes, plan the river" / "Go, all three steps"
+- **What happened:**
+  - Claude planned it first (layout, rules, risks), then built it all in one go: `BP_Log` (a log that stretches to its Length setting and drifts like the cars), `BP_Water` (a water surface with an invisible "you're in the river" zone), a purple safe strip, the far bank, and 10 logs in 3 lanes.
+  - The frog got a new `CheckGround` function that runs whenever it isn't mid-hop: ride the log you're on, die if carried off the side, drown if you're in water with no log.
+  - One write failed because a new variable's category didn't exist yet. Nothing half-built was left behind; Claude set the category and retried.
+  - The tool's readout labelled the log's Speed reader as belonging to a wind component. Claude checked the actual nodes and they were correct (same labelling quirk as before).
+  - Testing was tricky: the editor runs slowly when it's not the focused window, so logs drifted further than expected between checks, and the frog kept landing on logs instead of water. Claude moved one lane's logs out of the way to test drowning cleanly.
+- **What we learned:** When testing moving things, control the setup (move things out of the way) instead of relying on timing. Don't trust a summary readout over the real node details.
+- **Media:** [River and logs](media/2026-11-01-river-and-logs.png)
