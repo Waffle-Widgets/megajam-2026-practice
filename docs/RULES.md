@@ -1,33 +1,47 @@
 # Official jam rules
 
-_Answers below are summarized from the [jam's itch.io page](https://itch.io/jam/2026-epic-ai-megajam) (checked Nov 1, 2026).
-The full [Official Rules PDF](https://epicgames.box.com/s/a7xcgl07fqoieeb99sjtd3juhj4agc4z) still needs a read-through; it wins if anything here disagrees._
+_Summarized from the [Official Rules PDF](https://epicgames.box.com/s/svkmfifwv7336vyq1h0y7eucdr9d6ooc) (version of Oct 30, 2026; 14 pages)
+and the [jam's itch.io page](https://itch.io/jam/2026-epic-ai-megajam), read Nov 1, 2026. Section numbers (§) point to the PDF.
+The PDF wins if anything here disagrees; it may be updated, so check its change log before the jam._
 
 ## Answers we need
 
-- **Submission deadline and timezone:** Sun Nov 15, 5:59 PM PST / 8:59 PM EST. Late entries are disqualified. The jam starts
-  Nov 12 at 12:00 AM EST, which is **Wed Nov 11, 9:00 PM PST** (itch.io opens submissions then too).
-- **Sourced and AI-generated assets — what's allowed and how to credit:** Any AI tools are allowed. Assets we didn't make (Fab etc.)
-  are fine if we have the license, and must be listed in our submission. Anything made before Nov 12 (prompts, scripts, assets)
-  must be declared. Gameplay has to go beyond Epic's starter templates.
-- **Required build platform(s) and file size limit:** A packaged build (unpackaged projects are not accepted) for Windows, macOS,
-  Android or iOS. Upload a .zip named `TeamName_GameName`, under 1 GB, to our own itch.io account, then submit it to the jam.
-- **Required gameplay video or screenshots:** A link to a 30–60 second gameplay video. Their tip: show gameplay in the first five seconds.
-- **How Glass Box devlogs are submitted and judged:** Submit a link to the devlog with the entry (optional for everyone, required
-  for Glass Box). The prize goes to the best devlog showing how we built the game. No format or scoring details on the itch.io
-  page; check the PDF.
-- **Team submission — one entry, or every member registered:** One entry per team (up to five people), listing each member's name
-  and the email address on their Epic Games account. Everyone must be 18+ with an active Epic Games account.
+- **Submission deadline and timezone:** The contest runs Nov 12, 12:00 AM ET to **Nov 15, 8:59 PM ET (5:59 PM PST)** (§4).
+  In Pacific time it starts **Wed Nov 11 at 9:00 PM**. Late or broken entries are disqualified, and Epic doesn't confirm receipt (§3).
+- **Sourced and AI-generated assets:** AI is allowed for anything (§7a). Sourced (non-original) assets are allowed but must be
+  listed at submission, need the right license, and **are not scored** (§15c). **AI-generated content is not a sourced asset**,
+  so it counts as ours and is scored. No trademarks or logos except the Unreal Engine logo (§15d).
+- **Required build platform(s) and file size limit:** A packaged build that runs on Windows 10/11 (or macOS, Android, iOS) with no
+  extra software needed (§1, §7f). Unpackaged projects aren't accepted. itch.io: a .zip named `TeamName_GameName`, under 1 GB.
+- **Required gameplay video or screenshots:** A 30–60 second gameplay video at **1920x1080 or higher** (§1e, §7c).
+  itch.io tip: show gameplay in the first five seconds.
+- **How Glass Box devlogs are submitted and judged:** Best devlog documenting how we created the game. To qualify it **must be
+  submitted with the game, before the deadline** (§10); there's a devlog link field on the itch.io form. No scoring rubric is given.
+- **Team submission — one entry, or every member registered:** One entry per team of 1–5 (§2). It lists every member's full name
+  and email (the one on their Epic account), and names one **Team Owner**, who submits and receives any prize money for the team
+  (§1c, §13). Everyone must be 18+ with an active Epic account. A human must submit, not an AI agent (§17).
 
-## Things that affect our plan
+## Rules that change how we work
 
-- **Don't build the game before Nov 12.** Setting up tools, agents and MCP early is allowed. Our planned "starter project"
-  (Nov 9–10) must be declared, and should stay generic (start/restart, packaging), not game content.
-- **Declare pre-jam work.** List what we bring in: `CLAUDE.md`, `GEMINI.md`, the starter project, and any reusable prompts.
-- **Pick Unreal Engine (not UEFN).** A team can't enter both.
-- Main-category judging (1–5 each): ambition and innovation, theme, fun factor, gameplay, visuals, level design and progression, audio.
+- **What we may prepare before Nov 12 (§7h):** AI tools, agent configs (`CLAUDE.md`, `GEMINI.md`), MCP settings, prompt libraries
+  and scripts. **Everything else — gameplay, levels, art — must be made during the jam.** Epic may ask for these files or our
+  **Git history** to check. That's why the jam repo starts fresh on Nov 11.
+- **Our planned Nov 9–10 "starter project" is risky.** Start/restart logic is gameplay. Keep anything prepared limited to an empty
+  project with plugins, MCP and packaging settings, and rebuild gameplay during the jam.
+- **Not a tutorial or template reskin (§7d, §7e).** Starting from the Third Person template is fine, but the game needs custom
+  gameplay well beyond it.
+- **Use the theme (§7g)** and keep everything **in English**, including in-game text, audio and the video (§7i).
+- **Teen-appropriate (§8):** suitable for ages 13+ (ESRB Teen). No real people's IP, no disparaging anyone.
+- **Prefer making or AI-generating assets over sourcing them**, since sourced assets aren't scored (§15c).
+
+## How we're judged
+
+- **Main categories (§9):** up to 5 points each for ambition and innovation, use of theme, fun factor, gameplay, visuals,
+  level design, and audio. Ties are re-scored with **fun factor counted double**. How much AI we used is context only; it
+  doesn't raise or lower our score.
+- **Modifiers (§10):** one main prize plus one modifier per entry at most. Ours: Best Team ($5,000, teams of 2+) and Glass Box ($2,500).
+- Winners are notified by email around **Jan 29, 2027** and have **72 hours** to reply (§14), so watch the email used to enter.
 
 ## Full rules text
 
-Not pasted here. Read the [Official Rules PDF](https://epicgames.box.com/s/a7xcgl07fqoieeb99sjtd3juhj4agc4z) directly, and update
-the answers above if it adds anything.
+Not copied here. Read the [Official Rules PDF](https://epicgames.box.com/s/svkmfifwv7336vyq1h0y7eucdr9d6ooc).

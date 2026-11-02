@@ -44,5 +44,13 @@
 ## Assets and credits
 - When we import an asset we didn't make (Fab, AI-generated, sound libraries), remind us to add it to `CREDITS.md` with its source and license.
 
+## Jam rules to enforce
+Full summary in `docs/RULES.md`. Warn us if a request would break one of these:
+- Only tools, agent configs, MCP settings, prompts and scripts may be prepared before the jam. Gameplay, levels and art must be
+  made between Nov 12 and 15, and Epic may check our Git history.
+- Sourced assets (Fab, sound libraries) are allowed but not scored. Assets we make or generate with AI are scored, so prefer those.
+- Everything in English, suitable for ages 13+, and no trademarks or logos except the Unreal Engine logo.
+- The game must use the theme and go well beyond the Third Person template.
+
 ## The current game
 See `docs/PITCH.md` for the current practice game. If it's empty, ask us what we're building before starting.
