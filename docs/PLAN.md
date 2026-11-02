@@ -125,14 +125,14 @@ We direct, the agent builds, we test after every change.
 
 ## Rules to confirm and devlog plan
 
-Read the official rules on the itch.io page before Nov 9 and fill in the answers here.
+Read the official rules on the itch.io page before Nov 9 and fill in the answers in `docs/RULES.md`. Still to do: read the full Official Rules PDF, especially for Glass Box judging.
 
-- [ ] Submission deadline and timezone
-- [ ] Rules on sourced and AI-generated assets (past MegaJams required crediting every asset we didn't make, and some years didn't score sourced assets)
-- [ ] Required build platforms and file size limit
-- [ ] Required gameplay video or screenshots
+- [x] Submission deadline and timezone
+- [x] Rules on sourced and AI-generated assets (past MegaJams required crediting every asset we didn't make, and some years didn't score sourced assets)
+- [x] Required build platforms and file size limit
+- [x] Required gameplay video or screenshots
 - [ ] How Glass Box devlogs are submitted and judged
-- [ ] Whether a team needs one submission or all members registered
+- [x] Whether a team needs one submission or all members registered
 
 **Devlog (Glass Box).** Capture as we go: setup struggles, prompts that worked and failed, before/after clips, and what we'd do differently. Aim for a short written post plus a 2–3 minute video.
 

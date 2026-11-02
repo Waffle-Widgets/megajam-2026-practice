@@ -34,6 +34,13 @@
 - Push back if we ask for multiplayer, story/dialogue systems, inventories, complex enemy AI, or open worlds during the jam. Suggest a simpler version instead.
 - Prioritize game feel (responsive controls, feedback, sound, juice) over feature count.
 
+## Devlog (Glass Box)
+- We're aiming for the Glass Box prize (best devlog showing how we built the game), so keep `docs/DEVLOG.md` going without being asked.
+- After each change we test and you commit, add an entry using the template in `DEVLOG.md`: what we asked for, the actual prompt,
+  what happened (including failures, retries and dead ends), and what we learned. Commit it with the change.
+- Log setup problems and things that broke too, not just successes. Those are the most useful parts.
+- When the editor is open, save a screenshot to `docs/media/` and link it from the entry.
+
 ## Assets and credits
 - When we import an asset we didn't make (Fab, AI-generated, sound libraries), remind us to add it to `CREDITS.md` with its source and license.
 
