@@ -32,3 +32,36 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Some installs need us at the keyboard: Epic login, permission prompts, sign-ins. Everything else the agent can do.
   - We read the jam rules: no building the game before Nov 12, and anything made before then gets declared (see `docs/RULES.md`).
 - **Media:** (none yet)
+
+### 2026-11-01 — Checking the setup, and picking practice game 1
+- **What we tried:** Making sure everything the agent needs works, then choosing what to build for practice round 1.
+- **Prompt(s) we gave the agent:** "Check to see if everything you need is enabled to start working on this UE project." / "Let's do the pitch"
+- **What happened:**
+  - Claude connected to the editor over MCP, read the level and took an editor screenshot through it. Git, LFS, GitHub sign-in, Visual Studio and Node all checked out.
+  - It noticed the project is Blueprint-only (no C++ source folder), which is fine for us.
+  - It offered four tiny arcade games. We picked Frogger, since it fits the Third Person template. It drafted `docs/PITCH.md` with a cut list and we approved it.
+- **What we learned:** Asking the agent to verify the setup with a real call (a screenshot) beats trusting the checklist.
+- **Media:** (none)
+
+### 2026-11-01 — One tile per hop
+- **What we tried:** The core mechanic: each key press hops the character exactly one tile.
+- **Prompt(s) we gave the agent:** "Yes, plan the hop" / "Go" / "Something's off" / "The model is not a frog. the person now hops but if you hold the button down it allows you to move very very slowly."
+- **What happened:**
+  - Claude planned first: a child Blueprint `BP_Frog` of the template character, a `BP_FroggerGameMode`, and a test level `Lvl_Frogger`. We said go.
+  - Its Blueprint-writing tool couldn't attach code to the move input event, so it put the hop in a `TryHop` function and wired the input to it by hand. It also couldn't make a Timeline, so the hop arc runs on Event Tick.
+  - Claude couldn't press keys inside Play mode itself, so we tested.
+  - Bug 1: holding a key hopped once, then walked. The template's walking still ran alongside our hop.
+  - First fix (walk speed 0) only half worked: the character still crept slowly. The template has a minimum walk speed.
+  - Real fix: `BP_Frog` overrides the template's `Move` with an empty event, so walking is off at the source. That worked.
+  - The model is still the mannequin. That's on purpose (it's on the pitch's cut list for now).
+- **What we learned:** A child Blueprint doesn't replace the parent's input handling. Patching a symptom (speed 0) can hide the real cause. We're the testers for anything about feel.
+- **Media:** [Frog spawned in Play mode](media/2026-11-01-frog-spawn.png)
+
+### 2026-11-01 — Fixed Frogger camera, and the silent save
+- **What we tried:** Lock the camera behind and above the frog, like the arcade game, with mouse look off.
+- **Prompt(s) we gave the agent:** "Fixed camera"
+- **What happened:**
+  - Claude set up the camera arm on game start: fixed 55° angle, 10 m back, a little lag so it glides after each hop. The settings are tunable in the frog's Details panel.
+  - The save reported success but nothing changed on disk. The cause: our Git LFS setup makes committed Unreal files read-only until someone locks them. Claude ran `git lfs lock` on `BP_Frog`, saved, committed, then unlocked.
+- **What we learned:** Lock an asset before editing it. Always check the file actually changed after saving. We added these lessons to CLAUDE.md.
+- **Media:** [Fixed camera in Play mode](media/2026-11-01-fixed-camera.png)

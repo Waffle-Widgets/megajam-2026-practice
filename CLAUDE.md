@@ -29,6 +29,17 @@
 - Keep the project tidy: put our content under `Content/Game/` in folders by type (Blueprints, Maps, Materials, Audio, UI).
 - Use clear names: `BP_` for Blueprints, `M_` for materials, `MI_` for material instances, `WBP_` for widgets, `SFX_` for sounds.
 
+## Lessons from practice (Unreal + MCP)
+- **Lock before you edit.** Git LFS marks committed `.uasset`/`.umap` files read-only. Run `git lfs lock <file>` before changing
+  an asset that's already committed, or the editor's save silently does nothing. After pushing, `git lfs unlock <file>`.
+  Check `git status` after saving to confirm the file really changed.
+- `Content/Game/` on disk is `/Game/Game/...` inside Unreal (and in MCP tool paths).
+- A child Blueprint's input event does **not** replace the parent's. To stop the template character walking, override the
+  parent's `Move` event with an empty one in the child.
+- Claude can't send keyboard input into Play mode, so it can check that things compile and spawn, but **we** test movement and feel.
+- The Blueprint graph tool (`write_graph_dsl`) can't attach code to Enhanced Input events or create Timelines. Put logic in a
+  function, then wire the input event to it by hand; use Event Tick instead of a Timeline.
+
 ## Scope guardrails
 - The game should be one level, one core mechanic, 3-5 minutes of play.
 - Push back if we ask for multiplayer, story/dialogue systems, inventories, complex enemy AI, or open worlds during the jam. Suggest a simpler version instead.
