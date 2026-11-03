@@ -120,6 +120,33 @@ def make_all(folder):
     bas = seq(*[tone(lambda x, f=note(n): f, beat * 2, tri, 0.35, attack=0.01, decay_pow=0.5) for n in bass])
     hats = seq(*[noise(0.04, 0.12, 0.9, 3.0) + silence(beat - 0.04) for _ in range(32)])
     write(os.path.join(folder, "SFX_Music.wav"), mix(mel, bas, hats))
+    # daytime ambience loop: soft wind plus scattered bird chirps
+    loop = 8.0
+    wind = [0.5 * s for s in noise(loop, 0.25, 0.01, 0.0)]
+    birds = silence(loop)
+    for _ in range(14):
+        start = int(random.uniform(0, loop - 0.6) * RATE)
+        base = random.uniform(2200, 3800)
+        chirp = seq(*[tone(lambda x, b=base: b * (1 + 0.25 * math.sin(x * math.pi)), random.uniform(0.04, 0.09),
+                           math.sin, 0.25, decay_pow=1.5) + silence(0.03) for _ in range(random.randint(2, 4))])
+        for i, s in enumerate(chirp):
+            if start + i < len(birds):
+                birds[start + i] += s
+    write(os.path.join(folder, "SFX_AmbienceDay.wav"), mix(wind, birds))
+    # night ambience loop: pulsing cricket trills over a low hum
+    loop = 6.0
+    crickets = silence(loop)
+    for _ in range(9):
+        start = int(random.uniform(0, loop - 0.8) * RATE)
+        f = random.uniform(4200, 5200)
+        trill = []
+        for _ in range(random.randint(3, 6)):
+            trill += tone(lambda x, f=f: f, 0.025, math.sin, 0.18, decay_pow=0.5) + silence(0.02)
+        for i, s in enumerate(trill):
+            if start + i < len(crickets):
+                crickets[start + i] += s
+    hum = [0.4 * s for s in noise(loop, 0.15, 0.005, 0.0)]
+    write(os.path.join(folder, "SFX_AmbienceNight.wav"), mix(crickets, hum))
 
 
 if __name__ == "__main__":
