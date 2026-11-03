@@ -170,3 +170,6 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
     - Hiding a widget needs an enum value the graph tool couldn't parse (`Hidden`). Claude used render opacity 0/1 instead.
     - Claude chose not to use mouse control to click PLAY, because it would pop up a permission dialog on the PC while we were away. So the PLAY button is the one thing a human must test first.
 - **Media:** [Title screen](media/2026-11-03-title.png), [New best](media/2026-11-03-newbest.png)
+- **Crossing timer:** each crossing has 30 seconds, shown next to the time of day ("SUNSET     TIME 18"). The last 5 seconds tick, running out costs a life, and seconds left over when you fill a pad become bonus points (2 per second, shown in the "+50  TIME +36" pop-up).
+  - **Same mistake twice in one morning:** the HUD's new `SetTime` function became an unrelated engine node (`AnimatedSparseVolumeTextureController.SetTime`). Then, after Claude gave the logs a `SpeedUp` function, the cars' `SpeedUp` call was quietly re-pointed at the log version. Both were caught by reading the graph back and fixed with unique names (`ShowCrossTime`, `LogSpeedUp`). Verified in Play mode: a car went from speed 450 to 495 after a goal.
+  - **Lesson:** give every function a name nobody else is likely to use, project-wide, not only engine-wide.
