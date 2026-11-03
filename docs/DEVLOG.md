@@ -176,3 +176,4 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
 - **Pause menu:** press **P** during play to pause. A PAUSED screen (`UI/WBP_Pause`, another copy of the title screen) shows your score and a RESUME button. P instead of Esc because Esc stops Play mode in the editor.
   - The graph tool can't create keyboard events from text, so Claude placed the "P" key node with `create_node` and wired its Pressed pin to a small frog function (`RequestPauseMenu`) with `connect_pins`. The read-back shows the event with an empty body, so Claude checked the wire with `get_node_infos` instead.
   - Not tested with a real key press yet (Claude can't press keys in Play mode).
+- **QUIT buttons** on the title and end screens (they close the game in a packaged build; in the editor they stop Play mode). Added with the UMG tools: a Button plus a TextBlock inside each screen's vertical box, bound to OnClicked.
