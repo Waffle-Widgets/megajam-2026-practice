@@ -40,6 +40,16 @@
 - The Blueprint graph tool (`write_graph_dsl`) can't attach code to Enhanced Input events or create Timelines. Put logic in a
   function, then wire the input event to it by hand; use Event Tick instead of a Timeline.
 
+## Switching computers
+We work on more than one PC. Only one machine should have the project open at a time. You can only act on the PC
+this session runs on, so the session on each machine handles its own side.
+- **"I'm leaving this computer":** check every asset under `/Game/Game` is saved (`is_dirty`), make sure tested work is
+  committed and pushed (ask about anything untested), release our LFS locks (`git lfs locks`), then close Unreal. If it
+  stalls on a save prompt for a template asset we never meant to change, force-close it, but only after confirming our
+  own assets are clean and pushed.
+- **"Let's work on this computer":** `git pull` (LFS brings the assets), open `MegaJamPractice/MegaJamPractice.uproject`
+  in UE 5.8, wait until the Unreal MCP at `http://127.0.0.1:8000/mcp` answers, then tell us it's ready.
+
 ## Scope guardrails
 - The game should be one level, one core mechanic, 3-5 minutes of play.
 - Push back if we ask for multiplayer, story/dialogue systems, inventories, complex enemy AI, or open worlds during the jam. Suggest a simpler version instead.
