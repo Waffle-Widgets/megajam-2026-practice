@@ -195,3 +195,34 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Verified in Play mode by dropping the frog on pads: after 3 goals the pads cleared, lives went 3 → 4, the timer went 30 → 27, and the game kept going. The 4th goal brought sunset again with the timer at 26.
 - **What we learned:** passing options through `OpenLevel` (`?retry?endless`) is an easy way to remember choices across a level reload, with no GameInstance needed.
 - **Media:** [Endless mode at sunset](media/2026-11-03-endless.png)
+
+### 2026-11-03 (afternoon) — Endless becomes a never-ending world
+- **What we asked for:** "what i meant by endless was that the user did not restart at the beginning each time they hit one of the markers, they just keep hopping until they die. So the level should continue going and creating new obstacles as we go instead of just being a road and a river over and over." Then: "We can also generate different landscapes if possible ... If you can add different types of roads and crossings and whatnot, get creative with it." Later: "Go ahead and add anything you think might make the game better or more interesting."
+- **What happened:**
+  - Our first endless mode (one board that just sped up) was a misunderstanding. Claude wrote up a plan for a Crossy Road-style version and waited for "go", since it was a big change.
+  - **New map `Lvl_Endless`:** a copy of our level with the sky, sun, moon, fog and lighting, and 152 board pieces removed. The ENDLESS button now opens it.
+  - **`BP_Lane` builds one row at a time:** grass, road, highway, river, railway or lily pond, with its own cars, logs, water, train, lamps and scenery. The game mode keeps about 22 rows built ahead of the frog and removes rows 10 behind, so the number of objects stays around 190.
+  - **Five landscapes, 25 rows each:** meadow, autumn forest, desert, snowfields and city, each with its own ground, props, mix of row types and a banner with a tip. New props: autumn tree, snowy pine, cactus, building, fire hydrant.
+  - **New crossings:** **railway** (`BP_Train`: red lights flash and a bell rings about 1.8 seconds before a fast train), **highways** with trucks and lane lines, **ice floes** instead of logs in the snow, and **lily ponds** with still pads.
+  - **Fairness rules:** grass to start, never too many dangerous rows in a row, ponds always between grass, and no obstacle rows back to back. Difficulty goes up with distance.
+  - **Checkpoints:** reaching a grass row makes it your respawn point. You can hop back 3 rows behind it.
+  - **Other rules:** an 18-second "keep moving" clock that refills on each new row, day → sunset → night → dawn every 20 rows, and +1 life every 50 rows.
+  - **Extras:** **golden flies** (+50) on some rows, and a **gold finish line** on the row of your best distance, with a "NEW RECORD!" banner when you pass it. The best distance is saved.
+  - Three new sounds from code: crossing bell, train horn, and a chime for each new landscape.
+- **What went wrong (lots):**
+  - **Name clashes again:** three Blueprints each got a `Configure` function, and the lane's call was quietly pointed at the log's version. Claude renamed them `CarSetup`, `LogSetup` and `TrainSetup`, and gave all the lane's functions a `Lane` prefix. **Lesson:** a unique name per function, always.
+  - **The silent save:** the edited car, log and water Blueprints didn't save because they were read-only until locked. `git status` showed it, and locking fixed it.
+  - **Our bug report: "Unable to go back after moving forward, and you respawn where you were even if it isn't safe."**
+    - Cause: the function asking a row "what kind are you?" was written as `(return (LaneKind ...))`. That compiles, but the call never runs, so it returned the default 0, which means grass.
+    - So every row became a checkpoint, and you could never go back past the latest one. The obstacle check had the same mistake, so trees didn't block anything.
+    - Fix: store the answer first, then return it. This lesson is now in CLAUDE.md.
+  - **Our report: "the spaces you land on seem off center."** Riding a log moves the frog by any amount, so it ended up out of line with the grid. Each hop now snaps to the nearest column.
+  - **Our report: no clear path before the clock ran out.**
+    - The rows went river, obstacle grass, river, obstacle grass. You land wherever the log takes you, so you were stuck waiting for a lucky log.
+    - Fixes: no obstacles on grass right after water, 4 logs per river early on, and an 18-second clock (was 12).
+  - The first test run lost all its lives to the clock before anyone moved. The endless clock now waits for the first hop.
+  - Claude compiled a Blueprint while we were in Play mode (against our own rule). It was lucky this time, and Claude now checks first.
+- **What we learned:**
+  - Building the world in small row pieces with a few fairness rules gives lots of variety for little work. Fairness problems only show up when a person plays, though.
+  - Teleporting the frog and reading values is a quick way for the agent to test rules, but it can't tell how a level *feels*.
+- **Media:** [Start of a run](media/endless-world-start.png), [Sunset with lily pads and lamps](media/endless-world-sunset.png), [Autumn forest banner](media/endless-world-autumn.png), [Best-distance line and golden flies](media/endless-bestline-flies.png), [Fairer rivers](media/endless-rivers-fairer.png)

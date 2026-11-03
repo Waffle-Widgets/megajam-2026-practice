@@ -185,6 +185,23 @@ def make_extras(folder):
     pings = seq(tone(lambda x: note(91), 0.09, math.sin, 0.4, decay_pow=1.5),
                 tone(lambda x: note(96), 0.3, math.sin, 0.4, decay_pow=2.0))
     write(os.path.join(folder, "SFX_FlyBonus.wav"), seq(buzz, pings))
+    make_endless(folder)
+
+
+def make_endless(folder):
+    """Sounds for endless mode: railway crossing bell, train horn, and a chime for entering a new landscape."""
+    # crossing bell: four bright metallic dings (two detuned partials each)
+    ding = mix(tone(lambda x: 1320, 0.22, math.sin, 0.4, attack=0.001, decay_pow=2.5),
+               tone(lambda x: 1760 * 1.01, 0.22, math.sin, 0.25, attack=0.001, decay_pow=3.0))
+    write(os.path.join(folder, "SFX_TrainBell.wav"), seq(*[ding + silence(0.06) for _ in range(4)]))
+    # train horn: a low chord of buzzy tones that swells and fades, plus rumbling noise
+    chord = mix(*[tone(lambda x, f=f: f * (1 - 0.02 * x), 1.1, lambda p: 0.6 * square(p) + 0.4 * tri(p), 0.18,
+                       attack=0.08, decay_pow=0.6) for f in (185.0, 233.0, 277.0)])
+    write(os.path.join(folder, "SFX_TrainHorn.wav"), mix(chord, noise(1.3, 0.35, 0.03, 0.8)))
+    # new landscape: soft rising four-note chime
+    write(os.path.join(folder, "SFX_NewArea.wav"),
+          mix(*[silence(0.1 * k) + tone(lambda x, f=note(n): f, 0.9, math.sin, 0.3, decay_pow=2.0)
+                for k, n in enumerate((67, 71, 74, 79))]))
 
 
 if __name__ == "__main__":

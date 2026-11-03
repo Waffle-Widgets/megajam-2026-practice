@@ -27,12 +27,16 @@ each time. You read danger by light by the last crossing.
 - Bonus fly: hops to a random empty pad every 7 seconds, worth +100.
 - Pause on P or Esc, best score saved between sessions, Play Again skips the title.
 
+**Endless mode (Nov 3, afternoon):** a separate map (`Lvl_Endless`) that builds itself as you hop forward, Crossy Road style.
+- Five landscapes (meadow, autumn forest, desert, snowfields, city) with roads, highways, rivers, ice floes, lily ponds and railway crossings.
+- Checkpoints on grass rows, an 18-second "keep moving" clock, golden flies (+50), and a saved best distance marked with a gold line.
+
 **Length of a playthrough:** 3–5 minutes
 
 **Art style in a few words:** Chunky, bright, toy-like blocks (grey-box shapes with bold colors), top-down-ish camera angled from behind.
 
 **Cut list (things we will NOT build):**
-- No crocodiles, diving turtles, or new maps (the 3 levels reuse one board)
+- No crocodiles or diving turtles. Story mode's 3 levels reuse one board; endless mode has its own generated map
 - No settings menu (volume, key rebinding)
 - No multiplayer or online leaderboard (the best score is local only)
 - _Originally cut, then added on Nov 3 when we had spare time: crossing timer, bonus fly, levels, best-score saving, a

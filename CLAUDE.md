@@ -60,6 +60,9 @@
 - Give every Blueprint function a name that is unique across the engine **and** our project (not Clear, SetTime, or a
   second `SpeedUp`). Otherwise the graph tool quietly calls the wrong one and it still compiles. Always `read_graph_dsl`
   after writing to check what was really built.
+- Never write `(return (SomeFunction ...))` with one of our own Blueprint functions inside. It compiles, but the call never
+  runs and the return gives the default (0 / false). `bind` the call first, then `(return value)`. This made every endless
+  row count as grass (checkpoints on roads) and switched off obstacle blocking.
 - **Packaging a Windows build** (about 4-5 minutes, works with the editor open). First set `GameDefaultMap` in
   `Config/DefaultEngine.ini` to our level. Then run `RunUAT.bat BuildCookRun -project=<uproject> -platform=Win64
   -clientconfig=Shipping -build -cook -stage -pak -archive -archivedirectory=<repo>/Builds -unrealexe="<UE>/Engine/Binaries/Win64/UnrealEditor-Cmd.exe"`.
