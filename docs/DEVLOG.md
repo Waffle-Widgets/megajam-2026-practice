@@ -145,7 +145,8 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - **Floating "+10 / +50" score pop-ups** and **near-miss honks** when a car is about to reach the frog.
   - **Victory fireworks** behind the win screen. They needed "tick even when paused", because the game pauses on the end screen.
   - **Ambience** that crossfades from birdsong and wind into crickets as night falls.
-  - **Road curbs and stone riverbanks.**
+  - **Road curbs, stone riverbanks** and decorative lily pads at the river ends.
+  - The frog **breathes** gently while sitting still and **blinks** every few seconds.
   - Two more surprises:
     - New assets became read-only after their first commit (our LFS lock rule), so two later saves silently failed. Claude now locks every newly committed asset straight away.
     - "Change only the scale" on the street lamps also reset their positions, stacking all four at the start tile. Always pass the full transform.
