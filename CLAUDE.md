@@ -52,6 +52,10 @@
 - New `.wav` files dropped into `Content/` only import when the editor starts (with "prompt before auto-importing" off).
   `tools/make_sfx.py` generates our sounds and music from code: no downloads, no credits needed.
 - Night scenes need fixed exposure (post-process Metering Mode = Manual), or auto-exposure brightens night back to day.
+- **Lock new assets right after their first commit.** Committing makes them read-only, and the next save fails silently.
+- `set_actor_transform` resets any part you leave out (location, rotation or scale). Always pass the full transform.
+- When two engine classes share a node name (e.g. Set Volume Multiplier on Audio vs Synth components), the DSL may pick
+  the wrong one. Write it, then use `retarget_node_class` and reconnect its pins.
 - Turn off "Use Less CPU when in Background" (Editor Preferences) so Play mode runs at full speed while Claude tests it.
 
 ## Switching computers
