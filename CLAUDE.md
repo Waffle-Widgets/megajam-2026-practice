@@ -49,7 +49,8 @@
   the bind again (the goal count got +1 twice). Read the variable after setting it instead.
 - Batch many MCP calls into one `execute_tool_script` (sandboxed Python) to save round trips. Don't `time.sleep` inside
   it; that freezes the game thread. Wait outside instead.
-- New `.wav` files dropped into `Content/` only import when the editor starts (with "prompt before auto-importing" off).
+- With "prompt before auto-importing" off (Editor Preferences > Loading & Saving), `.wav` files dropped into or changed in
+  `Content/` import by themselves within seconds, even while the editor is open. Save the new asset afterwards.
   `tools/make_sfx.py` generates our sounds and music from code: no downloads, no credits needed.
 - Night scenes need fixed exposure (post-process Metering Mode = Manual), or auto-exposure brightens night back to day.
 - **Lock new assets right after their first commit.** Committing makes them read-only, and the next save fails silently.

@@ -167,6 +167,24 @@ def make_all(folder):
                 crickets[start + i] += s
     hum = [0.4 * s for s in noise(loop, 0.15, 0.005, 0.0)]
     write(os.path.join(folder, "SFX_AmbienceNight.wav"), mix(crickets, hum))
+    make_extras(folder)
+
+
+def make_extras(folder):
+    """Sounds added for the full-game update: clock tick, level-up jingle, bonus fly chime."""
+    # clock tick for the last seconds of the crossing timer: a short woody click
+    write(os.path.join(folder, "SFX_Tick.wav"),
+          mix(tone(lambda x: 1800 - 600 * x, 0.04, math.sin, 0.6, attack=0.001, decay_pow=3.0), noise(0.02, 0.2, 0.7, 3.0)))
+    # level up: quick rising major arpeggio ending on a held chord
+    run_up = seq(*[tone(lambda x, f=note(n): f, 0.07, lambda p: 0.5 * square(p) + 0.5 * tri(p), 0.35, decay_pow=0.8)
+                   for n in (60, 64, 67, 72, 76, 79)])
+    held = mix(*[tone(lambda x, f=note(n): f, 0.6, tri, 0.25, decay_pow=1.5) for n in (72, 76, 79, 84)])
+    write(os.path.join(folder, "SFX_LevelUp.wav"), seq(run_up, held))
+    # bonus fly: a buzzy wing flutter that resolves into two sparkly pings
+    buzz = tone(lambda x: 220 + 30 * math.sin(x * 60), 0.18, square, 0.15, decay_pow=1.0)
+    pings = seq(tone(lambda x: note(91), 0.09, math.sin, 0.4, decay_pow=1.5),
+                tone(lambda x: note(96), 0.3, math.sin, 0.4, decay_pow=2.0))
+    write(os.path.join(folder, "SFX_FlyBonus.wav"), seq(buzz, pings))
 
 
 if __name__ == "__main__":
