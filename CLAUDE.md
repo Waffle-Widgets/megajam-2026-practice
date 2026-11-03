@@ -39,6 +39,20 @@
 - Claude can't send keyboard input into Play mode, so it can check that things compile and spawn, but **we** test movement and feel.
 - The Blueprint graph tool (`write_graph_dsl`) can't attach code to Enhanced Input events or create Timelines. Put logic in a
   function, then wire the input event to it by hand; use Event Tick instead of a Timeline.
+- **Never edit while Play mode is running.** Stop PIE first. Creating or editing Blueprints during PIE froze the editor
+  for good and lost all unsaved work. Also **save after every batch** of changes, not at the end.
+- Reset the input mode to "game only" when a level starts; "UI only" from an end screen survives a level reload.
+- After deleting a Blueprint function, compile before re-adding one with the same name, or it becomes `Name_0`.
+- Changing a Blueprint's components doesn't always update copies **already placed in the level**. After a component
+  change, check one placed copy; if it's stale, re-place the actors (keep their transforms and settings).
+- Blueprint "pure" nodes re-run every time they're read. Don't `bind` a value, then set the variable it came from and read
+  the bind again (the goal count got +1 twice). Read the variable after setting it instead.
+- Batch many MCP calls into one `execute_tool_script` (sandboxed Python) to save round trips. Don't `time.sleep` inside
+  it; that freezes the game thread. Wait outside instead.
+- New `.wav` files dropped into `Content/` only import when the editor starts (with "prompt before auto-importing" off).
+  `tools/make_sfx.py` generates our sounds and music from code: no downloads, no credits needed.
+- Night scenes need fixed exposure (post-process Metering Mode = Manual), or auto-exposure brightens night back to day.
+- Turn off "Use Less CPU when in Background" (Editor Preferences) so Play mode runs at full speed while Claude tests it.
 
 ## Switching computers
 We work on more than one PC. Only one machine should have the project open at a time. You can only act on the PC

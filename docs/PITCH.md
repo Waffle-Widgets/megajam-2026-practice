@@ -16,6 +16,10 @@ Practice 2 (Sun Nov 8): a random theme. Overwrite this file for each one; Git ke
 - Lose: get hit by a car or fall in the water 3 times (3 lives).
 - Score goes up for each new row you reach and for each goal slot filled.
 
+**The twist — Sundown (added Nov 3):** every lily pad you fill moves the day on: afternoon → sunset → night. The sun sinks
+and turns orange, then street lamps, headlight beams, glowing lily pads and fireflies take over, and the cars speed up 15%
+each time. You read danger by light by the last crossing.
+
 **Length of a playthrough:** 3–5 minutes
 
 **Art style in a few words:** Chunky, bright, toy-like blocks (grey-box shapes with bold colors), top-down-ish camera angled from behind.
