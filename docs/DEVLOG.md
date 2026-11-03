@@ -184,3 +184,14 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
 - **Media:** [HUD with the timer](media/2026-11-03-timer-hud.png)
 - **First packaged Windows build** (`Builds/Windows/MegaJamPractice.exe`, 665 MB, not committed). The first try compiled the game but failed at the cook step, looking for an editor "target" file our project doesn't have. Passing the engine's own `UnrealEditor-Cmd.exe` with `-unrealexe` fixed it: cook and package took 3.5 minutes with the editor still open. Claude launched the .exe and confirmed it opens on the Sundown Frogger title screen. Before packaging, the game's startup map was still the Third Person template level, so it was switched to `Lvl_Frogger`.
   - **Lesson:** package early in the real jam (by day 2), not in the last hour. The first build always finds something.
+
+### 2026-11-03 (late morning) — Endless mode
+- **What we asked for:** "Don't these games usually have an endless mode to compete for high score?" Claude offered two options. We picked a separate mode: "Option 2. But the endless mode should just be one level and it should evolve as you progress."
+- **What happened:**
+  - An **ENDLESS** button on the title, between PLAY and QUIT. PLAY is still the 3-level game you can win.
+  - **Endless is one board that keeps evolving:** no level banners, no win. Every lily pad moves the clock on (sunset → night → dawn → sunset ...) and makes the cars 6% and the logs 4% faster, capped at about 2.2× so it stays possible. It also takes 1 second off the crossing timer, down to 15.
+  - **Board clear:** when all 3 pads are full they empty with "BOARD CLEAR +100", fireworks and +1 life (max 5). The run ends only when you run out of lives.
+  - Endless has its **own best score** (the title shows both), the HUD says ENDLESS instead of LEVEL n, and Play Again keeps you in the same mode (the level reopens with `?retry?endless`).
+  - Verified in Play mode by dropping the frog on pads: after 3 goals the pads cleared, lives went 3 → 4, the timer went 30 → 27, and the game kept going. The 4th goal brought sunset again with the timer at 26.
+- **What we learned:** passing options through `OpenLevel` (`?retry?endless`) is an easy way to remember choices across a level reload, with no GameInstance needed.
+- **Media:** [Endless mode at sunset](media/2026-11-03-endless.png)
