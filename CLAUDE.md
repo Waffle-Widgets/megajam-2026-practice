@@ -63,7 +63,8 @@
 - **Packaging a Windows build** (about 4-5 minutes, works with the editor open). First set `GameDefaultMap` in
   `Config/DefaultEngine.ini` to our level. Then run `RunUAT.bat BuildCookRun -project=<uproject> -platform=Win64
   -clientconfig=Shipping -build -cook -stage -pak -archive -archivedirectory=<repo>/Builds -unrealexe="<UE>/Engine/Binaries/Win64/UnrealEditor-Cmd.exe"`.
-  Without `-unrealexe`, the cook step fails looking for `MegaJamPracticeEditor.target`. `Builds/` is gitignored. Don't
+  Without `-unrealexe`, the cook step fails looking for `MegaJamPracticeEditor.target`. When only Blueprints/assets
+  changed, use `-skipbuild` instead of `-build`. With the editor open, `-build` fails trying to recompile the editor. `Builds/` is gitignored. Don't
   save assets while it cooks.
 - Turn off "Use Less CPU when in Background" (Editor Preferences) so Play mode runs at full speed while Claude tests it.
 
