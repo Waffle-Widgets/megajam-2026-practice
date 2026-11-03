@@ -12,24 +12,28 @@ Practice 2 (Sun Nov 8): a random theme. Overwrite this file for each one; Git ke
 **Core mechanic (the one thing that has to feel great):** The hop. Each button press moves exactly one tile forward, back, left or right with a quick, snappy jump. It should feel instant, readable and fair, so every death feels like your mistake.
 
 **How you win / how you lose:**
-- Win: reach the far side 3 times (filling 3 goal slots) to clear the level.
-- Lose: get hit by a car or fall in the water 3 times (3 lives).
-- Score goes up for each new row you reach and for each goal slot filled.
+- Win: fill all 3 lily pads on each of 3 levels.
+- Lose: run out of lives. You start with 3; cars, water and running out of time each cost one; each new level gives +1.
+- Score: +10 per new row, +50 per lily pad, +2 per second left on the clock, +100 for the bonus fly, +100 per level.
 
 **The twist — Sundown (added Nov 3):** every lily pad you fill moves the day on: afternoon → sunset → night. The sun sinks
-and turns orange, then street lamps, headlight beams, glowing lily pads and fireflies take over, and the cars speed up 15%
+and turns orange, then street lamps, headlight beams, glowing lily pads and fireflies take over, and the cars speed up
 each time. You read danger by light by the last crossing.
 
-**Levels (added Nov 3):** filling all three lily pads brings sunrise and the next level (same board, faster traffic,
-+1 life). Clear level 3 to win. Cars speed up 10% per goal, stacking across levels.
+**Full-game update (Nov 3, morning):**
+- Title screen (PLAY / QUIT, best score) over a bird's-eye view of the live board.
+- 3 levels: filling all three pads brings sunrise, fireworks and the next level (faster cars and faster logs, +1 life).
+- 30-second crossing timer; spare seconds become bonus points, and the last 5 seconds tick and blink.
+- Bonus fly: hops to a random empty pad every 7 seconds, worth +100.
+- Pause on P or Esc, best score saved between sessions, Play Again skips the title.
 
 **Length of a playthrough:** 3–5 minutes
 
 **Art style in a few words:** Chunky, bright, toy-like blocks (grey-box shapes with bold colors), top-down-ish camera angled from behind.
 
 **Cut list (things we will NOT build):**
-- No timer per crossing, no bonus flies, crocodiles, diving turtles or extra levels
-- No difficulty ramp beyond one speed-up after each goal (if we have time)
-- No menus beyond a simple start screen and a game-over / win screen
-- No custom character model: we use the template mannequin
-- No multiplayer, no high-score saving
+- No crocodiles, diving turtles, or new maps (the 3 levels reuse one board)
+- No settings menu (volume, key rebinding)
+- No multiplayer or online leaderboard (the best score is local only)
+- _Originally cut, then added on Nov 3 when we had spare time: crossing timer, bonus fly, levels, best-score saving, a
+  title screen. The frog is our own sphere model, not the template mannequin._
