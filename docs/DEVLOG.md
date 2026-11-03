@@ -226,3 +226,12 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Building the world in small row pieces with a few fairness rules gives lots of variety for little work. Fairness problems only show up when a person plays, though.
   - Teleporting the frog and reading values is a quick way for the agent to test rules, but it can't tell how a level *feels*.
 - **Media:** [Start of a run](media/endless-world-start.png), [Sunset with lily pads and lamps](media/endless-world-sunset.png), [Autumn forest banner](media/endless-world-autumn.png), [Best-distance line and golden flies](media/endless-bestline-flies.png), [Fairer rivers](media/endless-rivers-fairer.png)
+
+### 2026-11-03 (evening) — Showing the side edges
+- **What we asked for:** "is it normal to restrict how far left and right the player can move?" Claude said yes: every game like this has a side limit, or you could walk around the danger. The problem was that ours was invisible, so it felt like the controls had stopped working. We picked "Show the edges".
+- **What happened:**
+  - First version: a white border line on every row, a dark see-through shade past it (new material `M_EdgeShade`), and the obstacle "bump" sound when you try to hop past the edge or back past your checkpoint.
+  - We said "it's a little distracting", so Claude removed the white line and roughly halved the shade (strength 0.5 → 0.28). Only a gentle dimming is left, plus the bump.
+  - The editor popped up a Message Log window over the viewport during testing. Harmless, but it hid half the first screenshot.
+- **What we learned:** feedback like the edge needs to be noticeable without pulling your eye off the frog. Start subtle and turn it up if players miss it.
+- **Media:** [Toned-down edge](media/endless-edges.png)
