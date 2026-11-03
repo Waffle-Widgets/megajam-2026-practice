@@ -20,6 +20,9 @@ Practice 2 (Sun Nov 8): a random theme. Overwrite this file for each one; Git ke
 and turns orange, then street lamps, headlight beams, glowing lily pads and fireflies take over, and the cars speed up 15%
 each time. You read danger by light by the last crossing.
 
+**Levels (added Nov 3):** filling all three lily pads brings sunrise and the next level (same board, faster traffic,
++1 life). Clear level 3 to win. Cars speed up 10% per goal, stacking across levels.
+
 **Length of a playthrough:** 3–5 minutes
 
 **Art style in a few words:** Chunky, bright, toy-like blocks (grey-box shapes with bold colors), top-down-ish camera angled from behind.

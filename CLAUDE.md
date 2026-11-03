@@ -56,6 +56,8 @@
 - `set_actor_transform` resets any part you leave out (location, rotation or scale). Always pass the full transform.
 - When two engine classes share a node name (e.g. Set Volume Multiplier on Audio vs Synth components), the DSL may pick
   the wrong one. Write it, then use `retarget_node_class` and reconnect its pins.
+- Don't name our own Blueprint functions after common engine nodes (Clear, Reset, Add...). A call to our `Clear` became
+  the array "Clear" node and compiled silently. Always `read_graph_dsl` after writing to check what was really built.
 - Turn off "Use Less CPU when in Background" (Editor Preferences) so Play mode runs at full speed while Claude tests it.
 
 ## Switching computers

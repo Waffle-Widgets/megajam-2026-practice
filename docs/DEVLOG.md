@@ -152,3 +152,12 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
     - "Change only the scale" on the street lamps also reset their positions, stacking all four at the start tile. Always pass the full transform.
   - One engine quirk: the graph tool picked the wrong "Set Volume" node (the synth version, not the audio player one). Claude retargeted the node to the right class by hand.
 - **Media (final):** [Afternoon](media/2026-11-03-final-afternoon.png), [Sunset](media/2026-11-03-final-sunset.png), [Night](media/2026-11-03-final-night.png), [Win](media/2026-11-03-final-win.png), [All four](media/2026-11-03-final-grid.png)
+- **Morning extras (after "You still have time to make this better" and "You can also expand on levels"):**
+  - **Three levels instead of one round.** Filling all three lily pads no longer ends the game: the sun comes back up, the pads clear, fireworks go off, and LEVEL 2 starts with +100 points and a bonus life. Winning means clearing level 3. The car speed-up per goal dropped from 15% to 10%, because it now stacks across all three levels. The HUD shows the level number.
+  - Claude pushed back gently first: our scope rule says one map, so the levels reuse the same board and get harder, instead of being new maps.
+  - **Logs bob** gently in the water and **dip** when the frog lands on them. **Cars bounce** slightly as if their engines are running.
+  - **New music:** the song is twice as long (16 seconds), with a second melody section, kick and snare drums, and soft chords, so the loop is less repetitive.
+  - **What went wrong:** the graph tool matched our new goal-slot function `Clear` to the array "Clear" node instead. It compiled without complaint and would have done nothing. Claude spotted it by reading the graph back, and renamed the function `Unfill`.
+  - **Lesson:** don't give your own functions common names like Clear, Reset or Add. The graph tool may pick an engine node with the same name. Always read the graph back after writing it.
+  - The editor re-imported the changed music file by itself while it was open (the auto-import setting from last night paid off).
+- **Media:** [Level 2 at sunrise](media/2026-11-03-level2.png)

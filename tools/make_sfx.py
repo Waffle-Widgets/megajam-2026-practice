@@ -110,16 +110,36 @@ def make_all(folder):
     # car horn (two-tone)
     write(os.path.join(folder, "SFX_Honk.wav"),
           mix(tone(lambda x: 400, 0.25, square, 0.3, decay_pow=0.3), tone(lambda x: 500, 0.25, square, 0.3, decay_pow=0.3)))
-    # looping music: 8 bars of a bouncy pentatonic tune over a bass line, 120 bpm
+    # looping music: 16 bars at 120 bpm. A section (bouncy pentatonic tune), then a B section an octave
+    # lower that climbs back up, over bass, soft chord pads, kick, snare and hats
     beat = 0.25
     melody = [72, 74, 76, 79, 76, 74, 72, 69, 72, 74, 76, 79, 81, 79, 76, 74,
-              76, 79, 81, 84, 81, 79, 76, 74, 72, 74, 76, 74, 72, 69, 67, 69]
-    bass = [48, 48, 55, 55, 45, 45, 52, 52, 41, 41, 48, 48, 43, 43, 50, 50]
-    mel = seq(*[tone(lambda x, f=note(n): f, beat, lambda p: 0.5 * square(p) + 0.5 * tri(p), 0.18, decay_pow=1.2)
-                for n in melody])
+              76, 79, 81, 84, 81, 79, 76, 74, 72, 74, 76, 74, 72, 69, 67, 69,
+              69, 72, 74, 72, 69, 67, 64, 67, 69, 72, 74, 76, 74, 72, 69, 67,
+              72, 76, 79, 76, 81, 79, 76, 79, 84, 81, 79, 76, 74, 76, 79, 72]
+    bass = [48, 48, 55, 55, 45, 45, 52, 52, 41, 41, 48, 48, 43, 43, 50, 50,
+            45, 45, 52, 52, 41, 41, 48, 48, 43, 43, 50, 50, 43, 43, 48, 48]
+    lead = lambda p: 0.5 * square(p) + 0.5 * tri(p)
+    mel = seq(*[tone(lambda x, f=note(n): f, beat, lead, 0.16, decay_pow=1.2) for n in melody])
     bas = seq(*[tone(lambda x, f=note(n): f, beat * 2, tri, 0.35, attack=0.01, decay_pow=0.5) for n in bass])
-    hats = seq(*[noise(0.04, 0.12, 0.9, 3.0) + silence(beat - 0.04) for _ in range(32)])
-    write(os.path.join(folder, "SFX_Music.wav"), mix(mel, bas, hats))
+    pads = seq(*[mix(tone(lambda x, f=note(n + 24): f, beat * 2, math.sin, 0.07, attack=0.08, decay_pow=0.4),
+                     tone(lambda x, f=note(n + 31): f, beat * 2, math.sin, 0.05, attack=0.08, decay_pow=0.4))
+                 for n in bass])
+    kick = tone(lambda x: 150 - 105 * x, 0.12, math.sin, 0.55, attack=0.001, decay_pow=2.0)
+    snare = mix(noise(0.12, 0.3, 0.6, 2.0), tone(lambda x: 190, 0.08, tri, 0.12, decay_pow=2.0))
+    step = int(beat * RATE)
+    drums = silence(beat * len(melody))
+    for i in range(len(melody)):
+        hits = [noise(0.04, 0.1, 0.9, 3.0)]
+        if i % 2 == 0:
+            hits.append(kick)
+        if i % 4 == 2:
+            hits.append(snare)
+        for hit in hits:
+            for j, s in enumerate(hit):
+                if i * step + j < len(drums):
+                    drums[i * step + j] += s
+    write(os.path.join(folder, "SFX_Music.wav"), mix(mel, bas, pads, drums))
     # daytime ambience loop: soft wind plus scattered bird chirps
     loop = 8.0
     wind = [0.5 * s for s in noise(loop, 0.25, 0.01, 0.0)]
