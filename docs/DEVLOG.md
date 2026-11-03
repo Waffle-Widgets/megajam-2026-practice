@@ -161,3 +161,12 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - **Lesson:** don't give your own functions common names like Clear, Reset or Add. The graph tool may pick an engine node with the same name. Always read the graph back after writing it.
   - The editor re-imported the changed music file by itself while it was open (the auto-import setting from last night paid off).
 - **Media:** [Level 2 at sunrise](media/2026-11-03-level2.png)
+- **"Make this a full game" (9:20 a.m.):**
+  - **Title screen** (`UI/WBP_Title`): the game name, how to play, your best score and a PLAY button, over a slow bird's-eye view of the board with traffic already moving. The HUD stays hidden until you press PLAY, then the camera swoops down to the frog. Play Again skips the title (the level is reopened with a `retry` option). Claude made it by duplicating the end screen, so the styling matched for free.
+  - **Best score saved between plays** (`Blueprints/BP_FroggerSave`, a SaveGame). The end screen shows "BEST n", or "** NEW BEST! **" when you beat it.
+  - **Levels feel different:** a big "LEVEL 2" / "LEVEL 3" banner with a one-line hint, and the logs speed up 15% each level (not only the cars).
+  - **What went wrong:**
+    - A long batch of graph writes stopped halfway at one wrong pin name (`Key` should have been `InKey`), and the next one at a node name (`FInterpTo_Constant`). Each graph write is all-or-nothing, so nothing was half-broken. Claude fixed the name and re-sent.
+    - Hiding a widget needs an enum value the graph tool couldn't parse (`Hidden`). Claude used render opacity 0/1 instead.
+    - Claude chose not to use mouse control to click PLAY, because it would pop up a permission dialog on the PC while we were away. So the PLAY button is the one thing a human must test first.
+- **Media:** [Title screen](media/2026-11-03-title.png), [New best](media/2026-11-03-newbest.png)
