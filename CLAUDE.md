@@ -63,8 +63,11 @@
 - Never write `(return (SomeFunction ...))` with one of our own Blueprint functions inside. It compiles, but the call never
   runs and the return gives the default (0 / false). `bind` the call first, then `(return value)`. This made every endless
   row count as grass (checkpoints on roads) and switched off obstacle blocking.
-- **Importing images and models:** there is no MCP import tool. Copy the file into `Content/Game/Imported/<Name>/` and the
-  editor imports it by itself (textures silently; an `.fbx` opens an "Import Content" window that a human must click).
+- **Importing images and models:** save the file into `Content/Game/Imported/<Name>/`, then import it with the MCP's
+  `StaticMeshTools.import_file` / `TextureTools.import_file`, which never open a window. Files dropped in also import by
+  themselves: `Config/DefaultEngine.ini` sets Interchange's `bShowImportDialog=False` (read at editor start); without it an
+  `.fbx` opens an "Import Content" window that freezes the MCP until a human clicks, so we can't answer it remotely.
+  Re-importing a mesh resets its materials, so don't re-import once it's set up.
   **Never delete the source file afterwards:** Unreal opens a modal "Delete Assets" dialog that freezes the MCP until
   someone answers it (Escape = keep the assets). Raw sources under `Imported/` are gitignored instead.
 - Fab in Claude's browser pane: the user signs in there once (the launcher login doesn't carry over). Free items still

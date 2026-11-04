@@ -38,3 +38,6 @@ MegaJamPractice/Content/Game/Imported/**/*.Fbx
 
 # Per-PC Claude Code settings
 .claude/settings.local.json
+
+# Blender auto-backups
+*.blend1

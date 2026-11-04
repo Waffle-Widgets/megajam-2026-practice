@@ -287,3 +287,31 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Open the editors yourself, or have the agent launch them via Explorer. Anything a chat starts lives and dies with that chat.
   - When tools vanish, check the apps first, then start a new chat. The log is still waiting to be built.
 - **Media:** (none)
+
+### 2026-11-03 (late night) — Our first Blender model: a river log, then a whole log kit
+- **What we asked for:** a log modelled in Blender to replace the plain cylinder. After the first version: "they work but they look awful" and then "use blender for whatever you need. I want to see what you can do. Impress me."
+- **Prompt(s) we gave the agent:** "Yes, bring it in" / "make sure you can import these items without me having to click on something in case I am controlling remotely" / "Yes, switch it off" / "Impress me."
+- **What happened:**
+  - **Version 1 (one log model):** Claude built a 1 m log in Blender: bark, sawn ends, two branch stubs, moss on top. The first render had bark like paving stones; the second render fixed it.
+  - **The MCP tools vanished mid-chat again.** Both apps were still running and `.mcp.json` was fine, but the session had simply dropped the servers. A fresh chat picked the job up.
+  - **Getting it into Unreal:** Claude baked the Blender look into a colour map and a bump (normal) map, then exported the FBX. The first bump map was almost flat, so it re-baked with a deeper bump.
+  - The FBX opened Unreal's "Import Content" window, and the MCP froze until we clicked Import. The other chat added a project setting (`DefaultEngine.ini`) that turns that window off, so imports need no clicks when we play remotely.
+  - **Version 1 looked awful in game.** Logs are 2-4 m long, so one 1 m model got stretched up to 4×: smeared bark and wide flat stubs. Worse, in Endless the logs stood on end. A second setup function, `LogSetup`, still used the old cylinder's sizing, which also squashed our log into the lily pads.
+  - **Version 2 (a log kit):** endless logs can be any length from about 1.2 to 3.6 m, so a model per length would never cover them all. Claude built three pieces instead:
+    - a **trunk** whose bark repeats seamlessly every metre (the pattern wraps around the log and along it);
+    - a **sawn end** with growth rings, heartwood, radial cracks and a branch stub;
+    - a **broken end** with splintered shards, a damp mossy core, a snapped twig and four bracket fungi.
+  - In Unreal, `BP_Log` places one end at each side and stretches only the trunk between them. The material is told the trunk's length, so it repeats the bark instead of stretching it, and each log gets a random offset so no two look alike.
+  - The no-click import worked first time: three models and four textures arrived with no window.
+- **What went wrong on the way:**
+  - The bark came out as rounded "paving stones" again, then far too pale. Fix: much longer, narrower ridge cells, and colours about 3× darker.
+  - Every end face rendered as bark. Blender drops face material numbers on a mesh with no material slots yet, and Claude's script also reset them by clearing slots.
+  - The broken end took three tries: first a crumpled paper bag, then a symmetrical "flower", then chunky clustered shards that read as broken wood.
+  - The caps came into Unreal facing −Y. Blender's +Y becomes Unreal's −Y, so the left end needs turning 180°.
+  - In Unreal the trunk first showed flat stripes. The "repeat the bark" value was set with a runtime-only node, which doesn't stick when the editor runs the Blueprint. `SetDefaultCustomPrimitiveDataFloat` works. The caps then went plain brown until they got a value of 1 too.
+- **What we learned:**
+  - Don't stretch one model to many sizes. Split it into ends that never stretch and a middle that repeats.
+  - Baking procedural Blender materials into textures works well. Bark that wraps in 4D noise tiles with no seams.
+  - Check every way a Blueprint is used (placed in a level vs spawned by `LogSetup`). The same actor was set up by two different functions.
+  - Turning off the Import Content window matters when we control the PC remotely.
+- **Media:** ![first log](media/blender-log.png) ![first log in game](media/blender-log-in-game.png) ![stretched](media/blender-log-stretched.png) ![log kit](media/blender-logkit-sheet.png) ![log kit in game](media/blender-logkit-in-game.png)
