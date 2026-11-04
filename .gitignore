@@ -35,3 +35,6 @@ MegaJamPractice/Content/Game/Imported/**/*.png
 MegaJamPractice/Content/Game/Imported/**/*.jpg
 MegaJamPractice/Content/Game/Imported/**/*.fbx
 MegaJamPractice/Content/Game/Imported/**/*.Fbx
+
+# Per-PC Claude Code settings
+.claude/settings.local.json

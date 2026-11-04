@@ -274,3 +274,16 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Every clip in the pack reports the same 8.35 seconds, as if they were all padded to one timeline. So Claude plays only the start of each clip, sped up.
   - One graph write failed on a wrong pin name (`NewSocketOffset` should be `SocketOffset`). The error message listed the valid pins, so it was a one-line fix.
 - **What we learned:** a pack's animations rarely match our game's timing. Playing part of a clip, faster, is a cheap way to make them fit.
+
+### 2026-11-03 (late night) — Blender tools keep vanishing: apps tied to a chat
+- **What we tried:** Starting a fresh chat to build our first Blender model (a river log) through the new Blender MCP.
+- **Prompt(s) we gave the agent:** "the OLD M Station - MegaJam Practice game chat had me open this new chat to create assets in blender" / "blender and UE closed when i deleted a chat"
+- **What happened:**
+  - Two chats in a row could see Blender and Unreal at the start, then lost both tool sets between messages, even though both apps were still running and listening.
+  - First guess: the app dropped unapproved project servers when we reconnected from another machine. Claude added a per-PC, gitignored `.claude/settings.local.json` that pre-approves the servers in `.mcp.json`.
+  - Then we deleted an old chat and Blender and Unreal both closed. An earlier chat had relaunched them itself, so Windows treated them as part of that chat and closed them with it.
+  - Claude reopened both through `explorer.exe`, so they belong to Windows and not to any chat. Both MCPs answered within about 15 seconds. Unreal was force-closed, but git showed nothing unsaved that mattered.
+- **What we learned:**
+  - Open the editors yourself, or have the agent launch them via Explorer. Anything a chat starts lives and dies with that chat.
+  - When tools vanish, check the apps first, then start a new chat. The log is still waiting to be built.
+- **Media:** (none)

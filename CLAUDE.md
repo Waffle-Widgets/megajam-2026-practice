@@ -88,6 +88,11 @@
   3. `.mcp.json` points at `C:\Users\thecl\.local\bin\uv.exe`. If the Windows user name differs, fix that path.
   4. Start a new Claude Code session so the server is picked up.
 - Blender warns that the MCP runs AI-written code with no guards: keep only scratch/project files open while connected.
+- **Open Unreal and Blender yourselves** (Start menu, or Claude launches them with `explorer.exe <path>`), never as a
+  child of a chat. An app a chat starts closes when that chat is deleted, and its MCP tools vanish from every chat.
+  If tools disappear mid-chat, check both apps are running and listening (ports 8000 and 9876), relaunch, then start a new chat.
+- `.claude/settings.local.json` (per PC, gitignored) holds `"enableAllProjectMcpServers": true` so the servers in
+  `.mcp.json` load without an approval prompt. Create it on each new PC.
 - Models made in Blender count as our own (scored) art in the jam. Export FBX into `Content/Game/Imported/<Name>/`.
 
 ## Switching computers
