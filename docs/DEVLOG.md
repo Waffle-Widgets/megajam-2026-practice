@@ -338,3 +338,23 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - A parametric script beats hand-modelling for a family of props, and it's allowed before the jam.
   - Lesson from the logs applied this time: `BP_Car` is set up in two places (construction script and `CarSetup`), so both call the same function.
 - **Media:** ![cars](media/blender-cars-sheet.png) ![cars render](media/blender-cars-render.png) ![cars in game](media/blender-cars-in-game.png)
+
+### 2026-11-04 — All the scenery from Blender, then "I thought we were going for ultra realistic"
+- **What we asked for:** "make the rest in one shot and i will test after", then "i thought we were going for ultra realistic", then "Yes, test one" and "Realistic enough, do rest".
+- **What happened:**
+  - **Round 1 (chunky style):** one script (`Art/Blender/scenery_kit.py`) built 13 models: trees, pines, a snowy pine, a bush, a rock, reeds, a cactus, a hydrant, a lamp, a building, a three-car train, a crossing sign and a lily pad. Each scenery Blueprint now swaps in its model from its construction script, with a small random turn and size based on where it stands.
+  - **The miss:** that whole round was in the old toy-like style from the pitch, but on Nov 3 we had decided "as real as we can" (scanned ground, realistic toad). Claude hadn't re-read that devlog entry. We spotted the clash straight away.
+  - **Round 2 (realism test, `Art/Blender/real_kit.py`):** one rock and one tree first.
+    - Rock: a 330k-triangle sculpt (fracture planes, worn edges, a few deep cracks, granite speckle, lichen, moss, rain streaks), baked onto an 11k-triangle game mesh as colour, normal and roughness textures.
+    - Tree: grown by branching rules (trunk, scaffold branches, twigs) with ~14,700 modelled leaves. Bark and leaf textures are baked from procedural materials. Leaves deep in the crown are shaded darker. Nanite keeps 142k triangles cheap.
+    - Two new Unreal materials: `M_RealPBR` (texture colour times vertex shade) and `M_RealLeaf` (two-sided foliage, light shines through).
+- **What went wrong:**
+  - Editing `BP_Tree`'s parts directly made the 39 placed trees keep their old cylinders (placed copies treat the old value as their own setting). Doing the swap in the construction script fixed it.
+  - `git lfs lock` run from a sub-folder made doubled paths. Run it from the repo root.
+  - First rock looked like a cauliflower (bumps and cracks everywhere); first tree was sparse with willow-thin leaves; bark came out orange in Unreal and was re-baked greyer.
+  - Unreal's import tool won't overwrite an existing texture, so the re-baked bark got new names and the old textures were deleted.
+- **What we learned:**
+  - Read the devlog before a new art round: the style decision lived there, not in the pitch.
+  - Test one realistic asset before doing them all. It caught three problems cheaply.
+  - Realism mostly comes from baked texture detail and many small pieces (leaves, cracks), not from engine settings.
+- **Media:** ![chunky scenery](media/blender-scenery-sheet.png) ![realism test](media/real-test-sheet.png)

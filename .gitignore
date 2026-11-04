@@ -41,3 +41,6 @@ MegaJamPractice/Content/Game/Imported/**/*.Fbx
 
 # Blender auto-backups
 *.blend1
+# Baked textures and FBX exports from the Blender scripts (rebuilt by running the script)
+Art/Blender/textures/
+Art/Blender/export/
