@@ -262,3 +262,15 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - **Assets:** most of "realistic" comes from scanned assets, not engine settings. In the real jam, Fab assets are allowed but not scored, so the scored art must be ours or AI-generated.
   - **Our role:** the agent can shop on Fab for us, but sign-in, licences and spending money stay our call.
 - **Media:** [Camera pass](media/real-pass1-day.png), [Photo-scanned ground](media/real-pass2-scans.png), [The toad](media/real-pass3-toad.png), [Toad close-up](media/real-pass3-toad-closeup.png)
+
+### 2026-11-03 (late night) — The toad moves like a toad
+- **What we asked for:** "Yes, animate the toad".
+- **What happened:**
+  - **Hop:** the toad plays its own Jump animation at 2.5× speed, so it fits our 0.15-second hop, and goes back to idle about half a second after landing.
+  - **Death and respawn:** dying plays its Death animation on top of our squash or sink effect, and respawning brings back the idle loop.
+  - **How it's built:** two small helper functions in `BP_Frog`, `ToadPlay` and `ToadBackToIdle`, with a timer to return to idle.
+  - **Testing:** Claude tested a drowning by teleporting the toad into a river. The hop animation needed a real key press, so we checked that one ourselves.
+- **What went wrong:**
+  - Every clip in the pack reports the same 8.35 seconds, as if they were all padded to one timeline. So Claude plays only the start of each clip, sped up.
+  - One graph write failed on a wrong pin name (`NewSocketOffset` should be `SocketOffset`). The error message listed the valid pins, so it was a one-line fix.
+- **What we learned:** a pack's animations rarely match our game's timing. Playing part of a clip, faster, is a cheap way to make them fit.
