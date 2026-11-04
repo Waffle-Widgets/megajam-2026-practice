@@ -78,6 +78,18 @@
   save assets while it cooks.
 - Turn off "Use Less CPU when in Background" (Editor Preferences) so Play mode runs at full speed while Claude tests it.
 
+## Blender (for building our own 3D models)
+- Blender **5.2 LTS** with Blender's official MCP (Blender Lab). It is registered in `.mcp.json` as `blender`.
+- Setup on a new PC:
+  1. In Blender 5.2, enable online access, then drag the add-on link from blender.org/lab/mcp-server in twice
+     (repository, then add-on), enable it, and click Start (it listens on port 9876).
+  2. Install `uv` (`irm https://astral.sh/uv/install.ps1 | iex`), run
+     `git clone https://projects.blender.org/lab/blender_mcp.git C:\blender_mcp`, then `uv --directory C:\blender_mcp\mcp sync`.
+  3. `.mcp.json` points at `C:\Users\thecl\.local\bin\uv.exe`. If the Windows user name differs, fix that path.
+  4. Start a new Claude Code session so the server is picked up.
+- Blender warns that the MCP runs AI-written code with no guards: keep only scratch/project files open while connected.
+- Models made in Blender count as our own (scored) art in the jam. Export FBX into `Content/Game/Imported/<Name>/`.
+
 ## Switching computers
 We work on more than one PC. Only one machine should have the project open at a time. You can only act on the PC
 this session runs on, so the session on each machine handles its own side.

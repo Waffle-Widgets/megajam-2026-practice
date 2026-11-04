@@ -3,6 +3,11 @@
     "unreal": {
       "type": "http",
       "url": "http://127.0.0.1:8000/mcp"
+    },
+    "blender": {
+      "type": "stdio",
+      "command": "C:\\Users\\thecl\\.local\\bin\\uv.exe",
+      "args": ["--directory", "C:\\blender_mcp\\mcp", "run", "blender-mcp"]
     }
   }
 }
