@@ -315,3 +315,26 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Check every way a Blueprint is used (placed in a level vs spawned by `LogSetup`). The same actor was set up by two different functions.
   - Turning off the Import Content window matters when we control the PC remotely.
 - **Media:** ![first log](media/blender-log.png) ![first log in game](media/blender-log-in-game.png) ![stretched](media/blender-log-stretched.png) ![log kit](media/blender-logkit-sheet.png) ![log kit in game](media/blender-logkit-in-game.png)
+
+### 2026-11-04 — Real cars: a hatchback, a pickup and a box truck from one Blender script
+- **What we asked for:** "make better assets for the game", then "Yes, cars first".
+- **Prompt(s) we gave the agent:** "make better assets for the game" / "Yes, cars first" / "Works and looks good"
+- **What happened:**
+  - Claude checked what the game is made of first. Apart from the toad, the ground textures and the new logs, everything was still Unreal's basic shapes. It suggested replacing them in rounds, starting with the cars, because they're the main danger and always on screen. Each car was 11 cubes, and Endless made trucks by stretching a car 1.9×.
+  - **One script builds every vehicle** (`Art/Blender/car_kit.py`). Each body is lofted from a side profile and a width profile, then gets:
+    - wheel wells cut with a boolean;
+    - bumpers, a grille, headlight and taillight lenses, mirrors and door handles.
+
+    A new vehicle is mostly a list of numbers. The script also builds a wheel with a tyre, a rim and five spokes.
+  - **Three bodies:** a hatchback, a pickup with a sunken bed, and a box truck with a cab, a cargo box and a third axle.
+  - **In Unreal:** no-click import again. The paint slot keeps our four colours, and the light lenses reuse the existing glow materials, so night headlights still work. A new `ArrangeCarParts` function in `BP_Car` swaps the body, places 4 or 6 wheels, and turns everything to face the driving direction. It also moves the headlight beam and sizes the hit box per body.
+  - Placed cars in `Lvl_Frogger` pick a hatchback or a pickup from where they stand. Endless picks one at random, and highway trucks get the real truck instead of a stretched car.
+- **What went wrong on the way:**
+  - The first glass edges were jagged and the bodies looked inflated. Glass was chosen per face by its angle, which zig-zagged across the grid. Fix: remember each face's loft row and column, and draw borders along the loft lines. Bodies were also made boxier.
+  - The boolean wheel wells smeared the smooth shading. "Smooth by angle" keeps hard edges where parts meet.
+  - The wheel-well colour leaked onto the outer body. It now counts only faces set back from the body side.
+  - Calling our own Blueprint function from the graph tool needs `self` as its first argument. Without it the write fails with "Could not connect pin ReturnValue to self".
+- **What we learned:**
+  - A parametric script beats hand-modelling for a family of props, and it's allowed before the jam.
+  - Lesson from the logs applied this time: `BP_Car` is set up in two places (construction script and `CarSetup`), so both call the same function.
+- **Media:** ![cars](media/blender-cars-sheet.png) ![cars render](media/blender-cars-render.png) ![cars in game](media/blender-cars-in-game.png)
