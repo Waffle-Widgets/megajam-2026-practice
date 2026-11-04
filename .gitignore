@@ -28,3 +28,10 @@ Builds/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Raw source files for imported assets (the .uasset holds the data; keep the source next to it
+# so Unreal does not ask to delete the asset, but do not commit it)
+MegaJamPractice/Content/Game/Imported/**/*.png
+MegaJamPractice/Content/Game/Imported/**/*.jpg
+MegaJamPractice/Content/Game/Imported/**/*.fbx
+MegaJamPractice/Content/Game/Imported/**/*.Fbx

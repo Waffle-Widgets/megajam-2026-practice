@@ -63,6 +63,13 @@
 - Never write `(return (SomeFunction ...))` with one of our own Blueprint functions inside. It compiles, but the call never
   runs and the return gives the default (0 / false). `bind` the call first, then `(return value)`. This made every endless
   row count as grass (checkpoints on roads) and switched off obstacle blocking.
+- **Importing images and models:** there is no MCP import tool. Copy the file into `Content/Game/Imported/<Name>/` and the
+  editor imports it by itself (textures silently; an `.fbx` opens an "Import Content" window that a human must click).
+  **Never delete the source file afterwards:** Unreal opens a modal "Delete Assets" dialog that freezes the MCP until
+  someone answers it (Escape = keep the assets). Raw sources under `Imported/` are gitignored instead.
+- Fab in Claude's browser pane: the user signs in there once (the launcher login doesn't carry over). Free items still
+  need "Add to My Library" and a one-time EULA; Megascans surfaces are free, but many Megascans 3D models are not.
+  Downloads land in `~/Downloads` as `<guid>.tmp` zips; identify them by their contents.
 - **Packaging a Windows build** (about 4-5 minutes, works with the editor open). First set `GameDefaultMap` in
   `Config/DefaultEngine.ini` to our level. Then run `RunUAT.bat BuildCookRun -project=<uproject> -platform=Win64
   -clientconfig=Shipping -build -cook -stage -pak -archive -archivedirectory=<repo>/Builds -unrealexe="<UE>/Engine/Binaries/Win64/UnrealEditor-Cmd.exe"`.

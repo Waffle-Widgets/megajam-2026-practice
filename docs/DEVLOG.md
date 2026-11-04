@@ -235,3 +235,30 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - The editor popped up a Message Log window over the viewport during testing. Harmless, but it hid half the first screenshot.
 - **What we learned:** feedback like the edge needs to be noticeable without pulling your eye off the frog. Start subtle and turn it up if players miss it.
 - **Media:** [Toned-down edge](media/endless-edges.png)
+
+### 2026-11-03 (night) — "As real as we can": photo-scans and a realistic toad
+- **What we asked for:** "how realistic can you get this game looking ... Can we get this so realistic it's funny?" then "Let's go as real as we can." Then: "would you be able to get the scans from Fab yourself?"
+- **What happened:**
+  - **Camera and light pass (both maps):**
+    - Our old settings were working *against* realism: a very shallow focus (f/2.2) made everything look like a miniature, and the colours were boosted.
+    - Claude switched to a real-camera look: f/11 so everything is sharp, natural colour, light film grain, colour fringing at the edges, some motion blur, higher-quality Lumen lighting, sun light shafts and denser fog.
+  - **Getting assets from Fab, using Claude's built-in browser:**
+    - We signed in ourselves: Claude may not type passwords, and the Epic launcher login doesn't carry over to that browser.
+    - Claude searched, then showed us a shortlist with prices, licences and sizes before getting anything. On our "yes" it added each item to our library, accepted Fab's licence once (leaving the marketing-emails box unticked) and downloaded 2K versions.
+    - **Surprises:** Quixel Megascans *surfaces* are free, but the Granite Rock we'd picked is $2.99 for a Personal licence, so we skipped it. Free realistic frogs and cars basically don't exist.
+  - **Six photo-scanned grounds:** asphalt, grass, gravel, sand, snow and fallen leaves. One new material, `M_Surface`, lines them up seamlessly across every row and still paints dashed lane lines on roads. Our existing ground materials were switched over to it, so both maps changed at once.
+  - **The toad:** "Giang Demon_99" is a rigged fantasy toad with 34 animations, free with the Personal licence. It's 530 MB to download, so Claude asked us again before fetching it.
+    - We clicked Import ourselves; that one step needs a human.
+    - Claude deleted the import's 4K duplicate textures and 27 animations we don't need. The toad went from about 220 MB to 43 MB.
+    - It now replaces the sphere frog, playing its idle animation.
+- **What went wrong:**
+  - **Frozen editor:** after importing the textures, Claude deleted the raw `.jpg` copies. Unreal took that as "the textures were deleted" and opened a **Delete Assets** pop-up, which froze the MCP for 5 minutes.
+    - Claude found the pop-up by listing the editor's windows from PowerShell, because the screen-control tool couldn't find Unreal by name, and cancelled it with Escape.
+    - Nothing was lost. Raw source files now stay in the project folder and are gitignored instead.
+  - **Invisible toad:** at first the sphere frog still showed and the toad didn't. The frog's respawn-blink code switches its whole visual on every frame, which brought the spheres back. Hiding them with "hidden in game" fixed it.
+  - **Backwards toad:** we tested it and found it facing backwards, so Claude turned it 180°.
+  - **Downloads:** the browser pane saves downloads as `<random>.tmp` files, so Claude identified each one by what was inside the zip.
+- **What we learned:**
+  - **Assets:** most of "realistic" comes from scanned assets, not engine settings. In the real jam, Fab assets are allowed but not scored, so the scored art must be ours or AI-generated.
+  - **Our role:** the agent can shop on Fab for us, but sign-in, licences and spending money stay our call.
+- **Media:** [Camera pass](media/real-pass1-day.png), [Photo-scanned ground](media/real-pass2-scans.png), [The toad](media/real-pass3-toad.png), [Toad close-up](media/real-pass3-toad-closeup.png)
