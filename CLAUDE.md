@@ -80,6 +80,11 @@
   changed, use `-skipbuild` instead of `-build`. With the editor open, `-build` fails trying to recompile the editor. `Builds/` is gitignored. Don't
   save assets while it cooks.
 - Turn off "Use Less CPU when in Background" (Editor Preferences) so Play mode runs at full speed while Claude tests it.
+- To pass a per-actor number to a material (e.g. how often the log bark repeats), use a Scalar Parameter with
+  "Use Custom Primitive Data" and set it with `SetDefaultCustomPrimitiveDataFloat`. The runtime `SetCustomPrimitiveDataFloat`
+  doesn't stick when the editor runs a construction script. Every mesh using that material needs a value, or it reads 0.
+- One Blueprint can be set up in more than one place. `BP_Log` is built by its construction script (placed logs) **and** by
+  `LogSetup` (Endless spawns). Search for every caller before changing how an actor looks, and test both maps.
 
 ## Blender (for building our own 3D models)
 - Blender **5.2 LTS** with Blender's official MCP (Blender Lab). It is registered in `.mcp.json` as `blender`.
@@ -97,6 +102,11 @@
 - `.claude/settings.local.json` (per PC, gitignored) holds `"enableAllProjectMcpServers": true` so the servers in
   `.mcp.json` load without an approval prompt. Create it on each new PC.
 - Models made in Blender count as our own (scored) art in the jam. Export FBX into `Content/Game/Imported/<Name>/`.
+- With our FBX settings (forward -Z, up Y, scale 1), Blender's +Y becomes Unreal's **-Y** (X and Z stay). Check a mesh's
+  bounds after import before rotating it in a Blueprint.
+- When building meshes from script, add the material slots **before** writing faces, and never `materials.clear()` later.
+  Either one silently resets every face to material 0. `Art/Blender/log_kit_materials.py` is a worked example of
+  procedural materials baked to textures, including bark that tiles seamlessly.
 
 ## Switching computers
 We work on more than one PC. Only one machine should have the project open at a time. You can only act on the PC
