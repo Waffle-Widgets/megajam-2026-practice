@@ -15,7 +15,7 @@ from mathutils import Vector, Matrix
 SLOTS = ['Paint', 'Glass', 'Trim', 'Chrome', 'Headlight', 'Taillight', 'Cargo']
 PAINT, GLASS, TRIM, CHROME, HEAD, TAIL, CARGO = range(7)
 BODY_Z = 0.30          # body origin height above ground
-WHEEL_R = 0.15
+WHEEL_R = 0.135         # wheel radius (real-car proportions: about 0.18 x body width)
 
 
 def smooth_interp(keys, u):
@@ -63,7 +63,7 @@ def new_object(name, bm):
 
 
 # ---------------------------------------------------------------- body loft
-def loft(bm, P, n_st=64, n_ar=56, expo=5.0):
+def loft(bm, P, n_st=140, n_ar=64, expo=5.0):
     """Closed lofted shell. P holds profile keys over u = 0 (front) .. 1 (rear)."""
     L = P['length']
     rings = []
@@ -122,6 +122,8 @@ def paint_regions(bm, P):
         if 'bed' in P and P['bed'][0] <= u <= P['bed'][1]:
             continue
         if not (0.0 < a < math.pi) or z < belt + 0.01 or zt < belt + 0.06:
+            if z < belt - 0.01 and any(abs(u - g) < 0.0035 for g in P.get('gaps', [])) and abs(math.cos(a)) > 0.5:
+                f.material_index = TRIM                                 # door seam
             continue
         top = abs(a - math.pi / 2) < top_band
         in_roof = P['roof'][0] <= u <= P['roof'][1]
@@ -195,28 +197,34 @@ def details(ob, P):
     hw = smooth_interp(P['half_width'], 0.5)
     yf = surface_y(ob, 0.0, 0.26) or -L / 2
     yr = surface_y(ob, 0.0, 0.26, front=False) or L / 2
-    add_part(bm, (0, yf - 0.005, 0.25 - BODY_Z), (hw * 2 + 0.01, 0.07, 0.09), TRIM, 0.02)
-    add_part(bm, (0, yr + 0.005, 0.25 - BODY_Z), (hw * 2 + 0.01, 0.07, 0.09), TRIM, 0.02)
+    bz = P.get('bumper_z', 0.25)
+    yf = surface_y(ob, 0.0, bz) or yf; yr = surface_y(ob, 0.0, bz, front=False) or yr
+    add_part(bm, (0, yf + 0.012, bz - BODY_Z), (hw * 2 - 0.02, 0.05, 0.06), TRIM, 0.02)
+    add_part(bm, (0, yr - 0.012, bz - BODY_Z), (hw * 2 - 0.02, 0.05, 0.06), TRIM, 0.02)
     for side in (-1, 1):
         hx, hz = P['head']
         y = surface_y(ob, side * hx, hz)
         if y is not None:
-            add_part(bm, (side * hx, y + 0.004, hz - BODY_Z), (0.13, 0.03, 0.055), HEAD, 0.01)
+            add_part(bm, (side * hx, y + 0.008, hz - BODY_Z), (0.15, 0.022, 0.04), HEAD, 0.008)
         tx, tz = P['tail']
         y = surface_y(ob, side * tx, tz, front=False)
         if y is not None:
-            add_part(bm, (side * tx, y - 0.004, tz - BODY_Z), (0.10, 0.03, 0.07), TAIL, 0.01)
+            add_part(bm, (side * tx, y - 0.008, tz - BODY_Z), (0.11, 0.022, 0.05), TAIL, 0.008)
         # mirror on the A pillar
         mu = P['mirror_u']; my = -L / 2 + mu * L; mz = smooth_interp(P['belt'], mu) + 0.04
         mhw = smooth_interp(P['half_width'], mu)
-        add_part(bm, (side * (mhw + 0.035), my, mz - BODY_Z), (0.07, 0.035, 0.045), PAINT, 0.012)
+        add_part(bm, (side * (mhw + 0.028), my, mz - BODY_Z), (0.05, 0.028, 0.035), PAINT, 0.01)
         # door handles
         for hu in P.get('handles', []):
             hy = -L / 2 + hu * L; hz2 = smooth_interp(P['belt'], hu) - 0.05
             add_part(bm, (side * (smooth_interp(P['half_width'], hu) + 0.002), hy, hz2 - BODY_Z), (0.012, 0.06, 0.014), CHROME, 0.004)
+    if 'plate' in P:                                      # blank number plates (no text)
+        pz = P['plate']
+        add_part(bm, (0, yf - 0.016, pz - BODY_Z), (0.17, 0.006, 0.045), CARGO, 0.004)
+        add_part(bm, (0, yr + 0.016, pz - BODY_Z), (0.17, 0.006, 0.045), CARGO, 0.004)
     gy = surface_y(ob, 0.0, P['grille'][1])
     if gy is not None:
-        add_part(bm, (0, gy + 0.004, P['grille'][1] - BODY_Z), (P['grille'][0], 0.03, P['grille'][2]), TRIM, 0.01)
+        add_part(bm, (0, gy + 0.008, P['grille'][1] - BODY_Z), (P['grille'][0], 0.022, P['grille'][2]), TRIM, 0.008)
     bm.to_mesh(ob.data); bm.free()
 
 
@@ -263,23 +271,41 @@ def build_body(name, P, extra=None):
 
 
 # ---------------------------------------------------------------- the three bodies
-HATCH = dict(
-    length=1.46, axles=[0.20, 0.79], wheel_x=0.30, expo=7.0, tumblehome=0.26,
-    top=[(0.0, 0.42), (0.04, 0.52), (0.12, 0.58), (0.30, 0.62), (0.47, 0.90), (0.55, 0.93), (0.80, 0.92), (0.90, 0.84), (0.97, 0.66), (1.0, 0.50)],
-    bottom=[(0.0, 0.20), (0.06, 0.15), (0.94, 0.15), (1.0, 0.20)],
-    half_width=[(0.0, 0.30), (0.08, 0.355), (0.5, 0.37), (0.92, 0.36), (1.0, 0.32)],
-    belt=[(0.0, 0.60), (0.32, 0.62), (0.9, 0.66), (1.0, 0.66)],
-    roof=(0.52, 0.84), b_pillars=[0.64], sill=0.19,
-    head=(0.23, 0.50), tail=(0.25, 0.62), grille=(0.26, 0.40, 0.07), mirror_u=0.36, handles=[0.55, 0.74])
+HATCH = dict(   # real hatchback proportions at the lane's width: ~2.3x longer than wide, ~0.8x as tall as wide
+    length=1.62, axles=[0.17, 0.83], wheel_x=0.29, expo=9.0, tumblehome=0.30, sill=0.13, bumper_z=0.20, plate=0.24,
+    top=[(0.0, 0.30), (0.03, 0.36), (0.10, 0.38), (0.28, 0.42), (0.45, 0.565), (0.52, 0.575), (0.80, 0.57), (0.88, 0.53), (0.96, 0.44), (1.0, 0.33)],
+    bottom=[(0.0, 0.14), (0.05, 0.10), (0.95, 0.10), (1.0, 0.15)],
+    half_width=[(0.0, 0.30), (0.07, 0.34), (0.5, 0.35), (0.93, 0.345), (1.0, 0.31)],
+    belt=[(0.0, 0.40), (0.30, 0.42), (0.9, 0.45), (1.0, 0.45)],
+    roof=(0.50, 0.84), b_pillars=[0.66], gaps=[0.31, 0.655, 0.665, 0.86],
+    head=(0.24, 0.36), tail=(0.26, 0.43), grille=(0.22, 0.28, 0.035), mirror_u=0.33, handles=[0.56, 0.78])
 
 PICKUP = dict(
-    length=1.58, axles=[0.19, 0.78], wheel_x=0.31, expo=8.0, tumblehome=0.20, sill=0.21,
-    top=[(0.0, 0.50), (0.04, 0.62), (0.10, 0.68), (0.30, 0.70), (0.42, 0.95), (0.48, 1.00), (0.60, 1.00), (0.63, 0.80), (0.65, 0.76), (0.98, 0.76), (1.0, 0.62)],
-    bottom=[(0.0, 0.24), (0.05, 0.19), (0.95, 0.19), (1.0, 0.24)],
-    half_width=[(0.0, 0.33), (0.06, 0.37), (0.5, 0.38), (1.0, 0.37)],
-    belt=[(0.0, 0.68), (0.35, 0.70), (0.62, 0.72), (1.0, 0.76)],
-    roof=(0.46, 0.61), b_pillars=[], bed=(0.645, 0.985),
-    head=(0.25, 0.58), tail=(0.30, 0.62), grille=(0.34, 0.50, 0.11), mirror_u=0.34, handles=[0.50])
+    length=1.95, axles=[0.16, 0.80], wheel_x=0.30, expo=11.0, tumblehome=0.20, sill=0.15, bumper_z=0.22, plate=0.27,
+    top=[(0.0, 0.36), (0.03, 0.44), (0.09, 0.47), (0.30, 0.49), (0.40, 0.64), (0.45, 0.67), (0.58, 0.67), (0.60, 0.50), (0.62, 0.48), (0.985, 0.48), (1.0, 0.40)],
+    bottom=[(0.0, 0.18), (0.04, 0.13), (0.96, 0.13), (1.0, 0.18)],
+    half_width=[(0.0, 0.31), (0.05, 0.355), (0.5, 0.36), (1.0, 0.355)],
+    belt=[(0.0, 0.46), (0.33, 0.48), (0.60, 0.49), (1.0, 0.48)],
+    roof=(0.44, 0.585), b_pillars=[], bed=(0.61, 0.985), gaps=[0.30, 0.58],
+    head=(0.25, 0.42), tail=(0.29, 0.40), grille=(0.30, 0.36, 0.07), mirror_u=0.34, handles=[0.47])
+
+COUPE = dict(   # low 2+2 sports coupe (BRZ-like silhouette, no badges): long bonnet, set-back cabin, fastback
+    length=1.72, axles=[0.20, 0.81], wheel_x=0.30, expo=8.0, tumblehome=0.38, sill=0.12, bumper_z=0.16, plate=0.19,
+    top=[(0.0, 0.22), (0.02, 0.27), (0.08, 0.31), (0.36, 0.36), (0.50, 0.52), (0.56, 0.535), (0.66, 0.52), (0.84, 0.42), (0.95, 0.40), (0.98, 0.395), (1.0, 0.32)],
+    bottom=[(0.0, 0.12), (0.04, 0.09), (0.96, 0.09), (1.0, 0.13)],
+    half_width=[(0.0, 0.30), (0.06, 0.35), (0.20, 0.36), (0.45, 0.345), (0.80, 0.36), (0.95, 0.35), (1.0, 0.31)],
+    belt=[(0.0, 0.31), (0.40, 0.335), (0.75, 0.37), (1.0, 0.37)], top_band=1.15,
+    roof=(0.52, 0.70), b_pillars=[], gaps=[0.37, 0.62],
+    head=(0.26, 0.255), tail=(0.27, 0.37), grille=(0.34, 0.18, 0.06), mirror_u=0.42, handles=[0.58])
+
+
+def coupe_spoiler(ob, P):
+    """Small lip spoiler on the boot lid."""
+    bm = bmesh.new(); bm.from_mesh(ob.data)
+    L = P['length']; u = 0.975
+    add_part(bm, (0, -L / 2 + u * L, smooth_interp(P['top'], u) + 0.008 - BODY_Z), (0.56, 0.05, 0.014), PAINT, 0.005)
+    bm.to_mesh(ob.data); bm.free()
+
 
 TRUCK = dict(
     length=2.66, axles=[0.13, 0.62, 0.80], wheel_x=0.33, expo=9.0, tumblehome=0.15, sill=0.24, chassis_from=0.31,
@@ -305,12 +331,15 @@ def truck_box(ob, P):
 # ---------------------------------------------------------------- wheel
 def build_wheel():
     bm = bmesh.new()
-    prof = [  # (radius, x) around the tyre, outside -> inside, then the rim
-        (0.098, 0.050), (0.120, 0.052), (0.140, 0.048), (0.148, 0.038), (0.150, 0.0),
-        (0.148, -0.038), (0.140, -0.048), (0.120, -0.052), (0.098, -0.050)]
-    rim = [(0.098, -0.030), (0.090, -0.034), (0.030, -0.030), (0.025, -0.02), (0.0, -0.018)]
-    rim_o = [(0.098, 0.030), (0.090, 0.040), (0.060, 0.036), (0.030, 0.042), (0.012, 0.046), (0.0, 0.046)]
-    seg = 36
+    prof = [  # (radius, x) around the tyre, outside -> inside, with tread grooves; scaled to WHEEL_R below
+        (0.098, 0.050), (0.120, 0.052), (0.140, 0.048), (0.148, 0.040), (0.150, 0.032), (0.145, 0.027), (0.150, 0.022),
+        (0.150, 0.007), (0.145, 0.002), (0.145, -0.002), (0.150, -0.007), (0.150, -0.022), (0.145, -0.027),
+        (0.150, -0.032), (0.148, -0.040), (0.140, -0.048), (0.120, -0.052), (0.098, -0.050)]
+    k = WHEEL_R / 0.15
+    prof = [(r * k, x) for r, x in prof]
+    rim = [(r * k, x) for r, x in [(0.098, -0.030), (0.090, -0.034), (0.030, -0.030), (0.025, -0.02), (0.0, -0.018)]]
+    rim_o = [(r * k, x) for r, x in [(0.098, 0.030), (0.090, 0.040), (0.060, 0.036), (0.030, 0.042), (0.012, 0.046), (0.0, 0.046)]]
+    seg = 48
     def revolve(pts, mat, close_center=False):
         rows = []
         for r, x in pts:
@@ -321,16 +350,16 @@ def build_wheel():
                 f = bm.faces.new((a[i], a[j], b[j], b[i])); f.material_index = mat
         return rows
     tyre = revolve(prof, 0)
-    inner = revolve([(0.098, -0.050)] + rim, 1)
-    outer = revolve([(0.098, 0.050)] + rim_o, 1)
+    inner = revolve([(0.098 * k, -0.050)] + rim, 1)
+    outer = revolve([(0.098 * k, 0.050)] + rim_o, 1)
     # spokes: five raised bars on the outer face
-    for k in range(5):
-        a = 2 * math.pi * k / 5
-        c = Vector((0.050, 0.06 * math.cos(a), 0.06 * math.sin(a)))
+    for sp in range(5):
+        a = 2 * math.pi * sp / 5
+        c = Vector((0.050, 0.06 * k * math.cos(a), 0.06 * k * math.sin(a)))
         res = bmesh.ops.create_cube(bm, size=1.0)
         R = Matrix.Rotation(a, 3, 'X')
         for v in res['verts']:
-            v.co = R @ Vector((v.co.x * 0.012, v.co.y * 0.075, v.co.z * 0.022)) + c
+            v.co = R @ Vector((v.co.x * 0.012, v.co.y * 0.075 * k, v.co.z * 0.018)) + c
         for f in {f for v in res['verts'] for f in v.link_faces}: f.material_index = 1
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
@@ -359,8 +388,9 @@ def build_all():
     a = build_body('SM_CarHatch', HATCH); a.location = (-1.0, 0, BODY_Z)
     b = build_body('SM_CarPickup', PICKUP); b.location = (0.0, 0, BODY_Z)
     c = build_body('SM_CarTruck', TRUCK, truck_box); c.location = (1.1, 0, BODY_Z)
+    d = build_body('SM_CarCoupe', COUPE, coupe_spoiler); d.location = (-2.1, 0, BODY_Z)
     w = build_wheel(); w.location = (-1.0, 2.0, WHEEL_R)
-    return [a, b, c, w]
+    return [a, b, c, d, w]
 
 
 if __name__ == '__main__':

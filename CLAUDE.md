@@ -85,6 +85,34 @@
   doesn't stick when the editor runs a construction script. Every mesh using that material needs a value, or it reads 0.
 - One Blueprint can be set up in more than one place. `BP_Log` is built by its construction script (placed logs) **and** by
   `LogSetup` (Endless spawns). Search for every caller before changing how an actor looks, and test both maps.
+- `mcp__unreal__call_tool` needs `toolset_name` **and** `tool_name` (e.g. `EditorToolset.EditorAppToolset` / `StartPIE`).
+- Measure frame time with the console commands `startfpschart` / `stopfpschart` (type them into the console box with the
+  Slate inspector, read the result from the log). The `stat unit` overlay never shows in `CaptureEditorImage`. If it reads
+  3 fps, the editor is throttling in the background: `bThrottleCPUWhenNotForeground` must be false.
+- `TextureTools.import_file` / `StaticMeshTools.import_file` never overwrite: delete the old asset first, or use a new name.
+- To get the real game lighting in a capture, `StartPIE` in Simulate mode, click the editor's Pause button via the Slate
+  inspector, then `CaptureViewport` with a camera transform; `CaptureEditorImage` shows the game camera as the player sees it.
+
+## AI-generated 3D models (Hunyuan3D 2.1 and TRELLIS.2, both local)
+- **TRELLIS.2** (Microsoft, MIT licence, `D:\AI\TRELLIS2`) is the one to use: one photo with the background cut out ->
+  `venv\Scripts\python.exe run_image_to_3d.py <cutout.png> out\<name> 1024_cascade` (about 5 minutes on the 3090) -> a GLB
+  with real panel lines, handles, lights and wheel spokes. Hunyuan3D 2.1 (`D:\AI\Hunyuan3D2`) is lumpier and its licence is
+  non-commercial. TRELLIS.2 is Linux-only upstream; the Windows port (patched CUDA extensions, `build_ext.py`, a
+  `segment_reduce` replacement in `trellis2/modules/sparse/basic.py`) is done, don't `git pull` it away. Its DINOv3 image
+  encoder is gated: the owner's Hugging Face login (`hf auth login`) must be on the PC.
+- Generate from the photo that shows most of the car. A second photo does not merge into the first model; a front-photo run
+  gave a different, misshapen car.
+- **Cleanup lives in `Art/Blender/ai_car_clean.py`** and carries over to any AI model: `import_trellis` (orient, cut the
+  reflection plates the generator puts on roofs, smooth, decimate with the high-poly normals transferred), `bake_maps` +
+  `paint_pixels` (paint windows, lights and trim by baked 3D position, so outlines stay crisp on any triangles),
+  `texture_lamps` (take lamps from the generator's own red texture pixels), `fill_gaps`, `smooth_body`, `fix_trunk`.
+  Only the outlines and the wheel numbers are car-specific.
+- When smoothing a textured mesh, move points only along their normals. Sliding them sideways drags the painted
+  outlines into zigzags. Don't freeze "sharp" vertices either: the AI's jagged seams count as sharp and stay as ridges.
+- Never `recalc_face_normals` on a whole AI mesh (it isn't closed, big areas flip inside out); orient new patches only.
+- Decimating a smooth remeshed skin folds it into creases: smooth first, decimate, then transfer the smooth normals.
+- Measure the real object (length, width, height, wheelbase) before judging an AI model. The BRZ was 15% too wide and
+  only looked "squat" until the numbers said why.
 
 ## Blender (for building our own 3D models)
 - Blender **5.2 LTS** with Blender's official MCP (Blender Lab). It is registered in `.mcp.json` as `blender`.

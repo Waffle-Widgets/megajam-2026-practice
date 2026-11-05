@@ -358,3 +358,46 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Test one realistic asset before doing them all. It caught three problems cheaply.
   - Realism mostly comes from baked texture detail and many small pieces (leaves, cracks), not from engine settings.
 - **Media:** ![chunky scenery](media/blender-scenery-sheet.png) ![realism test](media/real-test-sheet.png)
+
+### 2026-11-04 — The owner's real car, part 1: an AI-generated BRZ, cleaned up by script
+- **What we asked for:** "Show me how accurate you can get this car looking. If you can't get close to photorealistic then we may have to cut our losses."
+- **Prompt(s) we gave the agent:** reference photos of the owner's 2017 BRZ (side, rear, wing, wheels, rear 3/4), "Here goes the combined approach: fix the pillars and build a new wheel", "Try to fix the trunk and panels if you can", "The wing does not sit that high up", "Show me how accurate you can get this car looking".
+- **What happened:**
+  - **Starting point:** a Hunyuan3D 2.1 model of the car made from one photo. Lumpy, with its windows and lights baked into a blurry texture. Claude wrote `Art/Blender/ai_car_clean.py` to fix it up by script:
+    - **Paint by position:** bake where every texel sits on the car, then paint windows, pillars, headlights, grille, fog lights, vents, wheel wells and tyres with smooth outlines measured from the photos. Edges ignore the AI triangles, so they come out crisp.
+    - **Model only what sticks out:** headlights, tail lights, fog rings, exhausts and a new rear wing are real geometry projected onto the body. Our own ten-spoke wheel from `wheel_kit.py` (red pinstripe, red calipers) replaces the AI wheels.
+    - **Measured fixes:** the body was 15% too wide for a BRZ (4240 x 1775 mm), so it was narrowed; the front fenders got the real car's rise; the wheels were tucked inside the arches.
+  - **The trunk mystery:** dark "smears" under the wing turned out to be a second, broken wing the AI had fused into the lid (floating blades, an overhanging lip, risers on the corners, torn holes). `fix_trunk` deletes the junk, presses the rest onto a smooth lid measured from the clean parts, and lays a clean skin over it; the wing is then rebuilt from the owner's photos (flat blade swept along the lid's back edge, body-colour risers and end plates, sitting about 1 cm above the lid).
+  - **Smoothing the panels** (`smooth_body`): points move towards their neighbours, but only straight in or out of the surface. The first version slid them sideways too and dragged the painted window outlines into zigzags, which the team spotted straight away ("We had fixed the paint on the car and the windows before. What happened?").
+  - **Result (`SM_CarCoupeC11`):** about 111k triangles, right proportions, good from the game camera. Close up it is not photoreal: the AI surface has no crisp panel lines and ripples in reflections. Claude said so plainly and offered two routes: hand-loft a body from blueprints, or try a newer generator.
+- **What went wrong on the way:**
+  - A 3 fps reading while measuring frame time was the editor throttling itself in the background ("Use Less CPU when in Background"). The real number was 114 fps.
+  - `materials.clear()` in Blender silently resets every face to material 0 (the wing turned blue).
+  - Recalculating normals on the whole AI mesh flipped big areas inside out: only new patches get recalculated now.
+  - Freezing "sharp" vertices during smoothing kept the AI's jagged panel lines as ridges, so nothing is frozen any more.
+  - The first iron-down rule squashed a tail-light corner into a strip down to the ground; the first hard-edge tag made 81,000 body faces flat.
+- **What we learned:**
+  - Paint by baked position, not by face: outlines stay crisp on any AI mesh.
+  - When smoothing a textured mesh, never let points slide along the surface.
+  - Measure the real car first (length, width, height, wheelbase). The width was off by 15% and nobody could see why it looked squat until it was measured.
+  - Every one of these scripts carries over to other AI models; only the outlines and wheel numbers are car-specific.
+- **Media:** ![C11 in game](media/hunyuan-c11-in-game.png) ![narrowed to BRZ width](media/hunyuan-narrowed.png)
+
+### 2026-11-04 — The owner's real car, part 2: TRELLIS.2 on Windows, a sharper car in five minutes
+- **What we asked for:** "You can't do the hand-modeling from blueprints? Or the newer sharper 3D generator?" then "If we have the space on the drive do it" and "Proceed with the next steps".
+- **What happened:**
+  - Claude picked **TRELLIS.2** (Microsoft, MIT licence, so jam-safe) and set it up on the game PC in `D:\AI\TRELLIS2`. It is officially Linux-only; getting it to run on Windows took about three hours: five CUDA libraries compiled from source (each needed a small Windows fix), a Windows build of Triton, a pinned `transformers`, and one PyTorch operation (`segment_reduce`) that has no CUDA kernel in the Windows build, replaced with an equivalent. The image encoder (Meta's DINOv3) is gated, so the owner accepted the licence and logged the PC in to Hugging Face.
+  - **One rear 3/4 photo -> a 6-million-face car in 270 seconds.** Real fender arches, door handles, mirrors, wing with end plates, moulded tail lights and diffuser, wheels with actual spokes. A front-photo run came out as a different, badly proportioned car with no rear wheels, so the rear-photo model is the one used.
+  - `import_trellis` in `ai_car_clean.py` orients it (the wing tells it which way is back), cuts the reflections the generator turned into solid plates on the roof, smooths and decimates to 180k faces with the high-poly normals transferred on, and bakes position maps. The same paint-by-position pipeline then lands windows, headlights, grille and the red wheel pinstripe on it, and the tail lights come straight from the generator's own red texture pixels so they sit exactly on the moulded lamps.
+  - **In the game:** `SM_CarCoupeT5` with four LODs (180k -> 18k triangles) is now the coupe in `BP_Car`, with `MI_CarCoupeT`. `SM_CarCoupeC11` stays in the project as a fallback.
+- **What went wrong on the way:**
+  - Claude Code's safety classifier refused to run the extension builds ("code from external sources"); the team added a permission rule for the build script.
+  - The newest `transformers` broke DINOv3's internals; pinned to 4.57.
+  - The import put the car on backwards once (hood mistaken for trunk), and a mirror-vs-rotation mix-up turned it inside out once.
+  - Decimating the smooth remeshed skin folded it into creases until the skin was smoothed first and the smooth normals transferred.
+  - Widening the roof clean-up past the fitted area cut a hole in the windscreen; the bounds were reverted.
+- **What we learned:**
+  - A newer generator beats hours of cleanup script: the output already has the panel lines and parts the Hunyuan model lacked. The cleanup pipeline still matters, and it carried over with almost no retuning.
+  - Generate from the photo that shows the most of the car; a second photo does not merge into the first model.
+  - Keep the Windows port notes: `D:\AI\TRELLIS2\build_ext.py` and `run_image_to_3d.py` make the next asset a one-command job.
+- **Media:** ![TRELLIS clay](media/trellis-brz-clay.png) ![TRELLIS vs Hunyuan in the level](media/trellis-vs-hunyuan-in-level.png) ![TRELLIS coupe in game](media/trellis-coupe-in-game.png)

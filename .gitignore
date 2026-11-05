@@ -44,3 +44,5 @@ MegaJamPractice/Content/Game/Imported/**/*.Fbx
 # Baked textures and FBX exports from the Blender scripts (rebuilt by running the script)
 Art/Blender/textures/
 Art/Blender/export/
+# Personal reference photos (may show number plates)
+Art/Reference/
