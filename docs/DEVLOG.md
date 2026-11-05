@@ -455,3 +455,20 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - If a whole family of materials looks flat grey, read the log for "Failed to compile" before touching the textures.
   - A modal dialog in Unreal looks exactly like a dead MCP. Check the editor window first.
 - **Media:** ![after the Blender cleanup](media/tacoma-blender.jpg) ![from the game camera](media/tacoma-game-camera.jpg)
+
+### 2026-11-05 — The coupe's rear window was painted blue
+- **What we asked for:** "i noticed the back window was colored blue. i noticed this while working on GameStation so you will need to pull the latest down to fix it"
+- **What happened:**
+  - The pull itself needed the editor closed: Unreal held `M_CarMasked.uasset` open and git could not replace it. The half-applied pull was finished by staging and fast-forwarding; no reset.
+  - **Why it was blue:** the texture bake decides what is glass by rules on the baked position and normal maps. The rear-window rule asked for a normal tilted at least 20° toward the back, but on this mesh the rear glass lies back at only about 17°, so every texel failed the test and was flattened to paint like the rest of the deck (the yellow photo's glass reflects blue sky, and blue counts as paint). The quarter windows were cut off by the side-glass box ending at y 0.36.
+  - **Found with a table, not by eye:** a probe over the baked maps printed the fraction of yellow (photo paint) per cell of the rear deck. The window showed up as a clean band from y 0.35 to 0.62, 0.21 either side of centre, and the quarter windows to y 0.40. The new rules use those bounds and test height instead of tilt. The plate recess is painted body colour too (it had a yellow-grey smear).
+  - Only the material step was re-run (51 s): the baked source image was still in Blender's memory, so no new bake. Textures re-imported into Unreal and `MI_CarCoupeT` re-pointed.
+- **What went wrong on the way:**
+  - **Importing three 4096 textures in one script crashed the editor** with a plain out-of-memory. Blender had 101 GB of committed memory (undo history from a long session) which counts against the same system limit, so Unreal's texture builds had nowhere to go. Fix: save and restart Blender (6 GB after), import one texture per call.
+  - **Then every coupe was flat grey.** GameStation's fix for the grey cars had made these exact textures the defaults of the parent `M_CarMasked`; deleting them for the re-import left the parent with null textures and "Found NULL, requires Texture2D" in the log, so the whole material family fell back to the default material. Re-pointing the three `TextureSampleParameter2D` nodes, recompile, save.
+  - Two ported scripts (`trellis_join.py`, `trellis_bake_texture.py`) looked for `trellis_build.py` in the cache folder instead of next to themselves; fixed.
+- **What we learned:**
+  - When a rule misses, measure where the feature really is on the mesh before guessing new numbers.
+  - A deleted-and-reimported asset is a new object: check `get_referencers` before deleting and re-point every one.
+  - Blender's undo history can quietly hold 100 GB of commit on a long session. Restart it before heavy Unreal work.
+- **Media:** ![before, Cycles preview](media/coupe-rear-window-before.jpg) ![after, in the game](media/coupe-rear-window-fixed.jpg)

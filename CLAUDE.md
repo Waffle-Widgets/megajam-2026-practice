@@ -90,6 +90,13 @@
   Slate inspector, read the result from the log). The `stat unit` overlay never shows in `CaptureEditorImage`. If it reads
   3 fps, the editor is throttling in the background: `bThrottleCPUWhenNotForeground` must be false.
 - `TextureTools.import_file` / `StaticMeshTools.import_file` never overwrite: delete the old asset first, or use a new name.
+  Deleting leaves every referencer pointing at nothing: run `AssetTools.get_referencers` first and re-point each one
+  afterwards. `M_CarMasked` uses the coupe textures as its parameter defaults, so after a texture re-import its
+  three `TextureSampleParameter2D` nodes need the new textures set (`ObjectTools.set_properties` `Texture`), then
+  `MaterialTools.recompile` and save, or every car on it turns default grey ("Found NULL, requires Texture2D").
+- Import 4096 textures one per call. Three in one script crashed the editor with a plain out-of-memory: each build
+  needs about 1 GB, and a Blender that has run a long session can hold 100 GB of committed memory (undo history)
+  that counts against the same limit. Save and restart Blender before heavy Unreal work; its MCP add-on autostarts.
 - To get the real game lighting in a capture, `StartPIE` in Simulate mode, click the editor's Pause button via the Slate
   inspector, then `CaptureViewport` with a camera transform; `CaptureEditorImage` shows the game camera as the player sees it.
 

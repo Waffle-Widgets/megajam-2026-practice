@@ -10,7 +10,7 @@ t0 = time.time()
 GLB_A = globals()['GLB_A']; GLB_B = globals()['GLB_B']; OUT = globals()['OUT']; TAG = globals()['TAG']
 Y_FULL, Y_NONE = globals().get('Y_FULL', -0.30), globals().get('Y_NONE', -0.10)     # wrap weight 1 ahead of Y_FULL, 0 behind Y_NONE
 Y_SPLIT = (Y_FULL + Y_NONE) / 2                                                       # bake sources meet here
-_b = open(SP + r"\trellis_build.py").read()
+_b = open(D + r"\trellis_build.py").read()
 exec(_b[_b.index('cl = {}'):_b.index('for o in list(bpy.data.objects)')])
 for o in list(bpy.data.objects):
     if o.name in ('SRC_A', 'SRC_B', 'TR_BRZ', 'TR_SRC'): bpy.data.objects.remove(o)
@@ -137,12 +137,14 @@ hue = np.where(mx == bb[..., 2], (4 + (bb[..., 0] - bb[..., 1]) / (mx - mn + 1e-
 paintpx = (sat > 0.35) & (mx > 0.05) & (((hue > 0.52) & (hue < 0.75)) | ((hue > 0.09) & (hue < 0.22)))
 red = (bb[..., 0] > 1.7 * bb[..., 1]) & (bb[..., 0] > 1.7 * bb[..., 2]) & (bb[..., 0] > 0.10) & (y > 0.6) & (z > -0.05) & (np.abs(x) > 0.17)
 dark = (lum < 0.025) & (sat < 0.5)
-glassbox = (np.abs(x) > 0.25) & (np.abs(x) < 0.37) & (y > -0.25) & (y < 0.36) & (z > 0.085) & (z < 0.24) & (np.abs(N[..., 0]) > 0.5)
-rglass = (N[..., 1] > 0.35) & (N[..., 2] > 0.2) & (z > 0.10) & (y > 0.30) & (y < 0.68) & (np.abs(x) < 0.30)
+side = (np.abs(x) > 0.25) & (np.abs(x) < 0.37) & (z < 0.24) & (np.abs(N[..., 0]) > 0.5)
+glassbox = side & (((y > -0.25) & (y < 0.36) & (z > 0.085)) | ((y >= 0.36) & (y < 0.40) & (z > 0.11)))   # door glass + quarter window
+rglass = (N[..., 2] > 0.4) & (z > 0.10) & (y > 0.35) & (y < 0.625) & (np.abs(x) < 0.205 + 0.1 * (y - 0.35))   # rear window: laid back ~17 deg, so test height not tilt
+plate = (N[..., 1] > 0.6) & (y > 0.72) & (np.abs(x) < 0.13) & (z > -0.06) & (z < 0.09)                           # plate recess: body colour, no plate
 wglass = (N[..., 1] < -0.3) & (N[..., 2] > 0.3) & (z > 0.10) & (y > -0.52) & (y < -0.12) & (np.abs(x) < 0.30)   # windscreen
 junk = ((sat < 0.3) & (lum > 0.25) & (z < -0.10)) | ((sat < 0.3) & (lum < 0.08) & (z < 0.06) & (np.abs(y) < 0.62) & (np.abs(N[..., 0]) > 0.5))
 junk &= ~wheel
-bc = bb.copy(); bc[paintpx | junk] = np.array(PAINT[0], np.float32)
+bc = bb.copy(); bc[paintpx | junk | plate] = np.array(PAINT[0], np.float32)
 br = np.full(lum.shape, PAINT[1], np.float32); bm0 = np.full(lum.shape, PAINT[2], np.float32); bm1 = np.full(lum.shape, PAINT[3], np.float32)
 br[dark] = GLASS[1]; bm0[dark] = 0; bm1[dark] = 0
 for m_, look in ((glassbox | rglass | wglass, GLASS), (red, RED)):

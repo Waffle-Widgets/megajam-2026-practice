@@ -9,7 +9,7 @@ import os; os.makedirs(SP, exist_ok=True)
 from mathutils import Vector
 t0 = time.time()
 GLB = globals()['GLB']; OUT = globals()['OUT']; TAG = globals()['TAG']
-_b = open(SP + r"\trellis_build.py").read()
+_b = open(D + r"\trellis_build.py").read()
 exec(_b[_b.index('cl = {}'):_b.index('for o in list(bpy.data.objects)')])          # cl, out, HEIGHT, fix_strips_and_orient (stops before the object clean-up)
 ob = bpy.data.objects['TR_BRZ']; me = ob.data; ob.location = (0, 0, 0)      # previews park it aside; the source is at the origin
 for o in list(bpy.data.objects):
