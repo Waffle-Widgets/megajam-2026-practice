@@ -60,6 +60,11 @@
 - Give every Blueprint function a name that is unique across the engine **and** our project (not Clear, SetTime, or a
   second `SpeedUp`). Otherwise the graph tool quietly calls the wrong one and it still compiles. Always `read_graph_dsl`
   after writing to check what was really built.
+- `write_graph_dsl` replaces the whole graph (good: a function can be rebuilt from text; read it out first as a backup).
+  The reader prints literals as `(bind _x 1.0)` and the writer rejects exactly that: fold literals back into the
+  expressions. Actor calls like `SetActorLocation` need `:NewLocation value`; a positional arg lands in the `self` pin.
+- In Play mode, `SceneTools.find_actors` with `actor_type` = the Blueprint's generated class (`BP_Car.BP_Car_C`) lists the
+  live actors, so captures can be aimed at a specific car.
 - Never write `(return (SomeFunction ...))` with one of our own Blueprint functions inside. It compiles, but the call never
   runs and the return gives the default (0 / false). `bind` the call first, then `(return value)`. This made every endless
   row count as grass (checkpoints on roads) and switched off obstacle blocking.
