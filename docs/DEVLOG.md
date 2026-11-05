@@ -434,3 +434,24 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - **The invisible Python.** The Claude desktop app keeps its own private copy of `AppData\Roaming`, so the Python that uv installed from the chat didn't exist for the user's own terminal ("No Python at ..."). Copied it to `C:\AI\python311`.
   - Because of that, the first Hugging Face login failed and the token got pasted at the shell prompt instead. It was deleted from the PowerShell history, revoked, and replaced with a new one. Lesson: run logins in your own terminal, and check the prompt is really asking before you paste.
 - **What we learned:** a new GPU generation means rebuilding, not copying; keep tools out of `AppData` when a chat installs them; save every hand fix as a patch file so the next PC is a checklist, not a hunt.
+
+### 2026-11-05 — A Tacoma from one photo: the TRELLIS pipeline on a pickup
+- **What we asked for:** a Toyota Tacoma model, then "front model alone" after seeing the two generator results (a grey front-3/4 photo and a red rear-3/4 photo, both from Wikimedia Commons).
+- **What happened:**
+  - The grey front-3/4 photo gave a complete long-bed double cab in about two minutes on the 5090; the red rear photo's model was weaker and is not used. Badges and plates had already been inpainted out of the photo.
+  - **A truck version of the cleanup**, kept apart from the BRZ scripts: `Art/Blender/trellis_truck.py` (import, orient, scale, weld, cut 99 floating crumbs, smooth along normals, decimate to 160k with the smooth normals, clean UVs) and `trellis_truck_bake.py` (bake the generator's own texture, paint rules, export). The bed's flat rails tell it which end is the back.
+  - **Measured, not eyeballed:** like the BRZ, the generator made it about 16% too wide and 9% too tall. Each axis is scaled to the real truck (5.69 x 1.91 x 1.79 m) in the game's car scale (the coupe is 1.717 units for 4.24 m), so it sits next to the coupe at the right size: 230 x 77 x 73 cm in Unreal.
+  - **Unbranded:** the whole grille insert is replaced with plain dark slats (no logo shape left), and the tailgate is repainted with its own row-by-row median colour plus a plain black handle, which wipes the badge remnants and lettering. The jam rules ban trademarks.
+  - **Paint:** the generator's grey was too blue and too dark (the photo's shadows bake into the texture), so it is desaturated, lifted to a mid grey, and made non-metallic.
+  - In Unreal: `SM_CarTacoma` (4 LODs: 160k, 64k, 24k, 8k triangles) in `Imported/CarTacoma/`, `MI_CarTacoma` (child of `M_CarMasked`, like the coupe), and one test copy, `TEST_Tacoma`, on the start grass. Not swapped into `BP_Car`.
+- **What went wrong on the way:**
+  - **A "Check Out Assets" dialog** (our committed `SFX_` sounds wanted saving) sat open in Unreal at session start and blocked its MCP, so the chat's Unreal tools never connected. The team cancelled it, and Claude talked to the MCP over plain HTTP with a tiny script for the rest of the session.
+  - **The 15,000-island UV map.** Unwrapping the noisy AI surface split it into 15,000 islands using 24% of the texture (packing made it worse, 32%). Fix: unwrap a heavily smoothed copy of the shape, then put the real points back; the UVs carry over and the islands are big (62% of the texture used).
+  - The first bake looked black: the baked colours were linear and were read as sRGB, and "empty" texels were mis-detected. Both fixed.
+  - **Every TRELLIS car was grey in-game on this PC.** `M_CarMasked`, the parent material of the coupe and now the truck, had no default textures on its three texture parameters, so on GameStation it failed to compile ("Found NULL, requires Texture2D") and Unreal used the default grey material. The coupe's own textures are now the defaults. Found only because we judged from the game camera: the asset thumbnail looked fine.
+  - Blender's file writes auto-imported the FBX and PNGs into Unreal before the MCP import (with an extra material); those were deleted and imported properly. Later texture re-bakes rely on that same auto-reimport, and the FBX is not re-exported, so the LODs and material stay.
+- **What we learned:**
+  - Unwrap a smoothed stand-in, not the noisy AI skin, then restore the real shape.
+  - If a whole family of materials looks flat grey, read the log for "Failed to compile" before touching the textures.
+  - A modal dialog in Unreal looks exactly like a dead MCP. Check the editor window first.
+- **Media:** ![after the Blender cleanup](media/tacoma-blender.jpg) ![from the game camera](media/tacoma-game-camera.jpg)
