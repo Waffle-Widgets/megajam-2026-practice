@@ -71,6 +71,9 @@ ob = bpy.data.objects.new('TR_BRZ', me); bpy.context.scene.collection.objects.li
 for o in bpy.context.view_layer.objects: o.select_set(False)
 ob.select_set(True); bpy.context.view_layer.objects.active = ob
 V = verts(ob); w = np.clip((Y_NONE - V[:, 1]) / (Y_NONE - Y_FULL), 0, 1)
+# the front wheels keep B's own hub and spokes: wrapped onto A's (different) wheel they crumple into a ball
+lowB = V[V[:, 2] < V[:, 2].min() + 0.02]; ysB = np.sort(lowB[:, 1]); wyB = float(np.median(ysB[:np.argmax(np.diff(ysB)) + 1]))
+w[(np.hypot(V[:, 1] - wyB, V[:, 2] - (V[:, 2].min() + cl['TYRE_R'])) < cl['TYRE_R'] + 0.03) & (np.abs(V[:, 0]) > 0.18)] = 0
 vg = ob.vertex_groups.new(name='front')
 for i in np.nonzero(w > 0)[0]: vg.add([int(i)], float(w[i]), 'REPLACE')
 mod = ob.modifiers.new('wrap', 'SHRINKWRAP'); mod.target = srcA; mod.wrap_method = 'NEAREST_SURFACEPOINT'

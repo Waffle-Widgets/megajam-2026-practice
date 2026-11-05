@@ -136,6 +136,8 @@
 - Close Chrome and anything else not in use before a TRELLIS run (it peaks near 17 GB VRAM); the GLB bake runs in its
   own process (`export_glb.py`) after the model is unloaded. A forced Unreal close leaves a "Restore Packages" dialog
   that blocks the MCP; close it with a window message from PowerShell.
+- After every TRELLIS build, render each wheel from a low side angle in Blender: the game camera hides the lower half of
+  a wheel, and the strip filter in `trellis_build.py` cut every coupe's hub and spokes there for a day before anyone saw it.
 - **Judge art from the real game camera** (Simulate, pause, `CaptureViewport` from the game's height), not from
   close-ups. The TRELLIS coupe looked great close up and like a dark blob from the game camera.
 

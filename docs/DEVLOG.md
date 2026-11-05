@@ -472,3 +472,19 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - A deleted-and-reimported asset is a new object: check `get_referencers` before deleting and re-point every one.
   - Blender's undo history can quietly hold 100 GB of commit on a long session. Restart it before heavy Unreal work.
 - **Media:** ![before, Cycles preview](media/coupe-rear-window-before.jpg) ![after, in the game](media/coupe-rear-window-fixed.jpg)
+
+### 2026-11-05 — The coupe's tyres were cut up
+- **What we asked for:** "The tires look cut up"
+- **What happened:**
+  - From the game camera the wheels are dark blobs, so a close-up in Blender showed it first: each wheel had its hub, spokes and inner sidewall cut off flat about 4 cm below the hub centre, with only the outer tread continuing below. All four wheels, every coupe since T1.
+  - **The cause was our own cleanup, not the generator.** `fix_strips_and_orient` (in `trellis_build.py`, also used by the two-photo join) exists because some TRELLIS runs hang thin vertical strips under the floor. It slices the mesh 9 cm above the ground and deletes every loose piece below that is thinner than a tyre. Below that line the generator's wheel is not one piece but about 2,000 slivers (each spoke, each sidewall patch), so the thin-piece test ate all of them. The raw GLB has the wheels complete down to the tread.
+  - Fix: the filter now finds the two wheel axes from the lowest points of the mesh and spares anything inside a tyre circle. Tested on the raw model first (hub reaches the tread again, the same slivers elsewhere still go).
+  - Second thing seen in the re-run: the front wheels came out crumpled, because the join shrink-wraps the whole nose onto the front-photo model, spokes included, and that model's wheel is a different design. The front wheel circles are now excluded from the wrap, so they keep the rear-photo model's clean wheel.
+  - The whole join re-ran in two minutes (both GLBs, wrap, smoothing, 4096 bake). New mesh `SM_CarCoupeT24` imported under a new name so nothing pointed at nothing; `BP_Car`'s Set Static Mesh pin re-pointed, textures replaced one per call, `M_CarMasked` defaults and `MI_CarCoupeT` set again, old T23 deleted after its referencer list was empty.
+- **What went wrong on the way:**
+  - Claude's own close-up camera had replaced the scene camera, so the join's preview renders came out black until it was switched back.
+  - Three different Unreal tools want the same object under three parameter names (`instance`, `material_or_function`, `asset_path`); half the script calls failed once each before they ran.
+- **What we learned:**
+  - A cleanup rule written for one bad run (strips under a clipped-roof model) kept running on every good one. Check what a filter removed, not only that the problem it was for is gone.
+  - Look at every car part from close up at least once; the game camera hides the lower half of a wheel in shadow.
+- **Media:** ![before, Cycles close-up](media/coupe-wheels-before.jpg) ![after, Cycles close-up](media/coupe-wheels-after.jpg) ![after, in the game](media/coupe-wheels-ingame.jpg)

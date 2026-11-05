@@ -20,6 +20,12 @@ def fix_strips_and_orient(ob):
     me = ob.data
     nv = len(me.vertices); V = np.empty(nv * 3); me.vertices.foreach_get('co', V); V = V.reshape(nv, 3)
     zg = V[:, 2].max() - HEIGHT; zs = zg + 0.09
+    # wheel axes (the lowest points are the two tyre bottoms): nothing inside a tyre circle is a strip. Below sill
+    # height the generator's hub and spokes are thousands of loose slivers, and the thin-piece test ate them,
+    # so every coupe up to T23 had its wheels cut flat 4 cm under the hub.
+    low = V[V[:, 2] < V[:, 2].min() + 0.02]; ys = np.sort(low[:, 1]); g = np.argmax(np.diff(ys))
+    wy = (float(np.median(ys[:g + 1])), float(np.median(ys[g + 1:]))); wz = float(V[:, 2].min()) + cl['TYRE_R']
+    in_wheel = lambda c: abs(c[0]) > 0.15 and min(math.hypot(c[1] - wy[0], c[2] - wz), math.hypot(c[1] - wy[1], c[2] - wz)) < cl['TYRE_R'] + 0.02
     bm = bmesh.new(); bm.from_mesh(me)
     cut = bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], plane_co=(0, 0, zs), plane_no=(0, 0, 1), dist=1e-5)
     bmesh.ops.split_edges(bm, edges=[g for g in cut['geom_cut'] if isinstance(g, bmesh.types.BMEdge)])
@@ -34,6 +40,7 @@ def fix_strips_and_orient(ob):
                     if h not in seen: seen.add(h); comp.append(h); st.append(h)
         C = np.array([g.calc_center_median()[:] for g in comp])
         if C[:, 2].max() > zs + 0.002: continue                   # part of the body
+        if in_wheel(C.mean(0)): kept += 1; continue               # hub, spokes, inner sidewall
         ext = C.max(0) - C.min(0)
         if ext[0] > 0.06 and ext[1] > 0.06 and C[:, 2].min() > zg - 0.03: kept += 1; continue   # tyre bottoms, diffuser
         dead += comp
