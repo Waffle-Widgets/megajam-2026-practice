@@ -115,6 +115,20 @@
   only looked "squat" until the numbers said why.
 - Never keep a generator's own UV atlas (thousands of micro-islands): mipmaps bleed them into smears, and without
   mipmaps the model sparkles at distance. Re-UV with `smart_project` (big islands), bake with margin 8, keep mipmaps on.
+- **Fix the photo, not the mesh.** Reflections in the paint become raised plates on the model; flatten them first
+  (`tools/deflect.py`), or use a studio shot. Five rounds of roof-patching code taught us this.
+- **The generator only knows what the photo shows.** Whole car in frame, 3/4 angle, a little height. A clipped roof
+  gave strips hanging under the car; a close rear shot gave an invented front. One photo gives one good end: join two
+  (`Art/Blender/trellis_join.py`: rear-photo model is the body, its nose shrink-wrapped onto the front-photo model).
+- **Bake the generator's own texture** (Cycles selected-to-active, full-res source -> clean smart-project UVs) instead of
+  painting outlines by position; only wheels, glass, lamps and plastics are rules. Park nothing aside before a bake
+  (an object at (3, 1.5, 0) bakes black), and never pick a datablock with `[-1]` on `bpy.data.images` (alphabetical).
+- **Weld before decimating.** The glTF import splits vertices along every UV island; decimating that tears holes
+  that show as dark flecks. `remove_doubles(dist=1e-5)` first. And never tell bmesh faces apart by index after a
+  delete: freed slots are reused. Tag them in an int layer.
+- Close Chrome and anything else not in use before a TRELLIS run (it peaks near 17 GB VRAM); the GLB bake runs in its
+  own process (`export_glb.py`) after the model is unloaded. A forced Unreal close leaves a "Restore Packages" dialog
+  that blocks the MCP; close it with a window message from PowerShell.
 - **Judge art from the real game camera** (Simulate, pause, `CaptureViewport` from the game's height), not from
   close-ups. The TRELLIS coupe looked great close up and like a dark blob from the game camera.
 
