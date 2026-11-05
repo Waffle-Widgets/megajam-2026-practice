@@ -80,6 +80,34 @@ mod = ob.modifiers.new('wrap', 'SHRINKWRAP'); mod.target = srcA; mod.wrap_method
 mod.vertex_group = 'front'; mod.wrap_mode = 'ON_SURFACE'
 bpy.ops.object.modifier_apply(modifier=mod.name)
 V2 = verts(ob); out['wrapped_mm'] = {'mean': round(float(np.linalg.norm(V2 - V, axis=1)[w > 0.5].mean()) * 1000, 1), 'max': round(float(np.linalg.norm(V2 - V, axis=1).max()) * 1000, 1)}
+
+def wheel_axle(V, y0, wz, sgn):
+    """Axle direction of one wheel: the thinnest axis of its tyre/rim points (inside the tyre circle, one side)."""
+    r = np.hypot(V[:, 1] - y0, V[:, 2] - wz); m = (r < cl['TYRE_R'] - 0.01) & (r > 0.06) & (sgn * V[:, 0] > 0.18) & (sgn * V[:, 0] < 0.40)
+    P = V[m]; c = P.mean(0); _, E = np.linalg.eigh(np.cov((P - c).T)); ax = E[:, 0]
+    if ax[0] < 0: ax = -ax
+    return math.atan2(ax[1], ax[0]), float(c[0]), int(m.sum())
+def straighten_front_wheels(ob, min_deg=5.0):
+    """The yellow photo was shot with the front wheels turned (38 deg here), and the generator copied that. The wheels
+    are part of the body mesh, so the game can't steer them: turn each front wheel back about the vertical axis
+    through its centre. The wheel is picked out in its own turned frame (a turned tyre pokes out of the straight
+    cylinder) with a 2.5 cm soft edge so the arch skin around it isn't torn."""
+    V = verts(ob); wz = float(V[:, 2].min()) + cl['TYRE_R']
+    low = V[V[:, 2] < V[:, 2].min() + 0.02]; ys = np.sort(low[:, 1]); y0 = float(np.median(ys[:np.argmax(np.diff(ys)) + 1]))
+    rep = {}
+    for sgn in (1, -1):
+        th, xc, n = wheel_axle(V, y0, wz, sgn); k = 'R' if sgn > 0 else 'L'
+        rep[k] = {'steer_deg': round(math.degrees(th), 1), 'n': n}
+        if abs(math.degrees(th)) < min_deg: continue
+        c = np.array([xc, y0, wz]); cs, sn = math.cos(-th), math.sin(-th)
+        D = V - c; Vr = D.copy(); Vr[:, 0] = cs * D[:, 0] - sn * D[:, 1]; Vr[:, 1] = sn * D[:, 0] + cs * D[:, 1]   # un-steered frame
+        r = np.hypot(Vr[:, 1], Vr[:, 2]); inx = (np.abs(Vr[:, 0]) < 0.085) & (sgn * V[:, 0] > 0.17)
+        wt = np.clip((cl['TYRE_R'] + 0.015 - r) / 0.025, 0, 1) * inx
+        V = V + (Vr - D) * wt[:, None]; rep[k]['moved'] = int((wt > 0).sum())
+    ob.data.vertices.foreach_set('co', V.ravel()); ob.data.update()
+    V = verts(ob); rep['after_deg'] = [round(math.degrees(wheel_axle(V, y0, wz, s)[0]), 1) for s in (1, -1)]
+    return rep
+out['steer'] = straighten_front_wheels(ob)
 for p in me.polygons: p.use_smooth = True
 cl['smooth_body'](ob, iters=6, normal_iters=30, snap_dot=-2)
 cl['smooth_body'](ob, iters=10, normal_iters=30, snap_dot=-2, only=((-0.5, -0.9, -0.3), (0.5, Y_FULL + 0.02, 0.35)))   # the wrapped nose, a little more
@@ -130,7 +158,9 @@ for o in (srcA, srcB): o.hide_render = True; o.hide_viewport = True
 V = verts(ob); low = V[V[:, 2] < V[:, 2].min() + 0.02]; ys = np.sort(low[:, 1]); gap = np.argmax(np.diff(ys))
 cl['WHEEL_YS'] = (float(np.median(ys[:gap + 1])), float(np.median(ys[gap + 1:]))); cl['WHEEL_Z'] = float(V[:, 2].min() + cl['TYRE_R'])
 out['wheels'] = [cl['WHEEL_YS'], cl['WHEEL_Z']]
-col, rough, mask = cl['paint_pixels'](P, N, np.zeros_like(P), skip=cl['TRELLIS_SKIP'])
+# only the wheel painting is used from paint_pixels (the body comes from the bake), so skip every body part and
+# circle: the straightened front tyre's face sits where the headlight projector rule looks and got a chrome disc
+col, rough, mask = cl['paint_pixels'](P, N, np.zeros_like(P), skip=tuple(p[0] for p in cl['PARTS']) + tuple(c[0] for c in cl['CIRCLES']))
 x, y, z = P[..., 0], P[..., 1], P[..., 2]
 wheel = np.zeros(P.shape[:2], bool)
 for yw in cl['WHEEL_YS']: wheel |= (np.hypot(y - yw, z - cl['WHEEL_Z']) < cl['TYRE_R'] + 0.002) & (np.abs(x) > 0.20)

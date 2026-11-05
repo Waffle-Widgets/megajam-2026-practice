@@ -488,3 +488,18 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - A cleanup rule written for one bad run (strips under a clipped-roof model) kept running on every good one. Check what a filter removed, not only that the problem it was for is gone.
   - Look at every car part from close up at least once; the game camera hides the lower half of a wheel in shadow.
 - **Media:** ![before, Cycles close-up](media/coupe-wheels-before.jpg) ![after, Cycles close-up](media/coupe-wheels-after.jpg) ![after, in the game](media/coupe-wheels-ingame.jpg)
+
+### 2026-11-05 — The front wheels were turned while the car drove straight
+- **What we asked for:** "Do we have the ability to turn the front tires? Because right now the car is going straight but the tires are turned."
+- **What happened:**
+  - Measured first: the thinnest axis of each wheel's point cloud is its axle. Front wheels were turned 42° (right) and 40° (left); the rears were within 3° of straight. The yellow car was photographed with its wheels cranked for the shot, and the generator copied that.
+  - The wheels are not separate parts on a TRELLIS car (one mesh, wheels and all), so the Blueprint cannot steer or spin them. The practical fix is to straighten them in the mesh: `trellis_join.py` now turns each front wheel back about the vertical axis through its centre. The wheel is picked out in its own turned frame (a turned tyre sticks out of a straight cylinder) with a 2.5 cm soft edge so the arch skin around it is not torn. It only runs when a wheel is more than 5° off.
+  - Rebuilt as `SM_CarCoupeT25` (front wheels now 2° and 4.5°), same import routine as the wheel fix an hour earlier.
+- **What went wrong on the way:**
+  - A small chrome disc appeared on the front tyre's sidewall. The headlight projector rule paints a chrome circle on any forward-facing surface at a given height, and that height is exactly the top of the tyre, which the straightened tyre's front face now points at. The body texture comes from the photo bake anyway, so the wheel region now takes only the wheel painting and no body-part rules. Only the texture step was re-run (16 s).
+  - Two rounds of in-game captures showed the rear of the car: the coupe's nose points +Y at yaw 0, not -Y. Third round from the right end.
+- **What we learned:**
+  - Measure a model's wheels (steer, camber) before judging it; a 40° steer reads as "something's off" from the game camera but not as what it is.
+  - A rule that keys on height and facing direction will hit any part that happens to be there. Keep part rules off the wheels.
+- **Not done:** spinning and steering wheels would need the wheels cut out of the mesh as their own part, like the other car bodies' `SM_CarWheelV3`. That is a separate job.
+- **Media:** ![before, from below](media/coupe-steer-before.jpg) ![after, from below](media/coupe-steer-after.jpg) ![after, in the game](media/coupe-steer-ingame.jpg)
