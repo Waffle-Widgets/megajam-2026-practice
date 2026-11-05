@@ -113,6 +113,10 @@
 - Decimating a smooth remeshed skin folds it into creases: smooth first, decimate, then transfer the smooth normals.
 - Measure the real object (length, width, height, wheelbase) before judging an AI model. The BRZ was 15% too wide and
   only looked "squat" until the numbers said why.
+- Never keep a generator's own UV atlas (thousands of micro-islands): mipmaps bleed them into smears, and without
+  mipmaps the model sparkles at distance. Re-UV with `smart_project` (big islands), bake with margin 8, keep mipmaps on.
+- **Judge art from the real game camera** (Simulate, pause, `CaptureViewport` from the game's height), not from
+  close-ups. The TRELLIS coupe looked great close up and like a dark blob from the game camera.
 
 ## Blender (for building our own 3D models)
 - Blender **5.2 LTS** with Blender's official MCP (Blender Lab). It is registered in `.mcp.json` as `blender`.

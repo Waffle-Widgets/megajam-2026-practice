@@ -506,7 +506,7 @@ NARROW = 0.867
 
 
 def smooth_body(ob, iters=10, lam=0.5, keep_sharp=(-2, -1), skip=None, normal_iters=60, deck_box=None,
-                snap_dot=0.5, snap_rings=4):
+                snap_dot=0.5, snap_rings=4, only=None):
     """Iron out the AI's lumpy panels (in place), in two layers:
     - shape: each vertex moves towards the average of its neighbours for `iters` rounds, but only along its
       normal (in/out). Sliding sideways moves the texture with it and zigzags painted outlines. (Gently, so the
@@ -539,6 +539,7 @@ def smooth_body(ob, iters=10, lam=0.5, keep_sharp=(-2, -1), skip=None, normal_it
         d = np.einsum('ij,ij->i', d, vn)[:, None] * vn     # in/out only: sliding along the surface drags
         P += (lam * wv)[:, None] * d                      # the painted outlines into zigzags
     keep = ~inbox(co, skip) if skip else np.ones(nv, bool)
+    if only: keep &= inbox(co, only)                        # only: box ((x0,y0,z0),(x1,y1,z1)) to work inside
     ws = w * keep
     for _ in range(iters): step(co, ws)
     me.calc_loop_triangles(); tri = np.empty(len(me.loop_triangles) * 3, np.int64)
