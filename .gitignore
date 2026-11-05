@@ -46,3 +46,6 @@ Art/Blender/textures/
 Art/Blender/export/
 # Personal reference photos (may show number plates)
 Art/Reference/
+
+# baked maps and lamp points from the TRELLIS pipeline
+Art/Blender/cache/
