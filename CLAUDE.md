@@ -143,6 +143,10 @@
   that blocks the MCP; close it with a window message from PowerShell.
 - After every TRELLIS build, render each wheel from a low side angle in Blender: the game camera hides the lower half of
   a wheel, and the strip filter in `trellis_build.py` cut every coupe's hub and spokes there for a day before anyone saw it.
+- A nearest-point shrink-wrap can't carry recesses (grille, lamp pockets): where a generator model has them, use its own
+  faces (`nose_transplant` in `trellis_join.py`). Join torn AI edges with an overlap (flange + dipped band), never by
+  bridging or welding the edges: pairing fails and leaves holes.
+- `git lfs unlock` makes the file read-only, and then `AssetTools.delete` fails and blames a referencer. `attrib -r` first.
 - **Judge art from the real game camera** (Simulate, pause, `CaptureViewport` from the game's height), not from
   close-ups. The TRELLIS coupe looked great close up and like a dark blob from the game camera.
 

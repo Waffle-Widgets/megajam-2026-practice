@@ -111,6 +111,34 @@ out['steer'] = straighten_front_wheels(ob)
 for p in me.polygons: p.use_smooth = True
 cl['smooth_body'](ob, iters=6, normal_iters=30, snap_dot=-2)
 cl['smooth_body'](ob, iters=10, normal_iters=30, snap_dot=-2, only=((-0.5, -0.9, -0.3), (0.5, Y_FULL + 0.02, 0.35)))   # the wrapped nose, a little more
+
+# nose transplant
+def nose_transplant(ob, srcA, y_cut=-0.65, lap=0.02, dip=0.002):
+    """The wrap puts B's invented nose onto A's surface, but a nearest-point wrap cannot carry recesses: the grille
+    opening, fog-lamp pockets and lamp housings come out as a crumpled lump. So ahead of y_cut (just in front of the
+    front arches, where both skins agree to a millimetre) the body's faces are swapped for A's own. It is an overlap
+    joint, not a butt joint: A's edge is torn into dozens of pieces, so bridging the two cut loops pairs them wrongly
+    and leaves a row of holes. Instead A keeps a flange `lap` past the cut, and the body's leading band is dipped
+    `dip` toward the car's centre line (a smooth ramp over lap + 1 cm) so it tucks under that flange. The dip
+    direction is geometric, not the vertex normal, because the AI shell's normals are not consistently outward.
+    A's flange edge (y_cut + lap) must stay ahead of the front arch hole (its front edge is at about -0.617, and
+    trellis_wheels.py cuts the wheels out there): at -0.62 A's ragged edge hung over the arch and showed in the game."""
+    def cut(bm, y0, keep_front):
+        bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], dist=1e-5, plane_co=(0, y0, 0), plane_no=(0, 1, 0), clear_inner=not keep_front, clear_outer=keep_front)
+        bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
+    bm = bmesh.new(); bm.from_mesh(ob.data); cut(bm, y_cut, keep_front=False); n_body = len(bm.faces)
+    zc = -0.08; dipped = 0
+    for v in bm.verts:
+        t = (v.co.y - y_cut) / (lap + 0.01)
+        if 0 <= t < 1:
+            d = Vector((-v.co.x, 0, zc - v.co.z)); d.normalize(); v.co += d * dip * (1 - t); dipped += 1
+    ba = bmesh.new(); ba.from_mesh(srcA.data); cut(ba, y_cut + lap, keep_front=True); n_nose = len(ba.faces)
+    tmp = bpy.data.meshes.new('_nose'); ba.to_mesh(tmp); ba.free(); bm.from_mesh(tmp); bpy.data.meshes.remove(tmp)
+    for f in bm.faces: f.smooth = True
+    bm.to_mesh(ob.data); bm.free(); ob.data.update()
+    return {'body_faces': n_body, 'nose_faces': n_nose, 'dipped': dipped}
+out['nose'] = nose_transplant(ob, srcA)
+# end nose transplant
 mod = ob.modifiers.new('dec', 'DECIMATE'); mod.ratio = 180000 / len(me.polygons); mod.use_collapse_triangulate = True
 bpy.ops.object.modifier_apply(modifier=mod.name)
 nv = len(me.vertices); vn = np.empty(nv * 3); me.vertices.foreach_get('normal', vn); vn = vn.reshape(nv, 3)
@@ -182,6 +210,14 @@ br = np.full(lum.shape, PAINT[1], np.float32); bm0 = np.full(lum.shape, PAINT[2]
 br[dark] = GLASS[1]; bm0[dark] = 0; bm1[dark] = 0
 for m_, look in ((glassbox | rglass | wglass, GLASS), (red, RED)):
     bc[m_] = np.array(look[0], np.float32); br[m_] = look[1]; bm0[m_] = 0; bm1[m_] = 0
+# the transplanted nose: the generator bakes the grille mesh and the fog-lamp pockets as dark blue (median
+# luminance 0.03 and 0.06), which the paint rule above turns body colour. Boxes measured on the front view.
+nose = (y < -0.70) & (N[..., 1] < -0.2)
+grille = nose & (np.abs(x) < 0.22) & (z > -0.195) & (z < -0.10)                                 # the opening, plate bar included
+pocket = nose & (np.abs(x) > 0.26) & (np.abs(x) < 0.37) & (z > -0.195) & (z < -0.095) & (lum < 0.12)   # the lamp itself stays
+PLASTIC = cl['PLASTIC']
+for m_ in (grille, pocket):
+    bc[m_] = np.array(PLASTIC[0], np.float32); br[m_] = PLASTIC[1]; bm0[m_] = 0; bm1[m_] = 0
 w_ = wheel[..., None]
 col = np.where(w_, col, bc); rough = np.where(wheel, rough, br); mask[..., 0] = np.where(wheel, mask[..., 0], bm0); mask[..., 1] = np.where(wheel, mask[..., 1], bm1)
 def put(name, rgb):
