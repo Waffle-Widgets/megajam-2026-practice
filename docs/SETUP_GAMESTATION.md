@@ -31,9 +31,9 @@ The venv is tied to its absolute path, so keep the same drive letter and path.
    `run_image_to_3d.py`, `export_glb.py`, `build_ext.py`) to `D:\AI\TRELLIS2` on GameStation. About 20 GB.
 2. Copy `D:\AI\hf_cache` (model weights, about 16 GB) to the same path, or let the first run download them.
 3. The compiled extensions target compute capability 8.6 (RTX 30 series). An RTX 40 card runs them as they are.
-   For anything else, rebuild each extension: `venv\Scripts\python.exe build_ext.py <ext>` after editing
-   `TORCH_CUDA_ARCH_LIST` in `build_ext.py`. Rebuilding needs Visual Studio 2022 Build Tools (C++ workload) and
-   the CUDA 12.9 toolkit installed.
+   An RTX 50 card does not (it also needs a newer PyTorch), so use Option B there. To rebuild one extension,
+   `venv\Scripts\python.exe build_ext.py <ext>`; it builds for the card in the PC. Rebuilding needs Visual Studio
+   2022 Build Tools (C++ workload) and the CUDA 12.9 toolkit installed.
 4. Install the NVIDIA driver that matches CUDA 12.9 (any recent Game Ready driver works).
 5. Hugging Face login on that PC: `venv\Scripts\hf.exe auth login` with the owner's token (the DINOv3 image encoder is
    gated; the owner has accepted its licence). Never paste the token into a chat.
@@ -41,12 +41,23 @@ The venv is tied to its absolute path, so keep the same drive letter and path.
    `out\test.glb` is the result. The GLB bake runs in its own process (`export_glb.py`); if it runs out of memory,
    `python export_glb.py out\test 2048 250000` retries it with a smaller texture and mesh.
 
-### Option B: rebuild from scratch
-Follow the notes in `docs/DEVLOG.md` ("The owner's real car, part 2"): clone TRELLIS.2, create the venv with
-PyTorch for CUDA 12.9, `pip install triton-windows transformers==4.57.1 "huggingface_hub<1.0" xformers rembg
-onnxruntime`, apply the three Windows patches (`segment_reduce` replacement in `trellis2/modules/sparse/basic.py`,
-`.template data_ptr<T>()` in FlexGEMM, integer casts in o-voxel), then build the extensions with `build_ext.py`.
-Budget three hours.
+### Option B: rebuild from scratch (what GameStation did: RTX 5090, no D: drive, about 1.5 hours)
+GameStation's copy lives in `C:\AI\TRELLIS2` (weights in `C:\AI\hf_cache`). The scripts find their own folder, so
+any drive works as long as `hf_cache` sits next to `TRELLIS2`.
+1. CUDA 12.9 toolkit (`winget install Nvidia.CUDA --version 12.9`) and VS 2022 Build Tools with the C++ workload.
+2. Python 3.11 **outside `AppData`**: the Claude desktop app keeps its own private copy of `AppData\Roaming`, so a
+   Python that uv installs from a chat (`uv python install 3.11`) is invisible to your own terminal ("No Python at
+   ..."). Copy it to `C:\AI\python311` and set `home = C:\AI\python311` in `venv\pyvenv.cfg`.
+3. `pip install torch torchvision xformers --index-url https://download.pytorch.org/whl/cu129` (gave torch 2.8.0,
+   which includes RTX 50 support, sm_120), then `pip install "triton-windows<3.5" "transformers==4.57.1"
+   "huggingface_hub<1.0" rembg onnxruntime` plus the `--basic` list from TRELLIS.2's `setup.sh` (and its utils3d
+   commit). Triton must match torch: 3.4 for torch 2.8.
+4. Clone TRELLIS.2, and into `ext\`: nvdiffrast (`-b v0.4.0`), nvdiffrec (`-b renderutils`), CuMesh, FlexGEMM
+   (both `--recursive`), and a copy of `TRELLIS.2\o-voxel`.
+5. Apply the three Windows fixes in `tools/trellis/patches/` (`segment_reduce` replacement, `.template data_ptr<T>()`
+   in FlexGEMM, integer casts and the `1e-6d` literals in o-voxel), then `venv\Scripts\python.exe build_ext.py ext\<name>`
+   for each of the five. `build_ext.py` finds Visual Studio itself and builds for the card in the PC.
+6. Log in to Hugging Face from **your own** terminal (step 5 of Option A), so the token never passes through a chat.
 
 ## 3. The car pipeline (scripts in this repo)
 

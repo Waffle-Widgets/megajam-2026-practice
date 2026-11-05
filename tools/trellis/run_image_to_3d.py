@@ -3,13 +3,17 @@ Writes <out_prefix>_raw.ply (shape only, always) and <out_prefix>.glb (textured 
 Env: SEED (default 42). A cut-out with real alpha skips the gated RMBG-2.0 background remover."""
 import os, sys, time
 os.environ.setdefault('ATTN_BACKEND', 'xformers'); os.environ.setdefault('SPARSE_ATTN_BACKEND', 'xformers')
-os.environ.setdefault('HF_HOME', r'D:\AI\hf_cache'); os.environ['HF_HUB_DISABLE_SYMLINKS'] = '1'
+ROOT = os.path.dirname(os.path.abspath(__file__))              # the TRELLIS2 folder (D:\AI\TRELLIS2 or C:\AI\TRELLIS2)
+os.environ.setdefault('HF_HOME', os.path.join(os.path.dirname(ROOT), 'hf_cache')); os.environ['HF_HUB_DISABLE_SYMLINKS'] = '1'
 _tok = os.path.expanduser('~/.cache/huggingface/token')         # where `huggingface-cli login` stores it
 if 'HF_TOKEN' not in os.environ and os.path.exists(_tok):
     os.environ['HF_TOKEN'] = open(_tok).read().strip()
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
-sys.path.insert(0, r'D:\AI\TRELLIS2\TRELLIS.2')
+sys.path.insert(0, os.path.join(ROOT, 'TRELLIS.2'))
 import numpy as np, torch, trimesh
+if torch.cuda.get_device_capability(0)[0] != 9:     # xformers' FlashAttention-3 kernel is Hopper-only; on an RTX 50
+    from xformers.ops.fmha import dispatch            # it fails with "invalid argument", so use FlashAttention-2
+    dispatch._set_use_fa3(False)
 from PIL import Image
 import trellis2.pipelines.rembg as rembg_mod
 img = Image.open(sys.argv[1])
@@ -29,6 +33,6 @@ torch.save({'vertices': mesh.vertices.detach().cpu(), 'faces': mesh.faces.detach
             'coords': mesh.coords.detach().cpu(), 'layout': mesh.layout, 'voxel_size': mesh.voxel_size}, out + '_mesh.pt')
 del mesh, pipe; import gc; gc.collect(); torch.cuda.empty_cache()
 import subprocess                                   # the GLB bake runs in a fresh process with the whole GPU
-r = subprocess.run([sys.executable, r'D:\AI\TRELLIS2\export_glb.py', out])
+r = subprocess.run([sys.executable, os.path.join(ROOT, 'export_glb.py'), out])
 print('GLB export exit', r.returncode, flush=True)
 if r.returncode == 0: os.remove(out + '_mesh.pt')

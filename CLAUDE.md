@@ -94,7 +94,7 @@
   inspector, then `CaptureViewport` with a camera transform; `CaptureEditorImage` shows the game camera as the player sees it.
 
 ## AI-generated 3D models (Hunyuan3D 2.1 and TRELLIS.2, both local)
-- **TRELLIS.2** (Microsoft, MIT licence, `D:\AI\TRELLIS2`) is the one to use: one photo with the background cut out ->
+- **TRELLIS.2** (Microsoft, MIT licence, `D:\AI\TRELLIS2` on the main PC, `C:\AI\TRELLIS2` on GameStation) is the one to use: one photo with the background cut out ->
   `venv\Scripts\python.exe run_image_to_3d.py <cutout.png> out\<name> 1024_cascade` (about 5 minutes on the 3090) -> a GLB
   with real panel lines, handles, lights and wheel spokes. Hunyuan3D 2.1 (`D:\AI\Hunyuan3D2`) is lumpier and its licence is
   non-commercial. TRELLIS.2 is Linux-only upstream; the Windows port (patched CUDA extensions, `build_ext.py`, a
@@ -145,6 +145,8 @@
 - **Open Unreal and Blender yourselves** (Start menu, or Claude launches them with `explorer.exe <path>`), never as a
   child of a chat. An app a chat starts closes when that chat is deleted, and its MCP tools vanish from every chat.
   If tools disappear mid-chat, check both apps are running and listening (ports 8000 and 9876), relaunch, then start a new chat.
+- The Claude desktop app keeps a private copy of `AppData\Roaming`: anything a chat installs there (e.g. a Python from
+  `uv python install`) is invisible to the user's own terminal. Install tools outside `AppData` (e.g. `C:\AI\...`).
 - `.claude/settings.local.json` (per PC, gitignored) holds `"enableAllProjectMcpServers": true` so the servers in
   `.mcp.json` load without an approval prompt. Create it on each new PC.
 - Models made in Blender count as our own (scored) art in the jam. Export FBX into `Content/Game/Imported/<Name>/`.

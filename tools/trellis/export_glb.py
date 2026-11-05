@@ -1,7 +1,7 @@
 """GLB bake in its own process, so the generator's weights are gone from the GPU.  python export_glb.py <out_prefix>"""
 import os, sys
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
-sys.path.insert(0, r'D:\AI\TRELLIS2\TRELLIS.2')
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'TRELLIS.2'))
 import torch, o_voxel
 out = sys.argv[1]; TEX = int(sys.argv[2]) if len(sys.argv) > 2 else 4096; DEC = int(sys.argv[3]) if len(sys.argv) > 3 else 500000
 d = torch.load(out + '_mesh.pt', weights_only=False)

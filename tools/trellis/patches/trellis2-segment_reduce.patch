@@ -1,0 +1,20 @@
+diff --git a/trellis2/modules/sparse/basic.py b/trellis2/modules/sparse/basic.py
+index 880973b..21856a9 100644
+--- a/trellis2/modules/sparse/basic.py
++++ b/trellis2/modules/sparse/basic.py
+@@ -280,8 +280,13 @@ class VarLenTensor:
+         if dim is None or 0 in dim:
+             return red
+         
+-        red = torch.segment_reduce(red, reduce=op, lengths=self.seqlen)
+-        return red
++        # Windows port: torch.segment_reduce has no CUDA kernel in the Windows build; same result per batch segment.
++        lengths = torch.as_tensor(self.seqlen, device=red.device)
++        idx = torch.repeat_interleave(torch.arange(lengths.numel(), device=red.device), lengths)
++        out = torch.zeros((lengths.numel(),) + tuple(red.shape[1:]), dtype=red.dtype, device=red.device)
++        if op == 'sum':
++            return out.index_add_(0, idx, red)
++        return out.index_reduce_(0, idx, red, op, include_self=False)
+     
+     def mean(self, dim: Optional[Union[int, Tuple[int,...]]] = None, keepdim: bool = False) -> torch.Tensor:
+         return self.reduce(op='mean', dim=dim, keepdim=keepdim)
