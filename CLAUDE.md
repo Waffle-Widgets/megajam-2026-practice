@@ -75,6 +75,14 @@
   Re-importing a mesh resets its materials, so don't re-import once it's set up.
   **Never delete the source file afterwards:** Unreal opens a modal "Delete Assets" dialog that freezes the MCP until
   someone answers it (Escape = keep the assets). Raw sources under `Imported/` are gitignored instead.
+- **Meshes that rely on vertex colours** (flowers, leaf shading from our Blender kits): `StaticMeshTools.import_file` uses
+  the old FBX importer with vertex colours set to Ignore, and that can't be changed. Copy the `.fbx` into
+  `Content/Game/Imported/<Name>/` instead and let Interchange import it by itself (it keeps vertex colours). Afterwards:
+  re-point the slots at our materials, delete the empty placeholder `M_*` materials it makes, and **switch Nanite off**
+  (`set_nanite_enabled false`). Interchange turns Nanite on, and its simplified mesh drops thin parts like petals.
+  Check with `get_triangle_count` that the full count is back.
+- A `.png` that Unreal refuses with "produced no assets" may really be WebP (TRELLIS GLBs pack WebP). Check the first
+  bytes (`RIFF....WEBP`) and re-save it as a real PNG.
 - Fab in Claude's browser pane: the user signs in there once (the launcher login doesn't carry over). Free items still
   need "Add to My Library" and a one-time EULA; Megascans surfaces are free, but many Megascans 3D models are not.
   Downloads land in `~/Downloads` as `<guid>.tmp` zips; identify them by their contents.

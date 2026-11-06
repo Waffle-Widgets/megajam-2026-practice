@@ -112,7 +112,11 @@ if DIRECT:
     lowo = src; lowo.name = NAME; log['direct'] = True
     log['game_tris'] = sum(len(p.vertices) - 2 for p in lowo.data.polygons)
     for p in lowo.data.polygons: p.use_smooth = True
-    img.filepath_raw = os.path.join(OUTD, 'T_%s_BaseColor.png' % NAME); img.file_format = 'PNG'; img.save()
+    # the GLB packs its texture as WebP and img.save() writes those bytes unchanged under a .png name, which
+    # Unreal refuses ("produced no assets"): copy the pixels into a fresh image and save that as a real PNG
+    w, h = img.size; png = bpy.data.images.new('T_%s_BaseColor' % NAME, w, h, alpha=True)
+    px = np.empty(w * h * 4, dtype=np.float32); img.pixels.foreach_get(px); png.pixels.foreach_set(px)
+    png.filepath_raw = os.path.join(OUTD, 'T_%s_BaseColor.png' % NAME); png.file_format = 'PNG'; png.save()
     m = lowo.data.materials[0]; m.name = 'M_%s' % NAME
 if not DIRECT:
   lowo = src.copy(); lowo.data = src.data.copy(); lowo.name = NAME; bpy.context.scene.collection.objects.link(lowo)

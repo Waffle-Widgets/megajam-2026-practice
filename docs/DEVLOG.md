@@ -569,3 +569,21 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Half of the look must be built on the Unreal side (glass, interiors, sky, reflections). Hand over a written recipe with the meshes.
   - Practice only: under the jam rules these models cannot go into the jam entry. The scripts can, and they rebuild everything in minutes.
 - **Media:** ![dead tree](media/blender-deadtree.png) ![scenery lineup](media/world-kit-lineup.png) ![greenery](media/world-kit-greenery.png) ![first skyline, day](media/world-kit-skyline-day.png) ![first skyline, dusk](media/world-kit-skyline-dusk.png) ![rebuilt skyline, day](media/city-kit-skyline-day.png) ![street level](media/city-kit-street.png) ![facade close-up](media/city-kit-facade-closeup.png) ![rebuilt skyline, golden hour](media/city-kit-skyline-dusk.png)
+
+### 2026-11-06 — Both PCs' art lands in Unreal: scenery, a city, a man and a Shiba (GameStation)
+- **What we asked for:** "Try again" (this chat had lost the Unreal connection), then pick the fix for white flowers ("1": change how we import), then "there were some errors" after a Play test.
+- **What happened:**
+  - Imported the main PC's push: 6 scenery models and 9 city buildings with their textures, plus the rigged man (1.8 m, 23 bones) and Shiba (49 cm, 20 bones) from the TRELLIS pipeline. Sizes and material slots came through right.
+  - The city's look had to be rebuilt in Unreal from the main PC's written recipe (`city_materials.json`): a tiling master `M_CityTile` (texture repeats every 2-6 m, tint, metal, roughness) with 12 instances, and `M_CityGlass`, where a small piece of shader code picks one of 16 rooms per window pane and blends reflective glass over it. 17 materials, every slot on every building filled.
+  - The Shiba's "PNG" was refused: TRELLIS packs WebP, and the character script copied those bytes under a `.png` name. Converted it and fixed `trellis_character.py`.
+  - The man's first thumbnail was grey: it was captured before his texture finished loading. Recapturing fixed it.
+  - **The flowers came in white.** Their colours live in the mesh (vertex colours), and the MCP's import tool uses the old FBX importer with vertex colours set to Ignore. Copying the FBX into the project folder lets Unreal's newer importer pick it up, which keeps them. That importer switched Nanite on, and Nanite's simplified mesh dropped every petal (4,332 triangles became 1,881). Nanite off: petals back, in purple, red, orange and white.
+  - The owner noticed lily pads in Endless fading in and out. The water's top is 2 cm above the lane, the pad is 3 cm thick and floated 1 cm up, and the bob swings it 3 cm either way, so it kept sinking under the solid water. Lifted pads to 5 cm in `BP_Log`'s `LogSetup`.
+  - The Play test also logged errors. Every car checks where the frog is (to honk), and on a frame with no frog all of them read nothing at once. `BP_Car` now checks that a frog exists first. The first rewrite compiled but silently deleted the honk: "IsValid" matched the version with two exec outputs. Reading the graph back caught it.
+  - The title, pause and end screens asked for keyboard focus but weren't focusable; now they are.
+- **What we learned:**
+  - A file's extension can lie. Check the first bytes when an import "produces no assets".
+  - When a mesh relies on vertex colours, import it by dropping it into the folder, then switch Nanite off and check the triangle count.
+  - Thin, flat props on a bobbing platform need clearance above the water, or they flicker through it.
+  - "It compiled" isn't "it works". Always read a rewritten graph back.
+- **Media:** ![everything imported](media/unreal-import-kits.png) ![wildflowers with colour](media/unreal-wildflowers-colour.png)
