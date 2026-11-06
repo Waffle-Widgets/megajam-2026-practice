@@ -612,3 +612,16 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - A general script with settings beats one script per vehicle, for a 3-day jam.
 - **Still rough:** the RAV4's wheels don't spin, and its smoked taillights are sorted as trim, not lamps.
 - **Media:** ![camera before](media/camera-before-topdown.jpg) ![camera after](media/camera-after-thirdperson.jpg) ![RAV4 from the game camera](media/rav4-game-camera.jpg) ![RAV4 close](media/rav4-close.jpg)
+
+### 2026-11-06 — True-scale frog: 5 cm, a mown lawn, and a frog that floated (GameStation)
+- **What we asked for:** "we might need to shrink the frog", then "I'm thinking it should be small enough for a human to step on, so size accurate frogger" (picked "True scale, 5 cm"), then after testing: "the size looks fine but we need to make it look right, looks like it is floating right now."
+- **What happened:**
+  - **Working out the scale:** our car kit is built at about 40% of real size (a 4.24 m car is 1.72 m in game). A real frog next to those cars is about 5 cm, and a person would be about 73 cm.
+  - **The frog:** the toad model is now 5 cm long and 2 cm tall, with a 2.5 cm hit capsule. The camera sits 60 cm behind it, 12° down, pivoting 2 cm off the ground, so cars tower over you. One hop still moves 1 m (20 frog lengths); it plays fine.
+  - **The lawn:** the PCG grass was up to 80 cm tall, sized for the old frog. Mown to 1.5-4 cm. The first two tries changed nothing: the scatter node had "uniform scale" on, which uses the width number for the height too. Two identical captures with different settings gave it away.
+  - **The float:** Unreal keeps a character's capsule about 2 cm above the floor so it doesn't catch on bumps. For a normal character that's invisible; for a 2 cm frog it's a whole body height. Reading the movement component in Play mode showed a gap of exactly 2.15 cm. The squash-and-stretch code anchors the frog's model at the capsule's bottom in three functions, so the anchor moved down 2.15 cm in all of them (plus the default). Now it squashes from the ground too.
+- **What we learned:**
+  - Engine defaults are tuned for human-sized characters. At tiny scales, small "safety gaps" become visible. Measure the live value before guessing.
+  - When a setting change shows no difference at all, look for an option that overrides it.
+- **Still to do:** lily pads (85 cm) and logs are still sized for the big frog, and the frog rises 18 cm onto a log.
+- **Media:** ![frog's-eye view of the lawn](media/lawn-frog-eye.jpg) ![mown lawn at frog scale](media/lawn-mown-frog-scale.jpg)
