@@ -708,3 +708,17 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Check a pose from more than one side. A walk that looks fine from the side can be broken from the front.
   - For moving things, one picture is a snapshot; a list of positions read one by one is not.
 - **Media:** ![arms from the front](media/walk-arms-front.png) ![a traffic light at frog height](media/traffic-light-frog-eye.jpg) ![queues at the lights from above](media/traffic-queues-top.jpg)
+
+### 2026-11-06 — Making it look like a real city: glass, concrete, curbs, zebra crossings (GameStation)
+- **What we asked for:** "yeah fix it, make it look like a real city", then after testing: "the frog jumps through the light posts that are in the middle of the way, can we make is so they aren't in the way?", then "Feels good".
+- **What happened:**
+  - **Windows:** the buildings' windows used our glowing lamp material, so they shone white in daylight. Now they use the city kit's glass, which shows a room behind every pane. A new `Variant` setting on `BP_CityBlock` picks neutral, blue, green or bronze glass, mixed across the 68 buildings.
+  - **Sidewalks:** the existing `MI_Pavement` came out as tan gravel. A new `MI_Sidewalk` (city-kit concrete, repeating every 2 m, slightly tinted) gives light-grey concrete that clearly isn't road.
+  - **Curbs:** 40 strips, 5 cm tall, along every road edge, with gaps at the junctions and no collision (the hop clears 40 cm). The curb material smeared like a barcode down their sides, so they use the sidewalk concrete too.
+  - **Zebra crossings:** 9 stripes on all four sides of every junction, right where the sidewalks cross the roads. That's 288 thin pieces, placed by one script.
+  - **End screen:** the "menu" button was hard-wired to `Lvl_Frogger`. Now it opens `Lvl_City` from the city and the main level everywhere else.
+  - **Posts in the way:** the street lamps stood exactly on tile centres, where the frog lands, and the traffic-light poles were 35 cm from them. Everything moved to a tile corner at the curb. A corner point is 50 cm from every line the frog can hop along, and real posts stand at the kerb anyway. The lights had to be re-placed to pick up their new pole positions (the placed-copies lesson again).
+- **What we learned:**
+  - In a grid game, decoration goes on tile corners, never tile centres. That's a rule worth keeping for the jam.
+  - Judge a material on the actual surface. A ground material can look fine on top and smear on the sides of a step.
+- **Media:** ![zebra crossing at frog height](media/city-crossing-frog-eye.jpg) ![the city from above](media/city-real-overview.jpg) ![one junction from overhead](media/city-junction-top.jpg) ![posts moved to the curb](media/city-posts-at-curb.jpg)

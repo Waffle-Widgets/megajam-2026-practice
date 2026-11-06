@@ -180,6 +180,8 @@
   anim together), then point the slot at the character's `MI_`. `SkeletalMeshTools.import_file` onto the existing
   skeleton does NOT work: the old FBX importer read the bones differently from Interchange (first 1/100 size, then
   twisted) and the walk crushed the man. Test an animation on a placed `SkeletalMeshActor` next to a plain copy.
+- **Grid games: put decoration (posts, lamps, props) on tile corners, never tile centres.** The frog lands on centres and
+  hops along the lines between them; a corner is 50 cm from every path. Street lamps on tile centres had the frog jumping through them.
 - **Judge art from the real game camera** (Simulate, pause, `CaptureViewport` from the game's height), not from
   close-ups. The TRELLIS coupe looked great close up and like a dark blob from the game camera.
 
