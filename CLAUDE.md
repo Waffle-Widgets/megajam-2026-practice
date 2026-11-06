@@ -174,6 +174,12 @@
   - Fur gives pale patches at `1024_cascade`; furry animals come out clean at `512`. Try that before changing seeds.
   - Blender's automatic bone weights fail on anything small (a 0.5 m dog got zero weights). The script weights at 10x scale.
 
+- **Animations for our characters** (`Art/Blender/walk_cycle.py <Name> human|dog`): keys a looping walk/trot on the
+  rig in a centimetre scene and exports mesh + rig + action. Import it the way the character came in: copy the FBX
+  into its own new folder under `Content/Game/Imported/` and let Interchange auto-import it (mesh, skeleton and
+  anim together), then point the slot at the character's `MI_`. `SkeletalMeshTools.import_file` onto the existing
+  skeleton does NOT work: the old FBX importer read the bones differently from Interchange (first 1/100 size, then
+  twisted) and the walk crushed the man. Test an animation on a placed `SkeletalMeshActor` next to a plain copy.
 - **Judge art from the real game camera** (Simulate, pause, `CaptureViewport` from the game's height), not from
   close-ups. The TRELLIS coupe looked great close up and like a dark blob from the game camera.
 

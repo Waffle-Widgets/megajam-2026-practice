@@ -676,3 +676,22 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Ease-out feels slow for a snap turn; constant speed feels responsive.
 - **Still rough:** cars on crossing streets drive through each other at junctions, the sidewalk looks like asphalt, the windows glow white in daytime, and the end screen's menu button opens the main level.
 - **Media:** ![first version, blocks with alleys](media/city-blocks-overview.jpg) ![frog's view up an alley](media/city-alley-frog-eye.jpg) ![the grid from above](media/city-grid-top.jpg) ![from the start corner](media/city-grid-corner.jpg) ![frog height on the first sidewalk](media/city-grid-sidewalk.jpg)
+
+### 2026-11-06 — People walking the sidewalks, and a Shiba on a walk (GameStation)
+- **What we asked for:** "Yes, pedestrians", then after testing: "Feels good".
+- **What happened:**
+  - **Our own walk cycles.** The man is rigged with Unreal mannequin bone names, but only 23 of them (the mannequin has extra spine and neck bones), so the template's walk would have bent him wrongly, and nothing fits the Shiba's dog rig at all. `Art/Blender/walk_cycle.py` keys a 1-second walk (stride, knee bend, arm swing, a little hip bob) or a half-second trot (legs in diagonal pairs, tail wag) on any rig the character script makes. It finds each joint's direction by testing which way the foot moves, and renders an 8-frame strip to check.
+  - **`BP_Pedestrian`:** one Blueprint with a man and a Shiba body (one is shown), a route (a rectangle around a block's sidewalk, or one stretch back and forth), a speed and a start point. Touching its feet costs a life, like a car.
+  - **In the city:** three people circle the middle blocks (one the other way round), two walk the side streets, and one walks his Shiba. People are 73 cm and the dog 20 cm, the same game scale as the cars.
+  - **The walk crushed the man (three tries):**
+    1. The MCP's import tool brought the walk in at 1/100 size. The man vanished, and the walkers' bounds were only 20 cm.
+    2. Exporting "100x" from Blender only changed a units label, which that importer ignores.
+    3. Baking the scale into the data put the ×100 on the skeleton's parent object: the mesh came out the right size, but the bone tracks stayed in metres.
+    4. With a centimetre scene the size was right, but the bones were twisted: that importer reads bone directions differently from the one the man came in through.
+    - **What worked:** dropping the FBX into a new folder under `Content/` so Unreal's own importer (Interchange) brought in mesh, skeleton and walk together. A plain copy placed next to an animated one made each failure obvious.
+  - **Placed walkers kept the old animation** after the Blueprint changed (again), and a deleted animation left them empty. Re-placing them fixed it.
+- **What we learned:**
+  - Import animations with the same importer as the character they belong to.
+  - When a model disappears, place a plain copy next to the broken one and compare. It turns "it's invisible" into "it's 0.8 cm tall" or "it's twisted".
+  - Making the animation ourselves was quicker than retargeting, and it counts as our own art.
+- **Media:** ![the dog owner and his Shiba](media/walkers-owner-and-shiba.jpg) ![standing vs walking](media/walker-rest-vs-walk.jpg)
