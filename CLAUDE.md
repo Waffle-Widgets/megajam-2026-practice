@@ -177,6 +177,12 @@
 ## Switching computers
 We work on more than one PC. Only one machine should have the project open at a time. You can only act on the PC
 this session runs on, so the session on each machine handles its own side.
+- **Split work (since Nov 5):** GameStation has Unreal open and is the only PC that edits or commits `.uasset`/`.umap`.
+  The main PC keeps Unreal closed and does TRELLIS, Blender and bakes, committing FBX + textures (`Art/Blender/export/`,
+  `Content/Game/Imported/<Name>/`) and scripts only; GameStation pulls and imports them. Both PCs use the same GitHub
+  account, so LFS locks can't protect us: `git pull --rebase` before every commit, and never commit Unreal assets from
+  the PC that doesn't own Unreal. Message the other PC's chat with the asset names after each push.
+- Unlock many files by ID, not path (`git lfs locks --json`); strip `\r` from IDs produced on Windows.
 - **"I'm leaving this computer":** check every asset under `/Game/Game` is saved (`is_dirty`), make sure tested work is
   committed and pushed (ask about anything untested), release our LFS locks (`git lfs locks`), then close Unreal. If it
   stalls on a save prompt for a template asset we never meant to change, force-close it, but only after confirming our
