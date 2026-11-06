@@ -640,3 +640,16 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Thinner objects can disappear under other surfaces. Check the heights of what's around them.
   - If a placed copy ignores every change, set the value at runtime where it's used.
 - **Media:** ![river log at frog scale](media/river-log-frog-scale.jpg) ![goal pad at frog scale](media/goal-pad-frog-scale.jpg)
+
+### 2026-11-06 — The RAV4's wheels spin (GameStation)
+- **What we asked for:** "Yes, wheels next" (the RAV4's wheels were part of its body model, so they couldn't turn), then after testing: "Looks good".
+- **What happened:**
+  - **Measuring first:** a headless Blender script counted the model's points by distance from each axle. There was a sharp edge at 15 cm (the tyre, in game size) and then almost nothing until 18 cm (the wheel arch). That 3 cm gap is what lets a cut free each wheel cleanly.
+  - **Reusing the coupe's script:** `Art/Blender/trellis_wheels.py` already cut the coupe's wheels out, but its sizes, names and export folder were the coupe's. They are now settings (tyre radius, cut depth, wheel position, material, export folder), with the coupe's numbers kept as the defaults. The RAV4 call:
+    `TYRE_R=0.15, CUT_PAD=0.006, X_IN=0.21, X_CAP=0.19, X_ORG=0.33, PICK=(1,'front')`, run headless in about 8 s.
+  - **Black previews:** the first check pictures were pure black. The RAV4's work file has no lights (its own check sheet adds them, then deletes them). The runner now adds a sun and a sky before the cut.
+  - **In the game:** `SM_CarRav4Body` (121k triangles, 4 LODs) and `SM_CarRav4Wheel` (8.9k, 3 LODs), on the RAV4's own material. In `BP_Car`, the RAV4 gets the new body and four wheels 33 cm out, 57 cm forward and 52 cm back, axle 15 cm up. The spin code already turned every car's wheels; the RAV4's were just hidden.
+- **What we learned:**
+  - Measure the model before choosing cut sizes. A histogram of distances found the tyre's edge exactly, no guessing.
+  - A script written for one car becomes a tool once its numbers are settings. Keeping the old numbers as defaults means the coupe still rebuilds the same way.
+- **Media:** ![RAV4 with separate wheels](media/rav4-wheels-cut.jpg) ![Blender check sheet](media/rav4-wheels-blender.jpg)

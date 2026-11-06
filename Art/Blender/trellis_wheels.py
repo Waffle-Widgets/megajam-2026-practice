@@ -6,18 +6,24 @@ The generator makes each wheel a nearly closed drum fused flush into the fender,
 (tyre radius + 4 mm) frees it as one piece.  The body gets a dark liner drum built from each hole's own edge loop, so
 the arch does not look straight into the empty shell.  The wheel is mirrored to face +X (Unreal's right side; the car
 Blueprint yaws the left wheels 180) with its origin on the axle at |x| = X_ORG, where the Blueprint places WheelFR.
+The defaults are the BRZ coupe's; another car passes its own (all in game metres, see the RAV4 call in the devlog):
+TYRE_R tyre radius, X_IN inner end of the cut, X_CAP liner depth, X_ORG wheel origin, PFX object-name prefix,
+MAT / IMG the car's material and base-colour image, CAND_X / CAND_R the outer tyre-sidewall band for the liner colour,
+EXPORT_DIR where the FBXs go, SAVE_AS a .blend to save the result to (for headless runs).
 """
 import bpy, bmesh, numpy as np, math, os, time
 from mathutils import Vector
 
 t0 = time.time()
-TYRE_R = 0.127; R_CUT = TYRE_R + 0.004; X_IN = 0.19; X_CAP = 0.17; X_ORG = 0.30
+G = globals().get
+TYRE_R = G('TYRE_R', 0.127); R_CUT = TYRE_R + G('CUT_PAD', 0.004); X_IN = G('X_IN', 0.19); X_CAP = G('X_CAP', 0.17); X_ORG = G('X_ORG', 0.30)
+PFX = G('PFX', 'TR_BRZ'); MAT = G('MAT', 'M_CarT'); IMG = G('IMG', 'T_CarCoupeT_BaseColor'); CAND_X = G('CAND_X', 0.345); CAND_R = G('CAND_R', (0.105, 0.12))
 SRC = globals().get('SRC', 'TR_BRZ'); OUT_BODY = globals().get('OUT_BODY', 'SM_CarCoupeT26'); OUT_WHEEL = globals().get('OUT_WHEEL', 'SM_CarCoupeTWheel')
 PICK = globals().get('PICK', (-1, 'rear')); DO_EXPORT = globals().get('DO_EXPORT', True); SPIN_DEG = globals().get('SPIN_DEG', 37.0)
 D = os.path.dirname(bpy.data.filepath); SP = globals().get('SP', D + '\\cache')
 out = {}
 src = bpy.data.objects[SRC]; col = src.users_collection[0]
-for nm in ('TR_BRZ_Body', 'TR_BRZ_WheelsCut', 'TR_BRZ_Wheel') + tuple('TR_BRZ_W%d' % i for i in range(4)):
+for nm in (PFX + '_Body', PFX + '_WheelsCut', PFX + '_Wheel') + tuple(PFX + '_W%d' % i for i in range(4)):
     o = bpy.data.objects.get(nm)
     if o:
         m = o.data; bpy.data.objects.remove(o)
@@ -27,7 +33,7 @@ def verts(me):
     V = np.empty(len(me.vertices) * 3, np.float32); me.vertices.foreach_get('co', V); return V.reshape(-1, 3)
 
 # ---- wheel centres: lowest points split into two y groups, axle at tyre radius above the ground
-body = src.copy(); body.data = src.data.copy(); body.name = body.data.name = 'TR_BRZ_Body'; col.objects.link(body)
+body = src.copy(); body.data = src.data.copy(); body.name = body.data.name = PFX + '_Body'; col.objects.link(body)
 body.location = (0, 0, 0); body.hide_render = False; body.hide_set(False); body.hide_viewport = False
 me = body.data; V = verts(me); n = len(V)
 zmin = float(V[:, 2].min()); wz = zmin + TYRE_R
@@ -60,21 +66,21 @@ for i, cs in comps.items():
     cs.sort(key=len, reverse=True); out['pieces'][str(wheels[i - 1])] = [len(c) for c in cs[:5]]
     for c in cs[1:]:
         for f in c: f[lay] = 0   # small slivers stay with the body
-wm = bpy.data.meshes.new('TR_BRZ_WheelsCut'); wm.materials.append(bpy.data.materials['M_CarT'])
+wm = bpy.data.meshes.new(PFX + '_WheelsCut'); wm.materials.append(bpy.data.materials[MAT])
 bw = bm.copy(); lw = bw.faces.layers.int.get('wid')
 bmesh.ops.delete(bw, geom=[f for f in bw.faces if f[lw] == 0], context='FACES')
 bmesh.ops.delete(bw, geom=[v for v in bw.verts if not v.link_faces], context='VERTS')
 bw.to_mesh(wm); bw.free()
-wcut = bpy.data.objects.new('TR_BRZ_WheelsCut', wm); col.objects.link(wcut); wcut.hide_render = True
+wcut = bpy.data.objects.new(PFX + '_WheelsCut', wm); col.objects.link(wcut); wcut.hide_render = True
 bmesh.ops.delete(bm, geom=[f for f in bm.faces if f[lay] != 0], context='FACES')
 bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')   # loose points blow up the bounds
 
 # ---- a dark texel for the liners: the darkest tyre-sidewall loop of the picked wheel (the tyre is painted, so black)
-im = bpy.data.images['T_CarCoupeT_BaseColor']; S = im.size[0]
+im = bpy.data.images[IMG]; S = im.size[0]
 px = np.empty(S * S * 4, np.float32); im.pixels.foreach_get(px); px = px.reshape(S, S, 4)[..., :3]
 uvl = wm.uv_layers.active.data; Vw = verts(wm); psgn, pk = PICK
 r = np.hypot(Vw[:, 1] - wy[pk], Vw[:, 2] - wz)
-cand = set(np.where((psgn * Vw[:, 0] > 0.345) & (r > 0.105) & (r < 0.12))[0].tolist())
+cand = set(np.where((psgn * Vw[:, 0] > CAND_X) & (r > CAND_R[0]) & (r < CAND_R[1]))[0].tolist())
 best = None
 for p in wm.polygons:
     for li in p.loop_indices:
@@ -132,8 +138,8 @@ bmesh.ops.delete(bw, geom=[v for v in bw.verts if v not in keep], context='VERTS
 for v in bw.verts: v.co = Vector((psgn * v.co.x - X_ORG, v.co.y - wy[pk], v.co.z - wz))
 if psgn < 0:
     for f in bw.faces: f.normal_flip()
-wmesh = bpy.data.meshes.new('TR_BRZ_Wheel'); wmesh.materials.append(bpy.data.materials['M_CarT']); bw.to_mesh(wmesh); bw.free()
-wob = bpy.data.objects.new('TR_BRZ_Wheel', wmesh); col.objects.link(wob); wob.hide_render = True
+wmesh = bpy.data.meshes.new(PFX + '_Wheel'); wmesh.materials.append(bpy.data.materials[MAT]); bw.to_mesh(wmesh); bw.free()
+wob = bpy.data.objects.new(PFX + '_Wheel', wmesh); col.objects.link(wob); wob.hide_render = True
 Vq = verts(wmesh); out['wheel'] = {'verts': len(wmesh.vertices), 'faces': len(wmesh.polygons), 'min': Vq.min(0).round(3).tolist(), 'max': Vq.max(0).round(3).tolist()}
 out['body'] = {'verts': len(me.vertices), 'faces': len(me.polygons)}
 V = verts(me); out['body_bounds'] = [V.min(0).round(3).tolist(), V.max(0).round(3).tolist()]
@@ -141,9 +147,12 @@ V = verts(me); out['body_bounds'] = [V.min(0).round(3).tolist(), V.max(0).round(
 # ---- put four copies back on the body (spun by SPIN_DEG so anything poking through the fender shows) and render
 inst = []
 for i, (sgn, k) in enumerate(wheels):
-    o = bpy.data.objects.new('TR_BRZ_W%d' % i, wmesh); col.objects.link(o)
+    o = bpy.data.objects.new(PFX + '_W%d' % i, wmesh); col.objects.link(o)
     o.location = (sgn * X_ORG, wy[k], wz); o.rotation_euler = (math.radians(SPIN_DEG), 0, 0 if sgn > 0 else math.pi); o.hide_render = False; inst.append(o)
-sc = bpy.context.scene; cam = bpy.data.objects['PV_Cam']; sc.camera = cam
+sc = bpy.context.scene; cam = bpy.data.objects.get('PV_Cam')
+if cam is None:
+    cam = bpy.data.objects.new('PV_Cam', bpy.data.cameras.new('PV_Cam')); col.objects.link(cam)
+sc.camera = cam
 vis = {o.name: o.hide_render for o in bpy.data.objects if o.type == 'MESH'}
 for o in bpy.data.objects:
     if o.type == 'MESH': o.hide_render = True
@@ -175,9 +184,10 @@ if DO_EXPORT:
     def export(ob, name):
         for o in bpy.context.view_layer.objects: o.select_set(False)
         ob.hide_set(False); ob.hide_viewport = False; ob.select_set(True); bpy.context.view_layer.objects.active = ob
-        bpy.ops.export_scene.fbx(filepath=D + '\\export\\%s.fbx' % name, use_selection=True, axis_forward='-Z', axis_up='Y', global_scale=1.0, apply_unit_scale=True, mesh_smooth_type='FACE', use_mesh_modifiers=True, path_mode='STRIP', embed_textures=False, bake_anim=False)
+        bpy.ops.export_scene.fbx(filepath=(G('EXPORT_DIR') + chr(92) + name + '.fbx') if G('EXPORT_DIR') else D + '\\export\\%s.fbx' % name, use_selection=True, axis_forward='-Z', axis_up='Y', global_scale=1.0, apply_unit_scale=True, mesh_smooth_type='FACE', use_mesh_modifiers=True, path_mode='STRIP', embed_textures=False, bake_anim=False)
     export(body, OUT_BODY); export(wob, OUT_WHEEL)
     out['exported'] = [OUT_BODY, OUT_WHEEL]
 body.location = (3, 1.5, 0)
+if G('SAVE_AS'): bpy.ops.wm.save_as_mainfile(filepath=G('SAVE_AS'), copy=True)
 out['s'] = round(time.time() - t0, 1)
 result = out
