@@ -653,3 +653,26 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Measure the model before choosing cut sizes. A histogram of distances found the tyre's edge exactly, no guessing.
   - A script written for one car becomes a tool once its numbers are settings. Keeping the old numbers as defaults means the coupe still rebuilds the same way.
 - **Media:** ![RAV4 with separate wheels](media/rav4-wheels-cut.jpg) ![Blender check sheet](media/rav4-wheels-blender.jpg)
+
+### 2026-11-06 — A city you have to walk through: blocks, alleys, a street grid and a camera that turns (GameStation)
+- **What we asked for:** "Yes, city blocks", then "just do it all and i will play test after", then after the first version: "I'm thinking this frog is just trying to get to a destination and it needs to traverse the city it has stumbled upon. can we make the layout like a normal city would be and see how that feels? the frog can then move in more directions than just forward". After testing: "when you turn the camera doesn't turn with you and it just feels really bad", "there is a delay sometimes. I also saw cars driving onto the sidewalk and I got hit by one", "the camera turn still feels slow", "feels better".
+- **What happened:**
+  - **A new map, `Lvl_City`**, copied from the main level so the original stays playable. It has its own game mode, `BP_CityGameMode` (90-second timer).
+  - **Buildings block the frog.** `BP_CityBlock` is one building that knows how many tiles it covers; the game mode's hop check refuses a hop into one, the same bump as the board edge. The building is our shopfront model (1.94 m deep, 2.6 m wide), which fits a 2-tile row almost exactly. The big kit towers became the skyline.
+  - **The frog finds its own goal row** from where the goal pads are, instead of a fixed 9, so a longer board needs no extra setting. Endless has no pads and keeps its own.
+  - **Version 1** was the old straight board with two blocks of buildings and alleys to weave through. It played "ok so far", but it was still "go forward".
+  - **Version 2 is a real grid:** 3 × 3 solid blocks (68 buildings), 4 cross streets and 2 avenues with traffic both ways (36 cars), a sidewalk around every block, alleys through three blocks, and the goal pads on the far side of the city.
+  - **Cars drive the way they face.** The car Blueprint used to move only sideways and loop around the middle of the map. Now each car drives along its own facing and loops around its own street. A car turned 90° drives up an avenue. The wheels spin in the car's own frame.
+  - **The camera turns with the frog (city only).** "Up" hops the way the camera faces. Left and right turn you and swing the camera behind you. Down hops back without spinning the camera.
+  - **Unreal crashed once.** A careless call of ours turned a whole settings description into a 2,122-character "property name", and Unreal stops on anything over 1,023. Everything was saved first, so nothing was lost; on restart we skipped the "Restore Packages" offer.
+  - **"The camera doesn't turn":** the numbers all said it had turned, but a picture of the live game showed it still facing north. The camera arm has Inherit Yaw off (that is what keeps it north in the main level), and with that off it ignores the direction we were setting and only reads its own relative angle. One-word fix.
+  - **Cars on the sidewalk:** the avenue cars looped around right at the ends of the avenue, and their noses stuck out onto the start sidewalk and the last one before the goal. Now the avenues run 15 m past the start, so cars loop around out of sight behind you, and at the far end they loop around in the middle of the last street.
+  - **"Still feels slow":** an easing turn creeps over its last few degrees. A fixed 720° a second does a corner in an eighth of a second and stops crisply.
+  - **Checked the old levels** in Play mode after the changes: the main level and Endless still drive their cars sideways, and the frog keeps normal controls there.
+- **What we learned:**
+  - When something on screen doesn't match the variables, take a picture of the live game. The numbers were right; the camera arm wasn't reading them.
+  - A setting that makes one feature work (Inherit Yaw off keeps the camera north) can silently break the next one.
+  - Our tools read one thing at a time while the game keeps running, so readings taken a moment apart aren't a snapshot.
+  - Ease-out feels slow for a snap turn; constant speed feels responsive.
+- **Still rough:** cars on crossing streets drive through each other at junctions, the sidewalk looks like asphalt, the windows glow white in daytime, and the end screen's menu button opens the main level.
+- **Media:** ![first version, blocks with alleys](media/city-blocks-overview.jpg) ![frog's view up an alley](media/city-alley-frog-eye.jpg) ![the grid from above](media/city-grid-top.jpg) ![from the start corner](media/city-grid-corner.jpg) ![frog height on the first sidewalk](media/city-grid-sidewalk.jpg)

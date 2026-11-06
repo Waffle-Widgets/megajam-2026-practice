@@ -99,6 +99,13 @@
 - One Blueprint can be set up in more than one place. `BP_Log` is built by its construction script (placed logs) **and** by
   `LogSetup` (Endless spawns). Search for every caller before changing how an actor looks, and test both maps.
 - `mcp__unreal__call_tool` needs `toolset_name` **and** `tool_name` (e.g. `EditorToolset.EditorAppToolset` / `StartPIE`).
+- `ObjectTools.get_properties` takes exact property names only. `list_properties` returns a JSON schema, not a list:
+  never turn its text into names by string-splitting. A 2,000-character "name" hit Unreal's 1,023-character FName
+  limit and crashed the editor (assertion in UnrealNames.cpp). Save before any exploratory call during PIE.
+- The frog's `CameraBoom` has Inherit Yaw off (that keeps the camera north while the frog turns). A spring arm
+  with Inherit Yaw off ignores its world rotation's yaw and uses its *relative* yaw, so turn it with
+  `SetRelativeRotation`, not `SetWorldRotation`. Debug camera problems with `CaptureEditorImage` during PIE: the
+  variables can all look right while the picture shows the camera never moved.
 - Measure frame time with the console commands `startfpschart` / `stopfpschart` (type them into the console box with the
   Slate inspector, read the result from the log). The `stat unit` overlay never shows in `CaptureEditorImage`. If it reads
   3 fps, the editor is throttling in the background: `bThrottleCPUWhenNotForeground` must be false.
