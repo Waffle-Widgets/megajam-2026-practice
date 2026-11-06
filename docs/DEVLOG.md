@@ -625,3 +625,18 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - When a setting change shows no difference at all, look for an option that overrides it.
 - **Still to do:** lily pads (85 cm) and logs are still sized for the big frog, and the frog rises 18 cm onto a log.
 - **Media:** ![frog's-eye view of the lawn](media/lawn-frog-eye.jpg) ![mown lawn at frog scale](media/lawn-mown-frog-scale.jpg)
+
+### 2026-11-06 — Logs, lily pads and goal pads shrunk to frog scale (GameStation)
+- **What we asked for:** "Yes, resize them" (the platforms were still sized for the old, big frog), then after testing: "Feels good".
+- **What happened:**
+  - **Logs:** 68 cm thick down to 20 cm, floating low in the water. Same length, so they're no harder to land on. Bobbing went from 3 cm to 1 cm, and the dip when you land from 9 cm to 2.5 cm.
+  - **Endless lily pads:** 85 cm down to 34 cm, and the landing zone from ±38 to ±22 cm, so the frog has to land on the leaf. Ice floes are half as thick.
+  - **The frog's height on a platform:** it used to rise a fixed 18 cm onto anything, which left it floating 10 cm above a lily pad. Now each platform has its own "top height" (log 14 cm, pad 4.5, ice 5.5), and a new `FrogPlatformLift` function measures from the frog's feet to the top of whatever it stands on.
+  - **Goal pads:** 72 cm down to 34 cm; the bonus fly is 1.5 cm instead of 20 cm and hovers 10 cm up instead of 70. The six decorative pads are half size.
+  - **The goal pad vanished:** made thinner, it sank under the inlet's water surface. Raised 1.5 cm.
+  - **The "filled" marker wouldn't shrink:** the goal slots placed in the level kept restoring the marker's old size from saved level data, whatever we changed in the Blueprint. Since it only shows when a slot fills, the size is now set at that moment instead.
+- **What we learned:**
+  - Shrinking the player means shrinking everything they touch. Fixed numbers like "lift 18 cm" hide in the code; give each object its own value instead.
+  - Thinner objects can disappear under other surfaces. Check the heights of what's around them.
+  - If a placed copy ignores every change, set the value at runtime where it's used.
+- **Media:** ![river log at frog scale](media/river-log-frog-scale.jpg) ![goal pad at frog scale](media/goal-pad-frog-scale.jpg)
