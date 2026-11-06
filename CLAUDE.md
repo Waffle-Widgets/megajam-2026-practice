@@ -147,6 +147,18 @@
   faces (`nose_transplant` in `trellis_join.py`). Join torn AI edges with an overlap (flange + dipped band), never by
   bridging or welding the edges: pairing fails and leaves holes.
 - `git lfs unlock` makes the file read-only, and then `AssetTools.delete` fails and blames a referencer. `attrib -r` first.
+- **Characters and animals** (`Art/Blender/trellis_character.py`, headless: `blender -b --factory-startup --python
+  trellis_character.py -- <glb> <Name> human|dog <height_m>`): imports, sizes, finds which way it faces, adds a skeleton
+  with the UE mannequin's bone names (humans) or a simple dog skeleton, weights it, and exports `SK_<Name>.fbx` and the colour
+  texture to `Content/Game/Imported/<Name>/`, with rest and test-pose renders in `Art/Blender/cache/`.
+  - Reference pictures come from Gemini in the user's Chrome (Claude in Chrome; the in-app browser isn't signed in).
+    Ask for the full body on a plain white background; for people, an A-pose with clear gaps between the arms and body.
+    Never pick a download by a filename pattern: `~/Downloads` holds older Gemini images. Take the newest file.
+  - Let TRELLIS simplify: `DEC=30000 TEX=2048` before `run_image_to_3d.py`. Its export rebuilds the surface from the voxel
+    volume, which is far cleaner than decimating the GLB in Blender (fur flaps stop the decimator and remeshes shatter).
+  - Fur gives pale patches at `1024_cascade`; furry animals come out clean at `512`. Try that before changing seeds.
+  - Blender's automatic bone weights fail on anything small (a 0.5 m dog got zero weights). The script weights at 10x scale.
+
 - **Judge art from the real game camera** (Simulate, pause, `CaptureViewport` from the game's height), not from
   close-ups. The TRELLIS coupe looked great close up and like a dark blob from the game camera.
 

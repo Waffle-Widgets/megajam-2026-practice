@@ -1,6 +1,8 @@
 """TRELLIS.2 image -> 3D on Windows.  python run_image_to_3d.py <image.png> <out_prefix> [512|1024|1024_cascade|1536_cascade]
 Writes <out_prefix>_raw.ply (shape only, always) and <out_prefix>.glb (textured PBR, needs nvdiffrast).
-Env: SEED (default 42). A cut-out with real alpha skips the gated RMBG-2.0 background remover."""
+Env: SEED (default 42); DEC = triangle target of the GLB (default 500000; ~30000 gives a clean game mesh, since the
+export remeshes from the voxel volume, not from the generator's fur flaps); TEX = texture size (4096); KEEP_PT=1 keeps
+<out_prefix>_mesh.pt so `export_glb.py <out_prefix> <TEX> <DEC>` can re-export without regenerating. A cut-out with real alpha skips the gated RMBG-2.0 background remover."""
 import os, sys, time
 os.environ.setdefault('ATTN_BACKEND', 'xformers'); os.environ.setdefault('SPARSE_ATTN_BACKEND', 'xformers')
 ROOT = os.path.dirname(os.path.abspath(__file__))              # the TRELLIS2 folder (D:\AI\TRELLIS2 or C:\AI\TRELLIS2)
@@ -33,6 +35,6 @@ torch.save({'vertices': mesh.vertices.detach().cpu(), 'faces': mesh.faces.detach
             'coords': mesh.coords.detach().cpu(), 'layout': mesh.layout, 'voxel_size': mesh.voxel_size}, out + '_mesh.pt')
 del mesh, pipe; import gc; gc.collect(); torch.cuda.empty_cache()
 import subprocess                                   # the GLB bake runs in a fresh process with the whole GPU
-r = subprocess.run([sys.executable, os.path.join(ROOT, 'export_glb.py'), out])
+r = subprocess.run([sys.executable, os.path.join(ROOT, 'export_glb.py'), out, os.environ.get('TEX', '4096'), os.environ.get('DEC', '500000')])
 print('GLB export exit', r.returncode, flush=True)
-if r.returncode == 0: os.remove(out + '_mesh.pt')
+if r.returncode == 0 and os.environ.get('KEEP_PT') != '1': os.remove(out + '_mesh.pt')   # KEEP_PT=1: re-export later with other TEX/DEC
