@@ -541,3 +541,31 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Look at the raw generator models before blaming the generator. Here the good nose existed all along, and the join step threw it away.
   - Measure paint-rule boxes from the position/normal maps and the bake's luminance, not by eye: the "blue" pockets were dark blue in the bake, not black.
 - **Media:** ![before: the wrapped nose](media/coupe-nose-before.jpg) ![the front-photo model's own nose](media/coupe-nose-front-model.jpg) ![bridge attempt: a row of holes](media/coupe-nose-bridge-holes.jpg) ![after, Blender](media/coupe-nose-after-blender.jpg) ![first build: flange over the arch](media/coupe-nose-flange-arch.jpg) ![in the game, nose](media/coupe-nose-after-ingame.jpg) ![in the game, side](media/coupe-nose-after-side.jpg) ![in the game, rear](media/coupe-nose-after-rear.jpg) ![from the game camera](media/coupe-nose-after-game.jpg)
+
+### 2026-11-05 — Scenery kit and a skyline, from "cheap game assets" to photoreal (main PC, Blender only)
+- **What we asked for:** GameStation now owns Unreal, so the main PC builds art in Blender. Prompts, in order: "Go" (build scenery for greenery, futuristic cities and desolate lands), "Make the rest of the stuff before committing", "Can you make enough buildings that we could make a city skyline with?", "Can we make them look near photorealistic? These look like cheap game assets", "Just do it".
+- **What happened:**
+  - Scenery kit (`Art/Blender/world_kit.py`, reusing the tree, bark and bake code from `real_kit.py`): `SM_DeadTree` (snapped top, broken stubs), `SM_DeadBush`, `SM_RockSpire` (banded sandstone hoodoo, baked from a 39k-triangle sculpt to 6k), `SM_Fern`, `SM_Wildflowers` (new petal texture tinted per flower by vertex colour), `SM_NeonLamp`. The tree, bush and fern reuse the bark and leaf textures already in Unreal.
+  - First renders caught problems: the fern looked like a palm (leaflets too broad, now long and narrow), the flowers were too sparse, the sandstone too pale, and the bush was 15k triangles (now 8.9k).
+  - First skyline: eight towers stacked from glass boxes with a neon line on every floor, one 2K texture stretched over each. It worked as a silhouette, and the owner said it looked like cheap game assets. Fair: one 2K texture over a 70 m tower is about 3 cm per pixel, the glass was flat and identical, and real towers do not light every slab.
+  - Rebuilt from scratch in `Art/Blender/city_kit.py`, the way real buildings are built:
+    - Real curtain-wall geometry: an aluminium frame every 1.5 m, glass set 14 cm back, spandrel panels at each slab, sills and heads, louvre bands on plant floors, a recessed double-height lobby with columns, rooftop parapets and plant.
+    - Two older-style blocks with brick and stone walls, deep-set windows, shop fronts and an awning.
+    - Textures repeat at real scale (UVs in metres): brushed metal, limestone, concrete, roof gravel, brick.
+    - Every glass pane is its own UV cell (u = module around the building, v = floor). The glass material hashes the cell to pick one of 16 rooms from a baked sheet (`T_CityRooms`: lit or dark, ceiling lights, desks, blinds), plus a slight per-pane tilt and tint, so reflections break up pane by pane.
+    - Neon is down to a few crown and spire accents.
+  - Nine buildings, 6-10k triangles each: Needle (96 m with spire), Twist (75 degree turn), Stepped, Cylinder, Twins with skybridges, Slab, Tiers, and two low-rise blocks. Rendered in Cycles with a physical sky, by day, at golden hour and from the street.
+  - Exports are committed this time (`.gitignore` now lets `Art/Blender/export/World` and `Art/Blender/export/City` through) because GameStation imports them. `city_materials.json` has the tile, tint, metallic and roughness for each material slot and the recipe for the glass, since the rooms behind the glass have to be rebuilt in Unreal's material editor.
+- **What went wrong on the way:**
+  - The first photoreal render was blown out: no exposure set, and the office interiors were lit by the outside sun like a painted wall. Fixed with AgX at -1.6 exposure, and the room shows through as dim emission behind a dark glass base, the way real glass does.
+  - At dusk with room glow 5 every lit office went pure white; 1.4 looks right.
+  - Python closures: a taper function read the variable `z` after the facade code had moved it to the roof height, so it divided by zero. Capture start values in their own variable.
+  - Blender 5.2 renamed the Nishita sky to `SINGLE_SCATTERING`; the code picks whichever name exists.
+  - A bake right after `read_homefile` in the same MCP call failed its poll (stale context). Running it as a separate call worked.
+  - Heredocs with apostrophes in comments broke the shell; long code is written to a file first, then appended.
+- **What we learned:**
+  - Realism for buildings comes from structure, not from a better texture: real mullions, recesses, spandrels and the life behind the glass. Texture at real scale and repeat it.
+  - Judge in physically lit renders (Cycles plus a physical sky). The grey Eevee previews made the cheap version look acceptable.
+  - Half of the look must be built on the Unreal side (glass, interiors, sky, reflections). Hand over a written recipe with the meshes.
+  - Practice only: under the jam rules these models cannot go into the jam entry. The scripts can, and they rebuild everything in minutes.
+- **Media:** ![dead tree](media/blender-deadtree.png) ![scenery lineup](media/world-kit-lineup.png) ![greenery](media/world-kit-greenery.png) ![first skyline, day](media/world-kit-skyline-day.png) ![first skyline, dusk](media/world-kit-skyline-dusk.png) ![rebuilt skyline, day](media/city-kit-skyline-day.png) ![street level](media/city-kit-street.png) ![facade close-up](media/city-kit-facade-closeup.png) ![rebuilt skyline, golden hour](media/city-kit-skyline-dusk.png)
