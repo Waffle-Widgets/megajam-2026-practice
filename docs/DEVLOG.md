@@ -587,3 +587,11 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Thin, flat props on a bobbing platform need clearance above the water, or they flicker through it.
   - "It compiled" isn't "it works". Always read a rewritten graph back.
 - **Media:** ![everything imported](media/unreal-import-kits.png) ![wildflowers with colour](media/unreal-wildflowers-colour.png)
+
+### 2026-11-06 — Yellow flowers were orange in Unreal: vertex colours exported as sRGB (main PC)
+- **What we asked for:** GameStation reported the yellow wildflowers looked orange in Unreal. The owner: "Yes, switch it".
+- **What happened:**
+  - Our FBX export (`export` in `Art/Blender/real_kit.py`) wrote vertex colours as linear values; Unreal reads FBX vertex colours as sRGB. The yellow went out as (1, 0.69, 0.01) and Unreal showed that number directly, which is orange.
+  - Switched the export to `colors_type='SRGB'` and re-exported `SM_Wildflowers` and `SM_Fern`. Re-importing the new FBX raw in Blender shows the yellow now goes out as (1, 0.85, 0.13), the colour we painted.
+  - The first export failed with "Context has no attribute selected_objects": opening a .blend and exporting in the same MCP call doesn't work (same as bakes). A separate call fixed it.
+- **What we learned:** Colour numbers mean nothing without knowing whether they're linear or sRGB. Check what the receiving program expects, and verify by reading back the exported file, not the scene.

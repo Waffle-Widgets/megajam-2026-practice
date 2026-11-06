@@ -1364,4 +1364,4 @@ def export(folder, names=('SM_RockReal', 'SM_TreeReal')):
         bpy.ops.export_scene.fbx(filepath=os.path.join(folder, nm + '.fbx'), use_selection=True, object_types={'MESH'},
                                  apply_unit_scale=True, apply_scale_options='FBX_SCALE_NONE', axis_forward='-Z', axis_up='Y',
                                  mesh_smooth_type='FACE', add_leaf_bones=False, bake_anim=False, embed_textures=False,
-                                 colors_type='LINEAR')
+                                 colors_type='SRGB')  # Unreal reads FBX vertex colours as sRGB
