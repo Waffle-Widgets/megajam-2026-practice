@@ -695,3 +695,16 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - When a model disappears, place a plain copy next to the broken one and compare. It turns "it's invisible" into "it's 0.8 cm tall" or "it's twisted".
   - Making the animation ourselves was quicker than retargeting, and it counts as our own art.
 - **Media:** ![the dog owner and his Shiba](media/walkers-owner-and-shiba.jpg) ![standing vs walking](media/walker-rest-vs-walk.jpg)
+
+### 2026-11-06 — Walkers' arms fixed, and traffic lights at every junction (GameStation)
+- **What we asked for:** "the arms on the humans looks weird. fix that and do the traffic lights", then after testing: "Feels good".
+- **What happened:**
+  - **The arms:** from the side the walk looked fine. A new front view in the walk script's check strip showed the problem. The upper arms were pushed into the chest, crushing the sleeves, and the forearms stuck out sideways with the palms up. The script had assumed a wide A-pose and turned the arms 62° "down", but our character rig already has them hanging about 20° from the body. Now it's 10°, with a smaller elbow bend. The new walk came in as `CharManWalkV2` (the auto-import doesn't re-run when a file is overwritten). The six walkers were placed again, and the old walk assets were locked and deleted.
+  - **`BP_TrafficLight`:** two corner poles per junction, each with red, amber and green glow lamps facing both directions of traffic. Three new lamp materials (`MI_TLRed`, `MI_TLAmber`, `MI_TLGreen`) come from our glow material with extra daytime glow. All 8 junctions share one 16-second cycle: the cross streets get 6.5 s of green and 1.5 s of amber, then the avenues get their turn, with a moment of red both ways in between.
+  - **Cars obey them:** a new `CarShouldHold` check in `BP_Car`. A car waits if its nose is about to enter a junction on red or amber (once inside, it carries on through), or if another car is less than 2.4 m ahead in its lane. While waiting its wheels stop. The main level and Endless have no lights, so only the queueing applies there.
+  - **Measuring was tricky:** the tool reads cars one at a time while the game runs, so their spacing looked wrong. Each car's own "holding" flag, plus two overhead pictures a light cycle apart (each picture is one instant), showed the real picture: queues at red, flowing again on green, nothing stuck.
+  - **Two small DSL snags:** a new Blueprint function needs its output added before `return` can use it, and setting collision on component templates didn't stick, so the construction script switches it off.
+- **What we learned:**
+  - Check a pose from more than one side. A walk that looks fine from the side can be broken from the front.
+  - For moving things, one picture is a snapshot; a list of positions read one by one is not.
+- **Media:** ![arms from the front](media/walk-arms-front.png) ![a traffic light at frog height](media/traffic-light-frog-eye.jpg) ![queues at the lights from above](media/traffic-queues-top.jpg)

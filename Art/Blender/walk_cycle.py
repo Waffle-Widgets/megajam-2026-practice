@@ -65,7 +65,9 @@ def sign_for(name, axis, end, want):
 if KIND == 'human':
     legs = [('thigh_l', 'calf_l', 'foot_l', 0.0), ('thigh_r', 'calf_r', 'foot_r', math.pi)]
     arms = [('upperarm_l', 'lowerarm_l', 'hand_l', math.pi), ('upperarm_r', 'lowerarm_r', 'hand_r', 0.0)]
-    SW, KN, AS, AD = 24.0, 36.0, 16.0, 62.0             # thigh swing, knee bend, arm swing, arms down from the A-pose
+    # thigh swing, knee bend, arm swing, arms in toward the body. trellis_character.py rigs arms hanging ~20 deg out
+    # from the body (not a wide A-pose), so AD stays small: 62 drove the arms into the chest and crushed the sleeves.
+    SW, KN, AS, AD = 24.0, 36.0, 16.0, 10.0
 else:
     legs = [('front_upper_l', 'front_lower_l', 'front_paw_l', 0.0), ('back_upper_r', 'back_lower_r', 'back_paw_r', 0.0),
             ('front_upper_r', 'front_lower_r', 'front_paw_r', math.pi), ('back_upper_l', 'back_lower_l', 'back_paw_l', math.pi)]
@@ -95,7 +97,7 @@ for f in range(N + 1):
         q = p + ph
         add = local_q(u, FWD, s_ad[u] * AD); swing = local_q(u, SIDE, s_as[u] * AS * math.sin(q))
         pb[u].rotation_quaternion = swing @ add
-        pb[l].rotation_quaternion = local_q(l, SIDE, s_el[l] * (14 + 8 * max(0.0, math.sin(q))))
+        pb[l].rotation_quaternion = local_q(l, SIDE, s_el[l] * (6 + 10 * max(0.0, math.sin(q))))
     if KIND == 'human':
         pb['spine_01'].rotation_quaternion = local_q('spine_01', UP, 4 * math.sin(p))
         bob = -0.012 * H * math.cos(2 * p)
@@ -129,6 +131,17 @@ for k, im in enumerate(ims):
 img = bpy.data.images.new('walk_sheet', Wd * 8, Ht); img.pixels.foreach_set(sheet.ravel())
 img.filepath_raw = os.path.join(CACHE, '%s_walk_sheet.png' % NAME); img.file_format = 'PNG'; img.save()
 log['sheet'] = img.filepath_raw
+# front views (arms are only readable from the front): 4 frames of the loop, camera on the -Y (face) side
+cam.location = ctr + Vector((0, -H * 3, 0)); cam.rotation_euler = (ctr - cam.location).to_track_quat('-Z', 'Y').to_euler()
+ft = []
+for k in range(4):
+    sc.frame_set(int(round(k * N / 4))); fp = os.path.join(CACHE, '%s_walkfront_%d.png' % (NAME, k))
+    sc.render.filepath = fp; bpy.ops.render.render(write_still=True); ft.append(fp)
+fims = [bpy.data.images.load(fp) for fp in ft]; fs = np.zeros((Ht, Wd * 4, 4), np.float32)
+for k, im in enumerate(fims):
+    a = np.empty(Wd * Ht * 4, np.float32); im.pixels.foreach_get(a); fs[:, k * Wd:(k + 1) * Wd] = a.reshape(Ht, Wd, 4)
+fimg = bpy.data.images.new('walk_front', Wd * 4, Ht); fimg.pixels.foreach_set(fs.ravel())
+fimg.filepath_raw = os.path.join(CACHE, '%s_walk_front.png' % NAME); fimg.file_format = 'PNG'; fimg.save()
 
 # export mesh + rig + the Walk action (same axes as trellis_character.py, so it matches the imported skeleton).
 # The scene is in centimetres (see the top), so the file's numbers are already cm and every importer reads them right.
