@@ -595,3 +595,20 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Switched the export to `colors_type='SRGB'` and re-exported `SM_Wildflowers` and `SM_Fern`. Re-importing the new FBX raw in Blender shows the yellow now goes out as (1, 0.85, 0.13), the colour we painted.
   - The first export failed with "Context has no attribute selected_objects": opening a .blend and exporting in the same MCP call doesn't work (same as bakes). A separate call fixed it.
 - **What we learned:** Colour numbers mean nothing without knowing whether they're linear or sRGB. Check what the receiving program expects, and verify by reading back the exported file, not the scene.
+
+### 2026-11-06 — Third-person camera, and a RAV4 from two pictures at once (GameStation)
+- **What we asked for:** "can we change this game into a third person perspective frogger where you're hopping across roads through the city…" (plan agreed: step 1 is the camera), "might need to put the camera a little closer", then "generate a Rav-4, i like the 2024 Prime PHEV in white/black, and put that in the game too", and mid-way: "you don't need to use the three quarter view if there are different views that make generation easier. rewrite the script if it's going to make it better for the megajam".
+- **What happened:**
+  - **Camera:** two numbers on `BP_Frog`. The camera arm went from 10 m at 55° down to 6 m at 20°, then 4.5 m after the first test. No code changes. From the start position the road, river, logs and goal pads are all in one view.
+  - **Pictures:** Gemini drew the SUV from the front corner, then "this exact same car" from the back corner in the same chat, so the two match (same wheels, roof and colours). The grille badge came out as a blank oval, which we painted over in the picture (fix the photo, not the mesh).
+  - **Multi-view TRELLIS:** TRELLIS.2 only takes one picture. Its predecessor's trick ("multidiffusion") is a small wrapper: at every generation step it asks the model once per picture and averages the answers. Added to `run_image_to_3d.py` (pictures separated by commas; one picture works exactly as before). It worked first time: 73 s for two pictures. Front-only guessed a plain white tailgate; front + rear has the real full-width lamps, black bumper and spoiler.
+  - **One cleanup script for any vehicle:** `Art/Blender/trellis_vehicle.py` + `_bake.py` generalise the Tacoma truck scripts. Real size, how to find the back ("tall" for SUVs, "flat" for pickups), glass height band, paint handling and badge boxes are settings in one JSON line. It renders a check sheet, and runs headless in 30 s. Output goes outside `Content/` on purpose, so Unreal doesn't auto-import half-finished files.
+  - **In the game:** `SM_CarRav4` (4 LODs, 160k → 8k), `MI_CarRav4`, and a fifth body style in `BP_Car` with its own hit box. The RAV4 has built-in wheels, so the spinning wheel parts are hidden on it.
+  - **Why no RAV4 showed up at first:** the cars placed in the level don't use the random pick. Their construction script picks a style from their position, out of three. Four restarts gave exactly the same cars, which is how we noticed. Widened to four.
+  - **Flowers:** the main PC re-exported them with sRGB vertex colours and we re-imported them. Committed meshes are read-only and refused to delete until locked, and overwriting a source file in `Content/` doesn't re-trigger auto-import (delete it, then copy it back in).
+- **What we learned:**
+  - Several matching pictures beat stitching two models. Ask Gemini for the second view in the same chat.
+  - "Random" isn't always random: check every place a Blueprint is set up (construction script vs spawn function) before trusting a sample.
+  - A general script with settings beats one script per vehicle, for a 3-day jam.
+- **Still rough:** the RAV4's wheels don't spin, and its smoked taillights are sorted as trim, not lamps.
+- **Media:** ![camera before](media/camera-before-topdown.jpg) ![camera after](media/camera-after-thirdperson.jpg) ![RAV4 from the game camera](media/rav4-game-camera.jpg) ![RAV4 close](media/rav4-close.jpg)

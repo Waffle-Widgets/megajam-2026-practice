@@ -1,4 +1,5 @@
-"""TRELLIS.2 image -> 3D on Windows.  python run_image_to_3d.py <image.png> <out_prefix> [512|1024|1024_cascade|1536_cascade]
+"""TRELLIS.2 image -> 3D on Windows.  python run_image_to_3d.py <image.png>[,<view2.png>,...] <out_prefix> [512|1024|1024_cascade|1536_cascade]
+Several comma-separated pictures of the same object are blended into one model (each step averages the model's answer per picture).
 Writes <out_prefix>_raw.ply (shape only, always) and <out_prefix>.glb (textured PBR, needs nvdiffrast).
 Env: SEED (default 42); DEC = triangle target of the GLB (default 500000; ~30000 gives a clean game mesh, since the
 export remeshes from the voxel volume, not from the generator's fur flaps); TEX = texture size (4096); KEEP_PT=1 keeps
@@ -18,14 +19,34 @@ if torch.cuda.get_device_capability(0)[0] != 9:     # xformers' FlashAttention-3
     dispatch._set_use_fa3(False)
 from PIL import Image
 import trellis2.pipelines.rembg as rembg_mod
-img = Image.open(sys.argv[1])
-if img.mode == 'RGBA' and (np.array(img)[:, :, 3] != 255).any():
+imgs = [Image.open(p) for p in sys.argv[1].split(',')]   # several views of ONE object: "front.png,rear.png"
+if all(im.mode == 'RGBA' and (np.array(im)[:, :, 3] != 255).any() for im in imgs):
     rembg_mod.BiRefNet = lambda **kw: None            # alpha present: the pipeline never calls the remover
 from trellis2.pipelines import Trellis2ImageTo3DPipeline
 pipe = Trellis2ImageTo3DPipeline.from_pretrained('microsoft/TRELLIS.2-4B'); pipe.cuda()
 ptype = sys.argv[3] if len(sys.argv) > 3 else '1024_cascade'
+if len(imgs) > 1:
+    # Multi-view ("multidiffusion", as TRELLIS v1 did it): every generation step asks the model once per picture
+    # and averages the answers, so all views shape ONE object. TRELLIS.2 itself only takes one picture.
+    imgs = [pipe.preprocess_image(im) for im in imgs]
+    _get_cond = pipe.get_cond
+    pipe.get_cond = lambda image, res, include_neg_cond=True: _get_cond(imgs, res, include_neg_cond)
+    def _multi(orig):
+        def run_views(model, x_t, t, cond=None, **kw):
+            n = cond.shape[0] if torch.is_tensor(cond) else 1
+            if n == 1: return orig(model, x_t, t, cond, **kw)
+            preds = []
+            for i in range(n):
+                kw_i = dict(kw)
+                if torch.is_tensor(kw.get('neg_cond')) and kw['neg_cond'].shape[0] == n: kw_i['neg_cond'] = kw['neg_cond'][i:i + 1]
+                preds.append(orig(model, x_t, t, cond[i:i + 1], **kw_i))
+            return sum(preds[1:], preds[0]) * (1.0 / n)
+        return run_views
+    for s in (pipe.sparse_structure_sampler, pipe.shape_slat_sampler, pipe.tex_slat_sampler):
+        s._inference_model = _multi(s._inference_model)
+    print('multi-view:', len(imgs), 'pictures', flush=True)
 t0 = time.time()
-mesh = pipe.run(img, seed=int(os.environ.get('SEED', '42')), pipeline_type=ptype)[0]
+mesh = pipe.run(imgs[0], seed=int(os.environ.get('SEED', '42')), pipeline_type=ptype, preprocess_image=len(imgs) == 1)[0]
 print('generated in', round(time.time() - t0, 1), 's; verts', tuple(mesh.vertices.shape), 'faces', tuple(mesh.faces.shape), flush=True)
 out = sys.argv[2]
 mesh.simplify(16777216)
