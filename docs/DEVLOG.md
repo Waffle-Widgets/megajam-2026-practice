@@ -734,3 +734,19 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - A turning camera and sideways hops don't mix: turn first, look, then hop.
   - Check how high the ground is with the tools (a ray down), not by eye. Half a centimetre is invisible in a picture but wrong in the game.
 - **Media:** ![raised sidewalk from road level](media/city-raised-sidewalk.jpg)
+
+### 2026-11-06 — A bootstrap script for the jam repo (GameStation)
+- **What we asked for:** "what else would be good to work on to prep for the megajam? I'm thinking we should build up scripts to help us hit the ground running", then "Bootstrap script" and "Go".
+- **What happened:**
+  - `tools/bootstrap/new_jam_repo.ps1` makes the whole jam repo in one command. It copies Epic's Third Person Blueprint template the way the New Project window does (the template plus its three shared packs), names the project, and applies every setting we learned the hard way: the MCP plugins and auto-start, imports without pop-ups, full speed in the background, the Asset Manager rule. It adds our `.gitignore`/LFS files, agent instructions, scripts and docs, and sets up git. It copies no practice gameplay or art, and never commits.
+  - `-Verify` opens the new project in Unreal, waits for the MCP, lists the level's actors through it, checks the log for load errors, and reads our settings back from the running editor.
+  - **Four rounds to a clean run:**
+    1. PowerShell treats `$uproject` and `$UProject` as one variable, so the project file was saved in the wrong folder.
+    2. "Use Less CPU when in Background" stayed on. It's read from a different settings file than the other editor options. The script now writes it to the right one, and `-Verify` reads it back.
+    3. The editor opened with a "Load Errors" window: a missing GameFeatureData rule that someone once fixed by hand in the practice project. That fix is now in the script.
+    4. The last run passed every check.
+  - Closing the practice editor stalled on a "Save Content" prompt for four assets it had only loaded. Our work was already pushed, so we force-closed it.
+- **What we learned:**
+  - Settings fixed once by clicking get lost in a new project. Writing them into a script is the only way they carry over.
+  - Make the script check its own results. Reading the settings back from the running editor caught a setting that looked right in the file and was silently ignored.
+- **Media:** ![the test project open in Unreal](media/bootstrap-test-project.png)

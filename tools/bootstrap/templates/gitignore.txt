@@ -1,0 +1,48 @@
+# Unreal Engine generated folders
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+Platforms/
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
+
+# Packaged builds (upload these to itch.io, don't commit them)
+Packaged/
+Builds/
+*.zip
+
+# IDE / build files
+.vs/
+.vscode/
+.idea/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Raw source files for imported assets (the .uasset holds the data; keep the source next to it
+# so Unreal does not ask to delete the asset, but do not commit it)
+{{NAME}}/Content/Game/Imported/**/*.png
+{{NAME}}/Content/Game/Imported/**/*.jpg
+{{NAME}}/Content/Game/Imported/**/*.fbx
+{{NAME}}/Content/Game/Imported/**/*.Fbx
+
+# Per-PC Claude Code settings
+.claude/settings.local.json
+
+# Blender auto-backups, script outputs and caches (rebuilt by running the scripts)
+*.blend1
+Art/Blender/textures/
+Art/Blender/export/
+Art/Blender/cache/
+# Personal reference photos (may show number plates or people)
+Art/Reference/

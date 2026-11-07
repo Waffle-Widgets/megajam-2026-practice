@@ -93,6 +93,8 @@
   changed, use `-skipbuild` instead of `-build`. With the editor open, `-build` fails trying to recompile the editor. `Builds/` is gitignored. Don't
   save assets while it cooks.
 - Turn off "Use Less CPU when in Background" (Editor Preferences) so Play mode runs at full speed while Claude tests it.
+  In a project's files it belongs in `Config/DefaultEditorSettings.ini`, not `DefaultEditorPerProjectUserSettings.ini`
+  (the bootstrap script does this, and its `-Verify` reads it back from the running editor).
 - To pass a per-actor number to a material (e.g. how often the log bark repeats), use a Scalar Parameter with
   "Use Custom Primitive Data" and set it with `SetDefaultCustomPrimitiveDataFloat`. The runtime `SetCustomPrimitiveDataFloat`
   doesn't stick when the editor runs a construction script. Every mesh using that material needs a value, or it reads 0.
@@ -208,6 +210,13 @@
 - When building meshes from script, add the material slots **before** writing faces, and never `materials.clear()` later.
   Either one silently resets every face to material 0. `Art/Blender/log_kit_materials.py` is a worked example of
   procedural materials baked to textures, including bark that tiles seamlessly.
+
+## Starting a new repo (Nov 11)
+- `tools/bootstrap/new_jam_repo.ps1 -Repo <new folder> -Name <Game> [-Verify]` makes the jam repo: the Third Person BP
+  template, our plugins and settings, scripts, agent files and docs, git with LFS. No practice gameplay or art.
+  `-Verify` opens it in Unreal and checks the MCP, load errors and settings; close any other Unreal first (port 8000).
+  It never commits. Its starter files are in `tools/bootstrap/templates/`.
+- PowerShell variable names ignore case: `$uproject` and `$UProject` are the same variable.
 
 ## Switching computers
 We work on more than one PC. Only one machine should have the project open at a time. You can only act on the PC
