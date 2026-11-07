@@ -769,3 +769,54 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - A packaging script is also a checker. Listing the maps by hand had silently dropped the newest level.
   - Read the build tool's own log, not just the summary. "RulesError" alone said nothing; the detailed log named the missing SDK.
 - **Media:** ![the packaged game running](media/packaged-build-running.jpg)
+
+### 2026-11-06 — Shrinking the build from 570 to 456 MB, and a size report (GameStation)
+- **What we asked for:** "If 1GB is the limit then shouldn't we try to compress this more? We don't have much in the game and we already used up half the space." Then, about the plugin Claude found: "will we need it for the megajam? might we need it?"
+- **What happened:**
+  - The game's data was already compressed, so squeezing harder wasn't the answer. Instead, `tools/package_build.ps1` now writes a size report (`Builds/size-report-<time>.txt`) that lists what takes the space, one line per art kit.
+  - The biggest items were the game program (160 MB) and its shaders (118 MB), then our own art: ground surfaces 60 MB, the city kit 51 MB, the RAV4 19 MB.
+  - **NNEDenoiser, a plugin Unreal turns on by default, was costing about 115 MB.** It cleans up noise in path-traced and movie renders, which a real-time game never uses. It's now off in the practice project and in every project the bootstrap script makes, and can be switched back on if a jam game ever renders movies.
+  - Two snags:
+    - The report's code had a broken pattern for Windows paths; fixed.
+    - Switching a plugin off only takes effect once the game program is rebuilt. The script now rebuilds by itself whenever the project file is newer than the last build.
+- **What we learned:**
+  - Measure before compressing: the space was in the program, the shaders and our own art, not in poor compression.
+  - Plugins that are on by default cost space even if we never use them.
+- **Media:** (a text report; see `Builds/size-report-*.txt` after any build)
+
+### 2026-11-07 — Bake-off: is there a better 3D generator than TRELLIS.2? (GameStation)
+- **What we asked for:** "Are there any better tools we can use for 3D modeling than TRELLIS?", then "Yes, bake-off". After the first results: "Can we see what it looks like in game compared to the old one?"
+- **What happened:**
+  - The research turned up **Pixal3D** (Tencent ARC, MIT licence, built on TRELLIS.2, claims more faithful results), and paid **Meshy** as the cloud option. Pixal3D went first because it's free and runs on our own GPU.
+  - **Getting Pixal3D running on Windows:**
+    - It got its own copy of our TRELLIS.2 setup, so the working one wasn't touched, plus the same Windows patch we made for TRELLIS.2.
+    - One library it needs (NATTEN) won't build on Windows. Claude wrote a small stand-in for the one function Pixal3D uses and checked it against a slow, obviously correct version.
+    - A version clash and a missing library each stopped the install once.
+    - Its default mode overflowed the 5090's 32 GB, and the first man took 25 minutes. Its low-memory mode brought that to 2.
+  - **Same three pictures (man, Shiba, RAV4) and the same game budget (30,000 triangles, 2048 textures) for both.** `Art/Blender/bakeoff_render.py` renders every model the same way and counts what costs us cleanup time: UV islands, loose pieces, open edges. `tools/bakeoff_sheet.py` puts it all on one sheet.
+
+    | | TRELLIS.2 | Pixal3D |
+    | --- | --- | --- |
+    | Man | 1.8 min | 2 min, shirt colour closer to the photo |
+    | Shiba | 1.3 min | 7 min, shiny gold (its metal map is wrong), needles on the tail |
+    | RAV4 | 2 min | 16 min, smeared windscreen |
+
+    TRELLIS.2 matched or beat Pixal3D on all three, with fewer loose pieces and open edges every time.
+  - **In the game:** Claude made a scratch copy of the city (never committed, not in builds) and stood the six models next to our current man, dog and RAV4. It used the game's own scale (the city is built at 0.405 of real size), its real lighting, and the real camera after pressing Play.
+    - From the game camera, all three men and dogs look the same.
+    - Up close, TRELLIS.2 straight out matches our current man and dog, which were made from the same pictures with TRELLIS.2 plus a skeleton. Pixal3D's dog is blotchy and gold.
+    - Our current RAV4, built from two photos with a lot of cleanup, is clearly the best. TRELLIS.2's straight-out car is close but has a white reflection baked into the bonnet. Pixal3D's looks melted.
+  - **Snags in Unreal:**
+    - Unreal doesn't auto-import `.glb` files, and the MCP's import tool only takes FBX/OBJ. Claude ran Unreal's own Python from the editor's console box instead, which keeps the glTF materials. That's now `tools/unreal_import_glb.py`.
+    - Its first version turned Nanite off the simple way and left Nanite's simplified copy as the mesh: 6,156 triangles instead of 29,730. Doing it through the static mesh subsystem rebuilds the mesh properly.
+    - Pixal3D's models come out turned the way the photo saw them (the car 43°, the dog 53°), so they had to be straightened first.
+    - When Unreal opened, it offered to restore four half-saved assets from the forced close on Nov 6. We skipped it: those changes were accidental.
+- **What we learned:**
+  - TRELLIS.2 stays our generator. At the game camera's distance the generator barely matters; up close, our cleanup still makes a visible difference on cars.
+  - Judge art at the game's scale, in its lighting, from its camera. Studio renders exaggerate differences players won't see.
+  - Both free tools share the same weak spots (hundreds of UV islands, loose pieces, no skeleton), which is exactly what Meshy says it fixes. That's the next test, if we subscribe. We also set a rule for it: Meshy retries happen on its website, where they're free, never through its paid API.
+- **Media:**
+  - ![TRELLIS.2 vs Pixal3D, all views with stats](media/bakeoff-trellis2-vs-pixal3d.jpg)
+  - ![front close-ups](media/bakeoff-closeups.jpg)
+  - ![in the game, next to our current models](media/bakeoff-ingame.jpg)
+  - ![in-game close-ups](media/bakeoff-ingame-closeups.jpg)

@@ -87,7 +87,9 @@ if (-not $VerifyOnly) {
             [ordered]@{ Name = 'GameplayStateTree'; Enabled = $true },
             [ordered]@{ Name = 'ModelContextProtocol'; Enabled = $true },
             [ordered]@{ Name = 'AllToolsets'; Enabled = $true },
-            [ordered]@{ Name = 'Terminal'; Enabled = $true }
+            [ordered]@{ Name = 'Terminal'; Enabled = $true },
+            # an AI denoiser for offline movie renders, on by default; it adds ~130 MB to every packaged game
+            [ordered]@{ Name = 'NNEDenoiser'; Enabled = $false }
         )
     }
     Write-Text $UProject ($uprojData | ConvertTo-Json -Depth 5)

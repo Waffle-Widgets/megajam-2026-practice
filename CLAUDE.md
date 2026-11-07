@@ -75,6 +75,12 @@
   Re-importing a mesh resets its materials, so don't re-import once it's set up.
   **Never delete the source file afterwards:** Unreal opens a modal "Delete Assets" dialog that freezes the MCP until
   someone answers it (Escape = keep the assets). Raw sources under `Imported/` are gitignored instead.
+- **GLB files** (TRELLIS.2, Pixal3D, Meshy): auto-import ignores `.glb`, and `StaticMeshTools.import_file` only takes
+  FBX/OBJ. Run `tools/glb_for_unreal.py` (PNG textures, real size), then type
+  `py <repo>/tools/unreal_import_glb.py <dest folder> <file.glb>` into the editor's console box with the Slate inspector
+  (`Observe` the window and `Click` the box first, or `Type` returns false). It imports through Interchange, which keeps
+  the glTF PBR material, and switches Nanite off through `StaticMeshEditorSubsystem.set_nanite_settings`: setting the
+  property alone left Nanite's fallback mesh, a fifth of the triangles.
 - **Meshes that rely on vertex colours** (flowers, leaf shading from our Blender kits): `StaticMeshTools.import_file` uses
   the old FBX importer with vertex colours set to Ignore, and that can't be changed. Copy the `.fbx` into
   `Content/Game/Imported/<Name>/` instead and let Interchange import it by itself (it keeps vertex colours). Afterwards:
@@ -124,6 +130,11 @@
   that counts against the same limit. Save and restart Blender before heavy Unreal work; its MCP add-on autostarts.
 - To get the real game lighting in a capture, `StartPIE` in Simulate mode, click the editor's Pause button via the Slate
   inspector, then `CaptureViewport` with a camera transform; `CaptureEditorImage` shows the game camera as the player sees it.
+- Save captures without pulling the picture through the chat: inside `execute_tool_script`, write the capture's base64
+  `data` to a `.txt` under `Saved/` with `AssetTools.write_file`, then decode it in PowerShell. `CaptureViewport` needs
+  `captureTransform` and an all-zero `annotations` even when they're unused; `CaptureEditorImage` comes back 1280 px wide.
+- Check the game's scale before comparing art with it. The practice city is built at **0.405**: the pedestrians' Man and
+  Dog meshes are scaled 0.405 and the car meshes are modelled small (the RAV4 is 186 cm long).
 
 ## AI-generated 3D models (Hunyuan3D 2.1 and TRELLIS.2, both local)
 - **TRELLIS.2** (Microsoft, MIT licence, `D:\AI\TRELLIS2` on the main PC, `C:\AI\TRELLIS2` on GameStation) is the one to use: one photo with the background cut out ->
@@ -189,6 +200,14 @@
   hops along the lines between them; a corner is 50 cm from every path. Street lamps on tile centres had the frog jumping through them.
 - **Judge art from the real game camera** (Simulate, pause, `CaptureViewport` from the game's height), not from
   close-ups. The TRELLIS coupe looked great close up and like a dark blob from the game camera.
+- **Meshy (paid, cloud): retries go through the browser, never the API.** Every API call (and the Meshy MCP) costs
+  credits; the free retries (4 per model on Pro, 40 on Ultra) are a feature of Meshy's website, for models made there.
+  So make every Meshy model on meshy.ai in the user's Chrome from the start (Claude in Chrome: its `file_upload` sends our
+  reference picture; the in-app browser can't upload files), and press its Retry until one is good. Use the API only for
+  steps that never need a retry, and save its results at once (Meshy keeps them 3 days).
+  The user signs in to Meshy themselves. Downloading needs the user's OK in chat unless the request already says to
+  download (e.g. "make these five and download them"); take the newest file in `~/Downloads`, never one picked by name.
+  Plan credits are monthly and reset each month (no carry-over); bought credit packs never expire.
 
 ## Blender (for building our own 3D models)
 - Blender **5.2 LTS** with Blender's official MCP (Blender Lab). It is registered in `.mcp.json` as `blender`.

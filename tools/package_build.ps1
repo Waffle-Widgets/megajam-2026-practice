@@ -69,6 +69,8 @@ Ok ("maps to cook: " + (($maps | ForEach-Object { ($_ -split '/')[-1] }) -join '
 $receipt = Join-Path $ProjDir "Binaries\Win64\$ProjName-Win64-Shipping.target"
 $hasSource = Test-Path (Join-Path $ProjDir 'Source')
 if (-not $Build -and -not (Test-Path $receipt)) { Warn 'No compiled game program on this PC yet: compiling it this time (first package only).'; $Build = $true }
+if (-not $Build -and (Test-Path $receipt) -and (Get-Item $Project).LastWriteTime -gt (Get-Item $receipt).LastWriteTime) {
+    Warn 'The plugin list (.uproject) changed since the last compile: compiling the game program again.'; $Build = $true }
 if ($hasSource -and -not $Build) { Warn 'This project has C++ code. Without -Build the last compiled game code is used.' }
 # the editor only gets in the way of a compile when it has THIS project open
 $sameEditor = @(Get-CimInstance Win32_Process -Filter "Name='UnrealEditor.exe'" | Where-Object { $_.CommandLine -like "*$ProjName.uproject*" })
@@ -118,6 +120,38 @@ $mb = (Get-Item $zip).Length / 1MB
 if ($mb -ge 1024) { Warn ("{0:N0} MB: over itch.io's 1 GB limit! Remove unused content or lower texture sizes." -f $mb) }
 else { Ok ("{0:N0} MB (itch.io limit 1024 MB)" -f $mb) }
 Remove-Item -Recurse -Force $Stage
+
+# ---------------------------------------------------------------- size report: what fills the build
+Step 'What takes the space (before zipping; the zip is a little smaller)'
+$rows = @{}
+function Add-Size($key, $bytes) { if ($rows.ContainsKey($key)) { $rows[$key] += $bytes } else { $rows[$key] = [double]$bytes } }
+$pak = Join-Path $Engine 'Engine\Binaries\Win64\UnrealPak.exe'
+Get-ChildItem $folder -Recurse -Filter *.utoc | ForEach-Object {
+    # list every asset in the packed game data; group by its top folders (Content/Game/<kit>, Engine/Plugins/<name>, ...)
+    & $pak $_.FullName -List 2>&1 | ForEach-Object {
+        if ("$_" -match '"([^"]+)" offset: \d+, size: (\d+) bytes') {
+            $path = $Matches[1] -replace '^(\.\./)+', ''
+            $parts = $path -split '/'
+            $key = if ($path -like '<*') { 'shaders' }
+                   elseif ($parts.Count -gt 5 -and $parts[1] -eq 'Content' -and $parts[2] -eq 'Game') { ($parts[0..4] -join '/') }   # one line per kit: Content/Game/Imported/<Kit>
+                   elseif ($parts.Count -gt 4 -and $parts[1] -eq 'Content' -and $parts[2] -eq 'Game') { ($parts[0..3] -join '/') }
+                   elseif ($parts.Count -gt 3) { ($parts[0..2] -join '/') } else { $path }
+            Add-Size "data: $key" ([double]$Matches[2])
+        }
+    }
+}
+# loose files outside the packed data (the game program, DLLs, installers)
+Get-ChildItem $folder -Recurse -File | Where-Object { $_.Extension -notin '.ucas', '.utoc', '.pak' } | ForEach-Object {
+    $rel = $_.FullName.Substring($folder.Length + 1).Replace('\', '/')
+    $key = if ($_.Length -gt 5MB) { $rel } else { (($rel -split '/') | Select-Object -First 2) -join '/' }
+    Add-Size "file: $key" $_.Length
+}
+$rows.GetEnumerator() | Sort-Object Value -Descending | Select-Object -First 15 | ForEach-Object {
+    Write-Host ("   {0,7:N1} MB  {1}" -f ($_.Value / 1MB), $_.Key)
+}
+$report = Join-Path $Builds "size-report-$stamp.txt"
+$rows.GetEnumerator() | Sort-Object Value -Descending | ForEach-Object { "{0,9:N1} MB  {1}" -f ($_.Value / 1MB), $_.Key } | Set-Content -Encoding utf8 $report
+Write-Host "   full list: $report"
 
 # ---------------------------------------------------------------- optional: smoke test and copy
 if ($Run) {
