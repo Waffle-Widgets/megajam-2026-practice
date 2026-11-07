@@ -62,7 +62,7 @@
   after writing to check what was really built.
 - `write_graph_dsl` replaces the whole graph (good: a function can be rebuilt from text; read it out first as a backup).
   The reader prints literals as `(bind _x 1.0)` and the writer rejects exactly that: fold literals back into the
-  expressions. Actor calls like `SetActorLocation` need `:NewLocation value`; a positional arg lands in the `self` pin.
+  expressions. Actor calls like `SetActorLocation` need `:NewLocation value`; a positional arg lands in the `self` pin. Same for `SetActorRotation` (`:NewRotation`). The reader prints a `b`-bool variable as `(|GetbIsHopping)`, but the writer needs `Variables|Default|GetIsHopping` / `SetIsHopping`.
 - In Play mode, `SceneTools.find_actors` with `actor_type` = the Blueprint's generated class (`BP_Car.BP_Car_C`) lists the
   live actors, so captures can be aimed at a specific car.
 - Never write `(return (SomeFunction ...))` with one of our own Blueprint functions inside. It compiles, but the call never

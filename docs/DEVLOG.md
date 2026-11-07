@@ -722,3 +722,15 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - In a grid game, decoration goes on tile corners, never tile centres. That's a rule worth keeping for the jam.
   - Judge a material on the actual surface. A ground material can look fine on top and smear on the sides of a step.
 - **Media:** ![zebra crossing at frog height](media/city-crossing-frog-eye.jpg) ![the city from above](media/city-real-overview.jpg) ![one junction from overhead](media/city-junction-top.jpg) ![posts moved to the curb](media/city-posts-at-curb.jpg)
+
+### 2026-11-06 — Raised sidewalks, and turning on the spot instead of hopping blind (GameStation)
+- **What we asked for:** "the sidewalk usually isn't lower than the street is it?", then "feels fine but having the frog jump blindly when it turns feels wrong", then "going back still does not turn the camera", then "Feels good".
+- **What happened:**
+  - **Sidewalks:** they really were lower. The flat sidewalk sheet sat about half a centimetre under the roads. Now 15 raised concrete slabs fill the blocks between the roads, 5 cm above them (a real curb at our scale). Their edges are the curbs, so the 40 separate curb strips were removed.
+  - **Stepping up and down:** a hop always landed at the height it took off from, which would have sunk the frog into the raised sidewalk. A new `FrogGroundZ` function sends a short ray straight down at the landing tile. In the city, each hop now lands on whatever is there (steps under 20 cm only). The walkers walk at the new height, and the frog's start point moved up 6 cm.
+  - **Turning:** before, pressing left hopped the frog sideways into a street the camera hadn't shown yet, and only then turned the camera. Now, in the city, left and right turn the frog and camera 90° on the spot (with a little squash and a soft tap sound), and back turns it round 180°. Only forward hops, so you always see where you'll land. A key pressed mid-hop still runs on landing. The river level keeps its old controls.
+  - **DSL snags:** the graph reader prints the hop flag as `|GetbIsHopping`, but the writer only accepts `Variables|Default|GetIsHopping` / `SetIsHopping`. `SetActorRotation` needs `:NewRotation`, just like `SetActorLocation`.
+- **What we learned:**
+  - A turning camera and sideways hops don't mix: turn first, look, then hop.
+  - Check how high the ground is with the tools (a ray down), not by eye. Half a centimetre is invisible in a picture but wrong in the game.
+- **Media:** ![raised sidewalk from road level](media/city-raised-sidewalk.jpg)
