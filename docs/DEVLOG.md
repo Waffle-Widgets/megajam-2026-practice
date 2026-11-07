@@ -750,3 +750,22 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Settings fixed once by clicking get lost in a new project. Writing them into a script is the only way they carry over.
   - Make the script check its own results. Reading the settings back from the running editor caught a setting that looked right in the file and was silently ignored.
 - **Media:** ![the test project open in Unreal](media/bootstrap-test-project.png)
+
+### 2026-11-06 — One-command packaging (GameStation)
+- **What we asked for:** "Yes, packaging" (the next prep script after the bootstrap).
+- **What happened:**
+  - `tools/package_build.ps1` packages a Windows Shipping build and makes `Builds/WaffleWidgets_<Game>.zip` for itch.io. It also:
+    - checks the start map is set;
+    - cooks every level under `Content/Game/`;
+    - checks the 1 GB itch.io limit;
+    - with `-Run`, starts the game for 20 seconds to check it stays up.
+  - **It already caught a real bug:** the project's cook list left out `Lvl_City`, so any build made the old way would have been missing the city.
+  - **Three tries to the first build:**
+    1. The cook worked, but staging wanted a compiled game program of our own. Our editor plugins make Unreal build one even with no C++, and that folder isn't in Git, so a fresh PC has none. The script now compiles it the first time.
+    2. The compile also tried to rebuild the editor. That needs a .NET Framework SDK this PC doesn't have, and it's also why "`-build` fails with the editor open" was in CLAUDE.md. `-nocompileeditor` fixed both.
+    3. It worked: about 1 minute for the whole package on a warm cook.
+  - The first zip was 620 MB, of which 184 MB was debug symbols players don't need. They now go to `Builds/Symbols/` and the zip is 570 MB.
+- **What we learned:**
+  - A packaging script is also a checker. Listing the maps by hand had silently dropped the newest level.
+  - Read the build tool's own log, not just the summary. "RulesError" alone said nothing; the detailed log named the missing SDK.
+- **Media:** ![the packaged game running](media/packaged-build-running.jpg)

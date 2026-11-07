@@ -86,12 +86,15 @@
 - Fab in Claude's browser pane: the user signs in there once (the launcher login doesn't carry over). Free items still
   need "Add to My Library" and a one-time EULA; Megascans surfaces are free, but many Megascans 3D models are not.
   Downloads land in `~/Downloads` as `<guid>.tmp` zips; identify them by their contents.
-- **Packaging a Windows build** (about 4-5 minutes, works with the editor open). First set `GameDefaultMap` in
-  `Config/DefaultEngine.ini` to our level. Then run `RunUAT.bat BuildCookRun -project=<uproject> -platform=Win64
-  -clientconfig=Shipping -build -cook -stage -pak -archive -archivedirectory=<repo>/Builds -unrealexe="<UE>/Engine/Binaries/Win64/UnrealEditor-Cmd.exe"`.
-  Without `-unrealexe`, the cook step fails looking for `MegaJamPracticeEditor.target`. When only Blueprints/assets
-  changed, use `-skipbuild` instead of `-build`. With the editor open, `-build` fails trying to recompile the editor. `Builds/` is gitignored. Don't
-  save assets while it cooks.
+- **Packaging a Windows build:** run `tools/package_build.ps1 [-Game Name] [-Run] [-CopyTo <folder>]`. It cooks the start
+  map (`GameDefaultMap`) plus every map under `Content/Game/`, zips `Builds/<Team>_<Game>.zip` for itch.io, checks the
+  1 GB limit, keeps the `.pdb` debug symbols out of the zip (`Builds/Symbols/`), and `-Run` checks the game launches.
+  Works with the editor open (don't save while it cooks). What it handles for us:
+  - Our editor plugins (MCP, toolsets) make Unreal build a game program of the project's own, even with no C++.
+    `Binaries/` isn't in Git, so the first package on each PC compiles it (about 20 s); later runs reuse it.
+  - `-nocompileeditor`: without it, `-build` also rebuilds the editor, which fails with the editor open and needs the
+    .NET Framework SDK (not installed on GameStation). `-unrealexe=UnrealEditor-Cmd.exe` avoids the missing
+    `<Project>Editor.target` error during the cook.
 - Turn off "Use Less CPU when in Background" (Editor Preferences) so Play mode runs at full speed while Claude tests it.
   In a project's files it belongs in `Config/DefaultEditorSettings.ini`, not `DefaultEditorPerProjectUserSettings.ini`
   (the bootstrap script does this, and its `-Verify` reads it back from the running editor).
