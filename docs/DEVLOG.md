@@ -835,3 +835,19 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Anything with one person's folder in it breaks the moment a second person clones. Search for your user name before sharing.
   - Our chats can't message a teammate's chat on another Claude account, so hand-offs go through commit messages and `TEAM.md`.
   - Still to check: One File Per Actor in Unreal, and whether a fresh clone opens without Visual Studio.
+
+### 2026-11-08 — Toshi: a Meshy dog from our own photos walks the city (main PC)
+- **What we tried:** Replacing the TRELLIS Shiba with Toshi, the owner's real dog, made in Meshy from our own photos, then rigging him and swapping him in as the city's walking dog.
+- **Prompt(s) we gave the agent:** "Yes, download it" / "Rig him to walk" / "Yes, swap him in" / "I can test this on GameStation if needed" / "looks ok for now, merge"
+- **What happened:**
+  - GameStation's chat handed the job to the main PC after the owner signed in to Meshy there. Claude downloaded the GLB from the Meshy website (free; the API would have cost credits), sized it to the old Shiba's height (48.75 cm) with `tools/glb_for_unreal.py` and compared the two side by side.
+  - `trellis_character.py` rigged him with our dog skeleton and `walk_cycle.py` gave him a trot. Interchange auto-imported the FBX into `Imported/ToshiWalk/`. Only the colour texture came along; Meshy's normal and metal maps were dropped, so he is a little flatter up close.
+  - Removing a scratch import folder with `AssetTools.delete` also deleted the texture's source PNG from disk. The texture asset was still loaded, so Claude duplicated that instead.
+  - The dog walker already placed in `Lvl_City` kept the old Shiba (the stale-copy problem again), and setting its properties didn't mark the level as changed, so the first save wrote nothing. Re-setting the actor's full transform did.
+  - Clicking the editor's "1 Unsaved" button opened a Save Content window that froze the MCP for 5 minutes. Claude found the window from PowerShell, looked at it, and pressed Enter to save.
+  - This one time the main PC edited `.uasset` files (normally only GameStation does). To test it on GameStation without touching `main`, Claude pushed it to a branch, `mendezm87/toshi-dog`; we played it there and merged it.
+- **What we learned:**
+  - Meshy plus our own rig scripts works: a real pet in the game in an afternoon, with no TRELLIS cleanup.
+  - Never click the editor's "Unsaved" button remotely; save with `save_assets`. Deleting a folder through the MCP deletes its source files too.
+  - A test branch is the easy way to play untested work on another PC.
+- **Media:** ![Meshy Toshi next to the old Shiba](media/meshy-toshi-vs-shiba.jpg) ![Toshi's trot](media/meshy-toshi-walk.jpg) ![Toshi walking in the city](media/toshi-in-city.jpg)

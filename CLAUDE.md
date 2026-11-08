@@ -143,6 +143,13 @@ learn something, and copy it into the jam repo (the bootstrap does). Allowed bef
 - Check the game's scale before comparing art with it. The practice city is built at **0.405**: the pedestrians' Man and
   Dog meshes are scaled 0.405 and the car meshes are modelled small (the RAV4 is 186 cm long).
 
+- **Never click the editor's "N Unsaved" button** through the Slate inspector: it opens a modal Save Content window
+  that freezes the MCP. Save with `AssetTools.save_assets`. (Escape it: find the window from PowerShell and send Enter.)
+- `AssetTools.delete` on a **folder** also deletes the source files on disk inside it (a texture's `.png`).
+- `ObjectTools.set_properties` on a placed actor doesn't mark the level as changed, so saving writes nothing. Re-set the
+  actor's full transform afterwards, then save and check `git status`.
+- To test untested `.uasset` work on another PC, push it to a branch (`<name>/<topic>`), play it there, then merge.
+
 ## AI-generated 3D models (Hunyuan3D 2.1 and TRELLIS.2, both local)
 - **TRELLIS.2** (Microsoft, MIT licence, `D:\AI\TRELLIS2` on the main PC, `C:\AI\TRELLIS2` on GameStation) is the one to use: one photo with the background cut out ->
   `venv\Scripts\python.exe run_image_to_3d.py <cutout.png> out\<name> 1024_cascade` (about 5 minutes on the 3090) -> a GLB
