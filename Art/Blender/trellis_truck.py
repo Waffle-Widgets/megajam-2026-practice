@@ -8,7 +8,7 @@
 import bpy, bmesh, numpy as np, math, time, os
 from mathutils import Vector
 t0 = time.time()
-REPO = globals().get('REPO', r"C:\Users\thecl\Projects\megajam-2026-practice")
+REPO = globals().get('REPO', (os.environ.get('MEGAJAM_REPO') or os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(globals().get('__file__', os.path.join(os.getcwd(), 'Art', 'Blender', '_')))), '..', '..'))))
 D = REPO + r"\Art\Blender"; SP = D + r"\cache"; os.makedirs(SP, exist_ok=True)
 GLB = globals().get('GLB', r"C:\AI\TRELLIS2\out\tacoma_front.glb")
 OUT = globals().get('OUT', 'SM_CarTacoma')

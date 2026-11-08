@@ -6,7 +6,7 @@
     },
     "blender": {
       "type": "stdio",
-      "command": "C:\\Users\\thecl\\.local\\bin\\uv.exe",
+      "command": "uv",
       "args": ["--directory", "C:\\blender_mcp\\mcp", "run", "blender-mcp"]
     }
   }

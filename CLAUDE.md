@@ -7,7 +7,8 @@
 - `CREDITS.md` — every asset we didn't make ourselves
 
 ## Who we are
-- A two-person team entering the 2026 Epic AI MegaJam (Nov 12-15).
+- A team of up to 5 (the jam's limit) entering the 2026 Epic AI MegaJam (Nov 12-15). Each teammate works on their own
+  PC, with their own GitHub account and their own Claude account. Team list and who owns what: `docs/TEAM.md`.
 - **This repo is our practice/setup sandbox, not the jam entry.** We're learning the tools and running practice jams here.
   When we discover a better way to work, suggest updating this CLAUDE.md so the improvement carries into the real jam repo.
 - We are beginners: we play a lot of games but have little coding or Unreal experience.
@@ -28,6 +29,12 @@
 - We often prompt you remotely from another machine, so send screenshots of the editor or results when they help us follow along.
 - Keep the project tidy: put our content under `Content/Game/` in folders by type (Blueprints, Maps, Materials, Audio, UI).
 - Use clear names: `BP_` for Blueprints, `M_` for materials, `MI_` for material instances, `WBP_` for widgets, `SFX_` for sounds.
+
+## Skills (`.claude/skills/`)
+Step-by-step checklists Claude loads when a task matches (or type `/<name>`). Use them; update the skill when we
+learn something, and copy it into the jam repo (the bootstrap does). Allowed before the jam: they're prompts (§7h).
+`unreal-blueprint`, `asset-import`, `trellis-model`, `make-sound`, `playtest-capture`, `package-build`,
+`devlog-entry`, `pc-handoff`, `jam-rules-check`.
 
 ## Lessons from practice (Unreal + MCP)
 - **Lock before you edit.** Git LFS marks committed `.uasset`/`.umap` files read-only. Run `git lfs lock <file>` before changing
@@ -216,7 +223,7 @@
      (repository, then add-on), enable it, and click Start (it listens on port 9876).
   2. Install `uv` (`irm https://astral.sh/uv/install.ps1 | iex`), run
      `git clone https://projects.blender.org/lab/blender_mcp.git C:\blender_mcp`, then `uv --directory C:\blender_mcp\mcp sync`.
-  3. `.mcp.json` points at `C:\Users\thecl\.local\bin\uv.exe`. If the Windows user name differs, fix that path.
+  3. `.mcp.json` runs plain `uv`, so `uv` must be on the PATH (the installer puts it in `%USERPROFILE%\.localin`). Check with `uv --version` in a new terminal.
   4. Start a new Claude Code session so the server is picked up.
 - Blender warns that the MCP runs AI-written code with no guards: keep only scratch/project files open while connected.
 - **Open Unreal and Blender yourselves** (Start menu, or Claude launches them with `explorer.exe <path>`), never as a
@@ -240,15 +247,40 @@
   It never commits. Its starter files are in `tools/bootstrap/templates/`.
 - PowerShell variable names ignore case: `$uproject` and `$UProject` are the same variable.
 
-## Switching computers
-We work on more than one PC. Only one machine should have the project open at a time. You can only act on the PC
-this session runs on, so the session on each machine handles its own side.
-- **Split work (since Nov 5):** GameStation has Unreal open and is the only PC that edits or commits `.uasset`/`.umap`.
-  The main PC keeps Unreal closed and does TRELLIS, Blender and bakes, committing FBX + textures (`Art/Blender/export/`,
-  `Content/Game/Imported/<Name>/`) and scripts only; GameStation pulls and imports them. Both PCs use the same GitHub
-  account, so LFS locks can't protect us: `git pull --rebase` before every commit, and never commit Unreal assets from
-  the PC that doesn't own Unreal. Message the other PC's chat with the asset names after each push.
-- Unlock many files by ID, not path (`git lfs locks --json`); strip `\r` from IDs produced on Windows.
+## Working as a team (up to 5 people, each on their own PC)
+Every teammate clones the repo and runs their own Claude Code. You only see and act on the PC this session runs on, and
+your chat can't message chats on another person's Claude account: hand-offs go through Git (commits, `docs/TEAM.md`)
+or through the humans. New teammate setup: `docs/SETUP_TEAMMATE.md`.
+- **Unreal files can't be merged.** `.uasset`/`.umap` are binary: if two people change the same one, one person's work is
+  lost. Git LFS locks are what stops that, and they work because everyone has their own GitHub account:
+  - Before changing an asset: `git pull --rebase`, then `git lfs lock <file>`. If it's locked by someone else
+    (`git lfs locks`), don't edit it: tell the user who has it, and suggest making a new asset or waiting.
+  - New assets: commit, then lock right away if you'll keep editing them.
+  - After pushing, unlock what you're done with (`git lfs unlock <file>`; by ID for many: `git lfs locks --json`,
+    strip `\r` on Windows). Never `--force` unlock someone else's file unless that person agreed.
+  - `git config lfs.locksverify true` (set by the setup guide) makes Git refuse a push over someone else's lock.
+- **One level, many people:** the level uses "One File Per Actor" (World Settings > Use External Actors), so each placed
+  actor is its own small file under `__ExternalActors__`. Two people can then place and move different things in the same
+  map. Lock the actor files you change, not the whole `.umap`. Blueprints are still one file each: split big ones
+  (e.g. separate `BP_` per system) so people don't queue for the same file.
+- **Ownership:** `docs/TEAM.md` says who owns which Blueprints, folders and systems this jam. Stay in your owner's
+  area; ask before editing another person's. Each person keeps work in their own folder for new assets
+  (`Content/Game/<Type>/`, with clear names) to avoid name clashes.
+- **Commit small, commit often, pull first:** `git pull --rebase` before every commit and before starting work. Text
+  files (scripts, docs, `.ini`) merge normally; if a rebase stops on a conflict, show the user both sides.
+- **Git identity:** every commit must be under the teammate's own name (`git config user.name` / `user.email`, their
+  GitHub address). Epic may read our Git history, and it shows who built what.
+- Push only tested work to `main` (see "How to work with us"). Bigger experiments go on a branch named
+  `<name>/<topic>`; merge them once the team has played them.
+- **Art made outside Unreal** (Blender, TRELLIS) is committed as FBX + textures under `Art/Blender/export/` and imported
+  by whoever owns that area in Unreal (see `docs/TEAM.md`). Tell them the asset names in your hand-off.
+
+## Switching computers (one person, two PCs)
+Only one machine should have a given person's working copy of the project open at a time.
+- **The Team Owner's two PCs (practice split since Nov 5):** GameStation has Unreal open and is the only one of the two
+  that edits or commits `.uasset`/`.umap`. M Station keeps Unreal closed and does TRELLIS, Blender and bakes,
+  committing FBX + textures and scripts only. Both are on the same GitHub account, so locks can't tell them apart:
+  message the other PC's chat with the asset names after each push.
 - **"I'm leaving this computer":** check every asset under `/Game/Game` is saved (`is_dirty`), make sure tested work is
   committed and pushed (ask about anything untested), release our LFS locks (`git lfs locks`), then close Unreal. If it
   stalls on a save prompt for a template asset we never meant to change, force-close it, but only after confirming our

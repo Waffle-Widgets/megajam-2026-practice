@@ -820,3 +820,18 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - ![front close-ups](media/bakeoff-closeups.jpg)
   - ![in the game, next to our current models](media/bakeoff-ingame.jpg)
   - ![in-game close-ups](media/bakeoff-ingame-closeups.jpg)
+
+### 2026-11-08 — Ready for up to 5 teammates, and Claude skills for the jam (main PC)
+- **What we tried:** Getting the repo ready for teammates who each use their own PC, GitHub account and Claude account, and turning our hard-won lessons into Claude skills we can take into the jam.
+- **Prompt(s) we gave the agent:** "are we allowed to take skills into the MegaJam? What kind of Claude Skills would be good?" / "Yes, build them" / "we will be working with other teammates using their own computers to commit code, are we set up for this?" / "make the fixes but keep in mind we can have up to 5 people on the team."
+- **What happened:**
+  - Skills are prompts, so §7h allows them before the jam. Claude wrote nine under `.claude/skills/`: `unreal-blueprint`, `asset-import`, `trellis-model`, `make-sound`, `playtest-capture`, `package-build`, `devlog-entry`, `pc-handoff`, `jam-rules-check`. Each one is a checklist built from bugs we actually hit.
+  - The repo assumed one person on two PCs. What would have broken with teammates:
+    - `.mcp.json` and eight Blender scripts had `C:\Users\thecl\...` built in. They now use plain `uv` and find the repo from where the script is saved (tested headless from another folder).
+    - Our only sharing rule was "GameStation owns Unreal". Now it's Git LFS locks: pull, lock before editing, and Git refuses a push over someone else's lock (`lfs.locksverify`). Locks only work because every teammate has their own GitHub account.
+    - One map can't be merged, so the plan is "One File Per Actor": each placed object becomes its own small file. Not tried in UE 5.8 yet.
+  - New: `docs/TEAM.md` (who's on the team, who owns what) and `docs/SETUP_TEAMMATE.md` (a new teammate's checklist). The jam-repo script copies both, plus the skills.
+- **What we learned:**
+  - Anything with one person's folder in it breaks the moment a second person clones. Search for your user name before sharing.
+  - Our chats can't message a teammate's chat on another Claude account, so hand-offs go through commit messages and `TEAM.md`.
+  - Still to check: One File Per Actor in Unreal, and whether a fresh clone opens without Visual Studio.

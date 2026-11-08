@@ -2,7 +2,8 @@
 # Between build and bake for the front-3/4 (cc8) body: close the side-window openings with glass panes,
 # record the rear deck height, and transplant the wing from the rear-3/4 (TR_CC7) model.
 import bpy, bmesh, numpy as np, math
-REPO = globals().get('REPO', r"C:\Users\thecl\code\megajam-2026-practice")   # pass REPO=... on another PC
+import os
+REPO = globals().get('REPO', (os.environ.get('MEGAJAM_REPO') or os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(globals().get('__file__', os.path.join(os.getcwd(), 'Art', 'Blender', '_')))), '..', '..'))))   # repo = two folders up from this script; pass REPO=... or set MEGAJAM_REPO to override
 D = REPO + r"\Art\Blender"; SP = D + r"\cache"                                   # cache: baked maps, lamp points (gitignored)
 import os; os.makedirs(SP, exist_ok=True)
 from mathutils import Vector

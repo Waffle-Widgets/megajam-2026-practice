@@ -20,7 +20,7 @@ import bpy, bmesh, numpy as np, math, time, os, sys, json
 from mathutils import Vector
 t0 = time.time()
 if '--' in sys.argv: globals().update(json.loads(sys.argv[sys.argv.index('--') + 1]))
-REPO = globals().get('REPO', r"C:\Users\thecl\Projects\megajam-2026-practice")
+REPO = globals().get('REPO', (os.environ.get('MEGAJAM_REPO') or os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(globals().get('__file__', os.path.join(os.getcwd(), 'Art', 'Blender', '_')))), '..', '..'))))
 D = REPO + r"\Art\Blender"; SP = D + r"\cache"; os.makedirs(SP, exist_ok=True)
 GLB = globals()['GLB']; OUT = globals()['OUT']; NAME = OUT[3:] if OUT.startswith('SM_') else OUT
 # Outside Content/ on purpose: files written into Content/ auto-import into an open Unreal (extra material, Nanite on)

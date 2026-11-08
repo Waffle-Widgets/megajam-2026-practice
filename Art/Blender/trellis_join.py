@@ -2,7 +2,8 @@
 # One car from two generator models without a seam: the rear-photo model B is the whole body; its invented front end
 # is shrink-wrapped onto the front-photo model A. Textures bake from A on the front, B on the rear. Runs in Blender.
 import bpy, bmesh, numpy as np, math, time
-REPO = globals().get('REPO', r"C:\Users\thecl\code\megajam-2026-practice")   # pass REPO=... on another PC
+import os
+REPO = globals().get('REPO', (os.environ.get('MEGAJAM_REPO') or os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(globals().get('__file__', os.path.join(os.getcwd(), 'Art', 'Blender', '_')))), '..', '..'))))   # repo = two folders up from this script; pass REPO=... or set MEGAJAM_REPO to override
 D = REPO + r"\Art\Blender"; SP = D + r"\cache"                                   # cache: baked maps, lamp points (gitignored)
 import os; os.makedirs(SP, exist_ok=True)
 from mathutils import Vector

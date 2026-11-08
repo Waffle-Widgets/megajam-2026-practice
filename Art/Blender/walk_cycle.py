@@ -11,7 +11,7 @@ from mathutils import Vector, Quaternion, Matrix
 
 args = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else ['CharMan', 'human']
 NAME, KIND = args[0], args[1]
-D = r"C:\Users\thecl\Projects\megajam-2026-practice\Art\Blender"
+D = os.path.join((os.environ.get('MEGAJAM_REPO') or os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(globals().get('__file__', os.path.join(os.getcwd(), 'Art', 'Blender', '_')))), '..', '..'))), 'Art', 'Blender')
 CACHE = os.path.join(D, 'cache'); OUTD = os.path.join(D, 'export', 'Characters'); os.makedirs(OUTD, exist_ok=True)
 bpy.ops.wm.open_mainfile(filepath=os.path.join(CACHE, NAME + '.blend'))
 sc = bpy.context.scene

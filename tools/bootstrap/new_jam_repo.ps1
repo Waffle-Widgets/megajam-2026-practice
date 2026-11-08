@@ -4,8 +4,8 @@
   settings, agent instructions, scripts and docs. Copies NO gameplay, levels or art from the practice repo.
 
 .EXAMPLE
-  powershell -ExecutionPolicy Bypass -File tools\bootstrap\new_jam_repo.ps1 -Repo C:\Users\thecl\Projects\megajam-2026 -Name OurGame
-  powershell -ExecutionPolicy Bypass -File tools\bootstrap\new_jam_repo.ps1 -Repo C:\Users\thecl\Projects\megajam-2026 -Name OurGame -Verify
+  powershell -ExecutionPolicy Bypass -File tools\bootstrap\new_jam_repo.ps1 -Repo C:\Projects\megajam-2026 -Name OurGame
+  powershell -ExecutionPolicy Bypass -File tools\bootstrap\new_jam_repo.ps1 -Repo C:\Projects\megajam-2026 -Name OurGame -Verify
 
 .NOTES
   -Verify opens the new project in Unreal (as its own app, not a child of this shell), waits for the Unreal MCP
@@ -112,13 +112,13 @@ if (-not $VerifyOnly) {
     Step 'Repo files (.gitignore, .gitattributes, .mcp.json, per-PC Claude settings)'
     Write-Text (Join-Path $Repo '.gitignore') (From-Template 'gitignore.txt')
     Copy-Item (Join-Path $Src '.gitattributes') (Join-Path $Repo '.gitattributes')
-    $uv = (Get-Command uv -ErrorAction SilentlyContinue).Source
-    if (-not $uv) { $uv = Join-Path $env:USERPROFILE '.local\bin\uv.exe' }
-    if (-not (Test-Path $uv)) { Warn "uv not found at ${uv}: the Blender MCP won't start until it's installed (see CLAUDE.md, Blender setup)" }
+    # .mcp.json is committed and shared by every teammate, so it names plain 'uv' (found on each PC's PATH),
+    # never one person's C:\Users\<name>\... path.
+    if (-not (Get-Command uv -ErrorAction SilentlyContinue)) { Warn "uv isn't on this PC's PATH: the Blender MCP won't start until it's installed (docs/SETUP_TEAMMATE.md)" }
     if (-not (Test-Path 'C:\blender_mcp\mcp')) { Warn 'C:\blender_mcp\mcp not found: clone the Blender MCP there (see CLAUDE.md, Blender setup)' }
     $mcp = [ordered]@{ mcpServers = [ordered]@{
             unreal  = [ordered]@{ type = 'http'; url = 'http://127.0.0.1:8000/mcp' }
-            blender = [ordered]@{ type = 'stdio'; command = $uv; args = @('--directory', 'C:\blender_mcp\mcp', 'run', 'blender-mcp') }
+            blender = [ordered]@{ type = 'stdio'; command = 'uv'; args = @('--directory', 'C:\blender_mcp\mcp', 'run', 'blender-mcp') }
         } }
     Write-Text (Join-Path $Repo '.mcp.json') ($mcp | ConvertTo-Json -Depth 5)
     Write-Text (Join-Path $Repo '.claude\settings.local.json') "{`r`n  `"enableAllProjectMcpServers`": true`r`n}`r`n"
@@ -138,14 +138,19 @@ if (-not $VerifyOnly) {
         $t = [IO.File]::ReadAllText((Join-Path $Src $f))
         Write-Text (Join-Path $Repo $f) ($t.Replace('MegaJamPractice', $Name))
     }
+    # Claude Code skills (.claude/skills/<name>/SKILL.md): how-to instructions only, allowed before the jam (§7h)
+    foreach ($sk in Get-ChildItem (Join-Path $Src '.claude\skills') -Recurse -File -ErrorAction SilentlyContinue) {
+        $rel = $sk.FullName.Substring($Src.TrimEnd('\').Length + 1)
+        Write-Text (Join-Path $Repo $rel) ([IO.File]::ReadAllText($sk.FullName).Replace('MegaJamPractice', $Name))
+    }
     New-Item -ItemType Directory -Force (Join-Path $Repo 'docs') | Out-Null
-    foreach ($f in 'PLAN.md', 'RULES.md') { Copy-Item (Join-Path $Src "docs\$f") (Join-Path $Repo "docs\$f") }
+    foreach ($f in 'PLAN.md', 'RULES.md', 'SETUP_TEAMMATE.md', 'TEAM.md') { Copy-Item (Join-Path $Src "docs\$f") (Join-Path $Repo "docs\$f") }
     Write-Text (Join-Path $Repo 'docs\PITCH.md') (From-Template 'PITCH.md')
     Write-Text (Join-Path $Repo 'docs\DEVLOG.md') (From-Template 'DEVLOG.md')
     Write-Text (Join-Path $Repo 'docs\media\.gitkeep') ''
     Write-Text (Join-Path $Repo 'CREDITS.md') (From-Template 'CREDITS.md')
     Write-Text (Join-Path $Repo 'README.md') (From-Template 'README.md')
-    Ok 'CLAUDE.md, GEMINI.md, README, CREDITS, docs/ (PLAN, RULES, empty PITCH, fresh DEVLOG)'
+    Ok 'CLAUDE.md, GEMINI.md, .claude/skills, README, CREDITS, docs/ (PLAN, RULES, SETUP_TEAMMATE, TEAM, empty PITCH, fresh DEVLOG)'
 
     # ------------------------------------------------------------ 6. git
     Step 'Git'
@@ -153,7 +158,8 @@ if (-not $VerifyOnly) {
     try {
         git init -q -b main
         git lfs install --local | Out-Null
-        Ok 'git repo (branch main) with LFS hooks; nothing committed yet'
+        git config lfs.locksverify true      # refuse a push that changes a file someone else has locked
+        Ok 'git repo (branch main) with LFS hooks and lock checks; nothing committed yet'
     } finally { Pop-Location }
 }
 

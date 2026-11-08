@@ -4,7 +4,7 @@ _Last updated: Nov 1, 2026_
 
 ## Overview
 
-We're a two-person beginner team building a small, polished Unreal Engine 5.8 game in four days, with AI agents doing most of the implementation.
+We're a beginner team (up to 5 people) building a small, polished Unreal Engine 5.8 game in four days, with AI agents doing most of the implementation.
 
 | What | When (Pacific) |
 | --- | --- |

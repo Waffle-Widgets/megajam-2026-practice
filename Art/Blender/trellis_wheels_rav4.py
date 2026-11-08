@@ -1,7 +1,8 @@
 # Cut the RAV4 wheels headless: blender -b --factory-startup --python Art/Blender/trellis_wheels_rav4.py [-- "{\"DO_EXPORT\": false}"]
 # Adds a sun and sky (the work file has none), runs trellis_wheels.py with the RAV4 sizes, writes cache/rav4_wheels_sheet.jpg.
 import bpy, json, sys
-R = r"C:\Users\thecl\Projects\megajam-2026-practice\Art\Blender"
+import os
+R = os.path.join((os.environ.get('MEGAJAM_REPO') or os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(globals().get('__file__', os.path.join(os.getcwd(), 'Art', 'Blender', '_')))), '..', '..'))), 'Art', 'Blender')
 bpy.ops.wm.open_mainfile(filepath=R + r"\cache\SM_CarRav4_work.blend")
 sc = bpy.context.scene; sc.render.engine = 'BLENDER_EEVEE_NEXT' if 'BLENDER_EEVEE_NEXT' in [e.identifier for e in bpy.types.RenderSettings.bl_rna.properties['engine'].enum_items] else 'BLENDER_EEVEE'
 w = bpy.data.worlds.new('VW'); sc.world = w; w.use_nodes = True
