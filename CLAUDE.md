@@ -223,7 +223,7 @@ learn something, and copy it into the jam repo (the bootstrap does). Allowed bef
      (repository, then add-on), enable it, and click Start (it listens on port 9876).
   2. Install `uv` (`irm https://astral.sh/uv/install.ps1 | iex`), run
      `git clone https://projects.blender.org/lab/blender_mcp.git C:\blender_mcp`, then `uv --directory C:\blender_mcp\mcp sync`.
-  3. `.mcp.json` runs plain `uv`, so `uv` must be on the PATH (the installer puts it in `%USERPROFILE%\.localin`). Check with `uv --version` in a new terminal.
+  3. `.mcp.json` runs plain `uv`, so `uv` must be on the PATH (the installer puts it in `%USERPROFILE%\.local\bin`). Check with `uv --version` in a new terminal.
   4. Start a new Claude Code session so the server is picked up.
 - Blender warns that the MCP runs AI-written code with no guards: keep only scratch/project files open while connected.
 - **Open Unreal and Blender yourselves** (Start menu, or Claude launches them with `explorer.exe <path>`), never as a
