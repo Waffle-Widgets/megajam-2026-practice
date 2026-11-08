@@ -8,7 +8,7 @@ Claude reads this file to know who owns what. Update it whenever ownership chang
 | Name | GitHub | Epic account email registered? | PC(s) | Role |
 |---|---|---|---|---|
 | _(Team Owner: submits the entry)_ | mendezm87 | | GameStation (Unreal), M Station (Blender, TRELLIS) | |
-| | | | | |
+| Justin | allbarkdev (invited to Waffle-Widgets Nov 6, not accepted yet) | | | |
 | | | | | |
 | | | | | |
 | | | | | |
