@@ -49,7 +49,7 @@ Start a new Claude Code chat in the repo folder. Type `/` and check our skills a
 
 ## On a Mac
 The project is Blueprint-only (no C++ of our own), so Unreal opens it on a Mac without Xcode. Not tested on a Mac
-yet: tell the Team Owner what happens at each step. Do sections 1-6 with these changes:
+yet: tell the Team Owner what happens at each step. Do sections 1-7 with these changes:
 - **Install (section 2):**
   - Unreal Engine 5.8 from the Epic Games Launcher for Mac (it installs to `/Users/Shared/Epic Games/UE_5.8`).
   - Git: `xcode-select --install` (Apple's command line tools; not the full Xcode).
@@ -65,10 +65,17 @@ yet: tell the Team Owner what happens at each step. Do sections 1-6 with these c
   - Packaging the game (`tools/package_build.ps1`): the jam wants a Windows build, and a Mac can't make one.
   - TRELLIS.2 (needs an NVIDIA GPU). Meshy works in any browser.
   - Making the jam repo (`tools/bootstrap/`).
+- **Your role:** a Mac is a **tester** (and can be a **maker**), never the builder. To playtest, Claude switches
+  the repo to the `playtest` branch; you press Play and never save.
 - **First test:** open the project, press Play, and ask Claude "Is the Unreal MCP answering?" If the Model Context
   Protocol plugin doesn't load on Mac, tell the Team Owner; you can still design, test and make art.
 
-## 6. How we work together
+## 6. Tell Claude what this computer does
+Ask Claude in the repo: **"Add this computer to the Computers table as a tester"** (or maker, or whatever the team
+agreed). It reads the computer's name with `hostname`, adds the row to `docs/TEAM.md`, commits and pushes. From then
+on, every chat on this computer checks that row and only does what the role allows. To playtest, see `docs/PLAYTEST.md`.
+
+## 7. How we work together
 - Read `CLAUDE.md` ("Working as a team") and `docs/TEAM.md` (who owns what).
 - Before work and before every commit: `git pull --rebase`.
 - Before changing an Unreal file: `git lfs lock <file>`. If someone else has it, don't edit it.

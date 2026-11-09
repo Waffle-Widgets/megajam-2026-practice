@@ -21,6 +21,10 @@ What the script already handles: cooks the start map plus every map under `Conte
 `Builds/<Team>_<Game>.zip`, checks the 1 GB limit, keeps `.pdb` symbols out of the zip, uses `-nocompileeditor` and
 `-unrealexe` (so the editor can stay open), and `-Run` launches the game for 20 seconds to check it stays up.
 
+## A test build for the testers
+Use `tools\publish_build.ps1` instead (builder only): it runs this script, then publishes the zip as a numbered
+pre-release on GitHub and marks the issues it fixes (`playtest-issues` skill).
+
 ## After
 - Report the zip path and size, and whether `-Run` passed. `Builds/` is gitignored: don't commit it.
 - Ask the user to play the packaged build (not just PIE) start to finish: title, a full run, game over, play again, quit.

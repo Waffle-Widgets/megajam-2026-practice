@@ -19,6 +19,17 @@
 - C++ project, but build gameplay in **Blueprints** unless C++ is truly required. Ask before writing C++.
 - Target platform: Windows.
 
+## Which computer am I on? (check at the start of every chat)
+Run `hostname` and find this computer's row in the **Computers** table in `docs/TEAM.md`, and do only what its role allows:
+- **builder:** the only role that saves or commits Unreal files (`.uasset`, `.umap`) and publishes test builds. Work on
+  the `playtest` branch; merge into `main` when testers confirm (`playtest-issues` skill). `builder (Area)` = only that area.
+- **maker:** Blender, Meshy, TRELLIS, sounds, scripts. Never save in Unreal, even if it's open: hand the files to the builder.
+- **tester:** help play, file and check issues (`docs/PLAYTEST.md`). If Unreal is open to play, never save in it.
+- Any role may edit docs and scripts.
+If asked to do something the role doesn't allow, say which computer is the builder and offer to file an issue or hand it
+over instead. If the user wants to change roles, edit the table, commit and push (`pc-handoff` skill when the builder
+moves). If no row matches `hostname`, ask which computer this is and fix its name in the table.
+
 ## How to work with us
 - Make **one small change at a time**, then stop and tell us exactly what to test in Play mode.
 - Explain every change in plain language: what you made, where it lives in the Content Browser, and why.
@@ -34,7 +45,7 @@
 Step-by-step checklists Claude loads when a task matches (or type `/<name>`). Use them; update the skill when we
 learn something, and copy it into the jam repo (the bootstrap does). Allowed before the jam: they're prompts (§7h).
 `unreal-blueprint`, `asset-import`, `trellis-model`, `make-sound`, `playtest-capture`, `package-build`,
-`devlog-entry`, `pc-handoff`, `jam-rules-check`.
+`playtest-issues`, `devlog-entry`, `pc-handoff`, `jam-rules-check`.
 
 ## Lessons from practice (Unreal + MCP)
 - **Lock before you edit.** Git LFS marks committed `.uasset`/`.umap` files read-only. Run `git lfs lock <file>` before changing
@@ -287,10 +298,8 @@ or through the humans. New teammate setup: `docs/SETUP_TEAMMATE.md`.
 
 ## Switching computers (one person, two PCs)
 Only one machine should have a given person's working copy of the project open at a time.
-- **The Team Owner's two PCs (practice split since Nov 5):** GameStation has Unreal open and is the only one of the two
-  that edits or commits `.uasset`/`.umap`. M Station keeps Unreal closed and does TRELLIS, Blender and bakes,
-  committing FBX + textures and scripts only. Both are on the same GitHub account, so locks can't tell them apart:
-  message the other PC's chat with the asset names after each push.
+- **Which PC does what** is the Computers table in `docs/TEAM.md`, not a fixed rule here. The Team Owner's PCs share
+  one GitHub account, so locks can't tell them apart: message the other PC's chat with the asset names after each push.
 - **"I'm leaving this computer":** check every asset under `/Game/Game` is saved (`is_dirty`), make sure tested work is
   committed and pushed (ask about anything untested), release our LFS locks (`git lfs locks`), then close Unreal. If it
   stalls on a save prompt for a template asset we never meant to change, force-close it, but only after confirming our

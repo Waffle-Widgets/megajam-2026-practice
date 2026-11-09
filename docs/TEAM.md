@@ -20,6 +20,31 @@ on it (repo Settings > Collaborators and teams), or teammates won't even see it.
 **Teammates get the MegaJam repos only.** Add new people to Jam Team, never to a repo directly, and give Jam Team
 only MegaJam repos. The org's other repos aren't part of this work. Members may create repos of their own. Each new person needs a paid seat on the org first.
 
+## Computers: who does what
+Claude reads this table at the start of every chat. It runs `hostname` and finds its row (case doesn't matter, and a
+Mac's `.local` ending is ignored). If no row matches, it asks which computer it is on and fixes the name here.
+**Change a role by asking any chat** ("make GameStation the builder", "add this Mac as a tester"): Claude edits this
+table, commits and pushes. A computer can have more than one role (`tester, maker`).
+
+| Computer (`hostname`) | Person | OS | Role | Notes |
+|---|---|---|---|---|
+| GameStation | Team Owner | Windows | builder | Unreal edits, packaging, fixes playtest issues |
+| M_Station | Team Owner | Windows | maker | TRELLIS, Blender, Meshy, sounds |
+| _(Owner's Mac: hostname to add)_ | Team Owner | macOS | tester | |
+| _(Justin's Mac: hostname to add)_ | Justin | macOS | tester, maker | |
+
+**Roles**
+- **builder:** the only computer that changes Unreal files (`.uasset`, `.umap`) and commits them. It packages and publishes
+  test builds and works through the playtest issues (`playtest-issues` skill). Exactly **one** at a time, on Windows
+  (the jam wants a Windows build). It works on the `playtest` branch and merges into `main` once testers confirm.
+- **builder (area):** e.g. `builder (UI)`. A second person may change Unreal files in that one area only (its folder
+  in "Who owns what" below), with LFS locks. Use it when one builder can't keep up; never two in the same Blueprint.
+- **maker:** makes things outside Unreal (Blender, Meshy, TRELLIS, `tools/make_sfx.py`) and commits FBX, textures,
+  sounds and scripts. It never saves in Unreal; the builder imports what it makes.
+- **tester:** plays test builds and files GitHub issues (`docs/PLAYTEST.md`). Windows: downloads the build from the
+  repo's Releases. Mac: pulls the `playtest` branch and presses Play in Unreal, never saving.
+- Everyone may edit docs and scripts (text files merge normally).
+
 ## Who owns what this jam
 Own a system, a folder, or a set of Blueprints. Others ask before changing it, and only the owner (or whoever holds
 the lock) edits its `.uasset` files.

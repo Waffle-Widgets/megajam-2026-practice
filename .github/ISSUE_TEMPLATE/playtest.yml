@@ -1,0 +1,54 @@
+name: Playtest report
+description: Something you noticed while playing (a bug, how it feels, or an idea)
+title: "[Playtest] "
+labels: ["playtest"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind?
+      options:
+        - Bug (something is broken)
+        - Feel (works, but feels off, too hard, too slow...)
+        - Idea (something to add or change)
+    validations:
+      required: true
+  - type: input
+    id: build
+    attributes:
+      label: Which build?
+      description: "The release you downloaded (e.g. Build 14), or \"Mac editor\" plus the commit if you played in Unreal."
+      placeholder: Build 14
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      placeholder: The frog fell through the road on the second lane.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+  - type: textarea
+    id: steps
+    attributes:
+      label: How do we make it happen again?
+      placeholder: Start a run, hop forward twice, hold left.
+  - type: dropdown
+    id: how-bad
+    attributes:
+      label: How bad is it?
+      options:
+        - Small (barely noticeable)
+        - Annoying (hurts the fun)
+        - Breaks the game (can't keep playing)
+    validations:
+      required: true
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshot or clip
+      description: "Windows: Win+Shift+S, then paste here. Mac: Cmd+Shift+4, then drag the file here. Optional."

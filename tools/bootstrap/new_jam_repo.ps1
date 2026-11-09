@@ -144,13 +144,15 @@ if (-not $VerifyOnly) {
         Write-Text (Join-Path $Repo $rel) ([IO.File]::ReadAllText($sk.FullName).Replace('MegaJamPractice', $Name))
     }
     New-Item -ItemType Directory -Force (Join-Path $Repo 'docs') | Out-Null
-    foreach ($f in 'PLAN.md', 'RULES.md', 'SETUP_TEAMMATE.md', 'TEAM.md') { Copy-Item (Join-Path $Src "docs\$f") (Join-Path $Repo "docs\$f") }
+    # GitHub issue form for playtest reports (labels: see the playtest-issues skill)
+    Copy-Tree (Join-Path $Src '.github') (Join-Path $Repo '.github')
+    foreach ($f in 'PLAN.md', 'RULES.md', 'SETUP_TEAMMATE.md', 'TEAM.md', 'PLAYTEST.md') { Copy-Item (Join-Path $Src "docs\$f") (Join-Path $Repo "docs\$f") }
     Write-Text (Join-Path $Repo 'docs\PITCH.md') (From-Template 'PITCH.md')
     Write-Text (Join-Path $Repo 'docs\DEVLOG.md') (From-Template 'DEVLOG.md')
     Write-Text (Join-Path $Repo 'docs\media\.gitkeep') ''
     Write-Text (Join-Path $Repo 'CREDITS.md') (From-Template 'CREDITS.md')
     Write-Text (Join-Path $Repo 'README.md') (From-Template 'README.md')
-    Ok 'CLAUDE.md, GEMINI.md, .claude/skills, README, CREDITS, docs/ (PLAN, RULES, SETUP_TEAMMATE, TEAM, empty PITCH, fresh DEVLOG)'
+    Ok 'CLAUDE.md, GEMINI.md, .claude/skills, README, CREDITS, docs/ (PLAN, RULES, SETUP_TEAMMATE, TEAM, PLAYTEST, empty PITCH, fresh DEVLOG), .github issue form'
 
     # ------------------------------------------------------------ 6. git
     Step 'Git'

@@ -7,8 +7,14 @@ description: Leave or take over a computer safely - save, commit, push, release 
 
 This is for **one person moving between their own PCs**, and for handing an area to a **teammate**.
 - Teammates each have their own GitHub account, so LFS locks show who holds a file (`git lfs locks`).
-- The Team Owner's two PCs share one account, so locks can't tell them apart: **GameStation** owns Unreal
-  (`.uasset`/`.umap`); **M Station** does TRELLIS, Blender and bakes and commits only FBX, textures and scripts.
+- Which computer does what is the **Computers** table in `docs/TEAM.md` (run `hostname` to find this one). The Team
+  Owner's PCs share one account, so locks can't tell them apart: only the `builder` row changes Unreal files.
+
+## "Make <computer> the builder"
+1. On the old builder: do "I'm leaving this computer" below (saved, pushed, locks released, Unreal closed).
+   If you're not on the old builder, ask the user to confirm it's done there first.
+2. Edit the table: the new computer gets `builder`, the old one its new role. Only one plain `builder` at a time.
+3. Commit and push the table, then do "Let's work on this computer" on the new builder.
 
 ## "I'm leaving this computer"
 1. Every asset under `/Game/Game` is saved (`is_dirty` false).
