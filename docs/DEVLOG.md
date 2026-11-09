@@ -851,3 +851,17 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
   - Never click the editor's "Unsaved" button remotely; save with `save_assets`. Deleting a folder through the MCP deletes its source files too.
   - A test branch is the easy way to play untested work on another PC.
 - **Media:** ![Meshy Toshi next to the old Shiba](media/meshy-toshi-vs-shiba.jpg) ![Toshi's trot](media/meshy-toshi-walk.jpg) ![Toshi walking in the city](media/toshi-in-city.jpg)
+
+### 2026-11-09 — A playtest loop: roles per computer, GitHub issues, test builds (main PC)
+- **What we tried:** Letting two of us playtest while one computer changes the game, with a fast way to report problems. Justin is on a Mac.
+- **Prompt(s) we gave the agent:** "We may want a way to open GitHub issues while we do this so we can rapidly do this. Can we come up with a method for this? Or is there a better way where multiple people can make edits simultaneously?" / "We need to make sure we can set which computers do what" / "Keep in mind Justin will be working on a Mac" / "If this will get us the best productivity I'm fine with it"
+- **What happened:**
+  - Claude advised against everyone editing Unreal at once: `.uasset` files can't be merged, and we're beginners. One builder changes the game; others make art and sound in their own files, or test.
+  - A **Computers** table in `docs/TEAM.md` gives each computer a role (builder, maker, tester), found by `hostname`, which works on Windows and Mac. Claude checks it at the start of every chat, and `tools/publish_build.ps1` refuses to publish anywhere but the builder.
+  - A "Playtest report" issue form and labels on GitHub, a `playtest-issues` skill for both sides, and `docs/PLAYTEST.md` for us.
+  - The builder works on a `playtest` branch and publishes numbered pre-release builds; Mac testers can't run a Windows build, so they pull the same commit and press Play in Unreal without saving.
+  - Bug of the day: a PowerShell helper named `Git` called itself forever, because PowerShell ignores case and `git` inside it meant the helper. The first test just hung.
+  - Tested with a fake issue (#1): filed, marked in progress, dry-run publish, ready-to-check, "works", closed. A real build still has to be published from GameStation.
+- **What we learned:** Pick roles per computer, not per person. Never name a PowerShell function after a command. Commit messages on the test branch must not say "Fixes #n", or GitHub closes the issue before anyone has checked it.
+- **Media:** (none)
+

@@ -264,6 +264,7 @@ learn something, and copy it into the jam repo (the bootstrap does). Allowed bef
   `-Verify` opens it in Unreal and checks the MCP, load errors and settings; close any other Unreal first (port 8000).
   It never commits. Its starter files are in `tools/bootstrap/templates/`.
 - PowerShell variable names ignore case: `$uproject` and `$UProject` are the same variable.
+- So do function names: a function called `Git` that runs `git` calls itself forever. Never name a function after a command.
 
 ## Working as a team (up to 5 people, each on their own PC)
 Every teammate clones the repo and runs their own Claude Code. You only see and act on the PC this session runs on, and
