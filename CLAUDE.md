@@ -275,6 +275,9 @@ or through the humans. New teammate setup: `docs/SETUP_TEAMMATE.md`.
   (`Content/Game/<Type>/`, with clear names) to avoid name clashes.
 - **Commit small, commit often, pull first:** `git pull --rebase` before every commit and before starting work. Text
   files (scripts, docs, `.ini`) merge normally; if a rebase stops on a conflict, show the user both sides.
+- **Teammates on a Mac** (Justin): the project is Blueprint-only, so it opens without Xcode. Packaging, TRELLIS.2 and
+  the bootstrap stay on Windows PCs. Their Blender MCP is a local-scope override (`docs/SETUP_TEAMMATE.md`, "On a
+  Mac"); never put a Mac path in the shared `.mcp.json`. Use forward slashes and no `C:\` paths in anything shared.
 - **Git identity:** every commit must be under the teammate's own name (`git config user.name` / `user.email`, their
   GitHub address). Epic may read our Git history, and it shows who built what.
 - Push only tested work to `main` (see "How to work with us"). Bigger experiments go on a branch named

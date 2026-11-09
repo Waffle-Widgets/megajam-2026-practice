@@ -1,6 +1,7 @@
 # Joining the team: setting up your PC
 
-About 1-2 hours, most of it downloads. You need Windows, a decent NVIDIA GPU, and about 150 GB free.
+About 1-2 hours, most of it downloads. You need Windows with a decent NVIDIA GPU, or a Mac with Apple silicon
+(see "On a Mac" below), and about 150 GB free.
 Do this **before the jam** (Nov 12), and open the project once so the first long shader compile is behind you.
 
 ## 1. Accounts (the Team Owner helps)
@@ -45,6 +46,27 @@ Start a new Claude Code chat in the repo folder. Type `/` and check our skills a
 2. The first open compiles shaders: 5-15 minutes. If a window asks to **rebuild modules**, say Yes. If it fails because
    Visual Studio is missing, tell the Team Owner (we want the project to open without it).
 3. When the editor is up, ask Claude: "Is the Unreal MCP answering?" It should list the level's actors.
+
+## On a Mac
+The project is Blueprint-only (no C++ of our own), so Unreal opens it on a Mac without Xcode. Not tested on a Mac
+yet: tell the Team Owner what happens at each step. Do sections 1-6 with these changes:
+- **Install (section 2):**
+  - Unreal Engine 5.8 from the Epic Games Launcher for Mac (it installs to `/Users/Shared/Epic Games/UE_5.8`).
+  - Git: `xcode-select --install` (Apple's command line tools; not the full Xcode).
+  - [Homebrew](https://brew.sh), then `brew install git-lfs gh`, `git lfs install`, `gh auth login`.
+  - uv, if you'll use Blender: `curl -LsSf https://astral.sh/uv/install.sh | sh`.
+- **Settings (section 4):** the same `.claude/settings.local.json`, with forward slashes in the path.
+- **Blender MCP:** the shared `.mcp.json` points at `C:\blender_mcp`, which doesn't exist on a Mac. Clone it into
+  your home folder (`git clone https://projects.blender.org/lab/blender_mcp.git ~/blender_mcp`, then
+  `uv --directory ~/blender_mcp/mcp sync`) and ask Claude to run
+  `claude mcp add --scope local blender -- uv --directory ~/blender_mcp/mcp run blender-mcp` in the repo folder.
+  A local server with the same name replaces the shared one on your machine only. Never change `.mcp.json` for this.
+- **What stays on the Windows PCs:**
+  - Packaging the game (`tools/package_build.ps1`): the jam wants a Windows build, and a Mac can't make one.
+  - TRELLIS.2 (needs an NVIDIA GPU). Meshy works in any browser.
+  - Making the jam repo (`tools/bootstrap/`).
+- **First test:** open the project, press Play, and ask Claude "Is the Unreal MCP answering?" If the Model Context
+  Protocol plugin doesn't load on Mac, tell the Team Owner; you can still design, test and make art.
 
 ## 6. How we work together
 - Read `CLAUDE.md` ("Working as a team") and `docs/TEAM.md` (who owns what).
