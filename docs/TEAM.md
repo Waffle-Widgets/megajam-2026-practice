@@ -14,8 +14,9 @@ Claude reads this file to know who owns what. Update it whenever ownership chang
 | | | | | |
 
 **GitHub access:** every teammate joins the Waffle-Widgets team **Jam Team**, which has write access (needed to push
-and to lock files). Members on their own only get read access. When the jam repo is made, give Jam Team write on it
-too (repo Settings > Collaborators and teams). Each new person needs a paid seat on the org first.
+and to lock files). The org's base permission is "No permission" (since Nov 8), so members see only the repos their
+team is given; the owner's other projects stay private to the owner. When the jam repo is made, give Jam Team write
+on it (repo Settings > Collaborators and teams), or teammates won't even see it. Each new person needs a paid seat on the org first.
 
 ## Who owns what this jam
 Own a system, a folder, or a set of Blueprints. Others ask before changing it, and only the owner (or whoever holds
