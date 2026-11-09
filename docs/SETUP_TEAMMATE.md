@@ -1,5 +1,7 @@
 # Joining the team: setting up your PC
 
+New here? Read [`HOW_WE_WORK.md`](HOW_WE_WORK.md) first (five minutes).
+
 About 1-2 hours, most of it downloads. You need Windows with a decent NVIDIA GPU, or a Mac with Apple silicon
 (see "On a Mac" below), and about 150 GB free.
 Do this **before the jam** (Nov 12), and open the project once so the first long shader compile is behind you.

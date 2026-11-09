@@ -6,10 +6,21 @@ Gemini, MCP, Git LFS and packaging working, and to run our practice jams (Nov 7â
 **This is not our jam entry.** On Nov 11 we create a fresh repo for the real game and copy over only the
 setup files (see "Starting the real jam repo" below). Break things here freely.
 
+## New to the team? Start here
+
+1. [`docs/HOW_WE_WORK.md`](docs/HOW_WE_WORK.md): how we work, in five minutes (roles per computer, the playtest loop).
+2. [`docs/SETUP_TEAMMATE.md`](docs/SETUP_TEAMMATE.md): set up your Windows PC or Mac.
+3. [`docs/PLAYTEST.md`](docs/PLAYTEST.md): how to get test builds and report problems.
+
+Almost everything is done by asking Claude in a chat opened on this repo folder.
+
 ## Where things are
 
 | File | What it is |
 | --- | --- |
+| `docs/HOW_WE_WORK.md` | How the team works: start here |
+| `docs/TEAM.md` | Who's on the team, what each computer does, who owns what |
+| `docs/PLAYTEST.md` | Test builds and reporting problems as GitHub issues |
 | `docs/PLAN.md` | Team plan: roles, tools, setup checklist, schedule |
 | `docs/PITCH.md` | The current practice game's idea |
 | `docs/RULES.md` | Official jam rules, pasted from itch.io |

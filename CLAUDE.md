@@ -1,6 +1,7 @@
 # Project notes for Claude Code
 
 ## Read these first
+- `docs/HOW_WE_WORK.md` — the team's workflow for newcomers (roles per computer, playtest loop); keep it current
 - `docs/PLAN.md` — the team plan, schedule, and rules of thumb
 - `docs/PITCH.md` — the game we're making (filled in after the theme reveal)
 - `docs/RULES.md` — the official jam rules we must follow
