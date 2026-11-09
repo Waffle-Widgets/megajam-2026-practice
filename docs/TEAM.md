@@ -31,7 +31,7 @@ table, commits and pushes. A computer can have more than one role (`tester, make
 | GameStation | Team Owner | Windows | builder | Unreal edits, packaging, fixes playtest issues |
 | M_Station | Team Owner | Windows | maker | TRELLIS, Blender, Meshy, sounds |
 | _(Owner's Mac: hostname to add)_ | Team Owner | macOS | tester | |
-| _(Justin's Mac: hostname to add)_ | Justin | macOS | tester, maker | |
+| Justins-Mac-mini | Justin | macOS | tester, maker | Mac mini, Apple silicon. git-lfs, gh, uv and the Blender MCP set up Nov 9; Blender is 5.1.2 (team uses 5.2) |
 
 **Roles**
 - **builder:** the only computer that changes Unreal files (`.uasset`, `.umap`) and commits them. It packages and publishes
