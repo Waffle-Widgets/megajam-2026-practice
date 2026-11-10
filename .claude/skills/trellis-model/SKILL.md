@@ -1,6 +1,6 @@
 ---
 name: trellis-model
-description: Make a game-ready 3D model (vehicle, prop, character or animal) from a picture with the local TRELLIS.2 generator, then clean it up in Blender and export FBX + textures for Unreal. Use when the user wants an AI-generated model.
+description: Make a game-ready 3D model (vehicle, prop, character or animal) from a picture with the local TRELLIS.2 generator, then clean it up in Blender and export FBX + textures for Unreal. Use when the user wants an AI-generated model, or a reference picture made locally (tools/gen_images.py).
 ---
 
 # Picture -> TRELLIS.2 -> cleaned FBX
@@ -15,6 +15,14 @@ patched: never `git pull` it. The owner's Hugging Face login must be on the PC (
 - Cut the background out: `venv\Scripts\python.exe tools\cutout.py <photo> <cutout.png> [boxes to paint over, e.g. plates]`.
 - Characters/animals: ask Gemini (in the user's Chrome) for the full body on plain white; people in an A-pose with
   gaps between arms and body. Take the **newest** file in `~/Downloads`, never one picked by filename pattern.
+- **Or make the picture locally** (M Station, no copy-paste): `python tools/gen_images.py --text "<prompt>" --name
+  <Name> --takes 4`. It starts ComfyUI (`C:\Users\thecl\ComfyUI`, Qwen-Image, Apache 2.0) and saves takes to
+  `Art/Refs/gen/`. Prompts: short, plain and positive; say the style once; describe shapes, because it reads words
+  literally ("tower shield" drew a tower). Put unwanted things in `--neg`. `--ref <picture>` (up to 3) draws from a
+  style reference. Close it before a TRELLIS run: both want the GPU. Credit it as AI-generated (ours, scored).
+- **Start new designs from pictures, not words** (Coreatures): designs drawn from words alone took rounds of "looks
+  pretty bad"; ones from the owner's pictures landed fast. Ask for a picture first, and when asked to improve a
+  design, keep it and raise the detail instead of redesigning.
 - Several views of one object can be blended: pass `front.png,rear.png` (comma-separated) in one run.
 - Note where the picture came from for `CREDITS.md`.
 

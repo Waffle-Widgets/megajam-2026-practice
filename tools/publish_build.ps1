@@ -13,7 +13,7 @@
   - Runs tools\package_build.ps1 (4-5 minutes; don't save assets while it cooks). -SkipPackage reuses the newest zip
     in Builds\ (only if nothing changed since it was made).
   - Each issue in -Issues gets a comment ("Fixed in Build N, please check") and the ready-to-check label.
-  - Releases are marked pre-release, so they never look like the jam submission.
+  - Builds are normal releases, so the fixed link <repo>/releases/latest always opens the newest one.
 #>
 param(
     [int[]]$Issues = @(),
@@ -78,7 +78,7 @@ if ($issueLines) { $body += "`n`n**Please check these and reply on each issue wi
 
 if ($DryRun) {
     Step 'Dry run: would package, then publish'
-    Write-Host "Release $tag (pre-release), target $sha`n$body"
+    Write-Host "Release $tag (becomes releases/latest), target $sha`n$body"
     exit 0
 }
 
@@ -98,7 +98,7 @@ Ok "$($zip.Name), $([math]::Round($zip.Length / 1MB)) MB"
 Step "Publishing Build $n"
 $notesFile = Join-Path $env:TEMP "release-$tag.md"
 [IO.File]::WriteAllText($notesFile, $body, (New-Object Text.UTF8Encoding $false))
-gh release create $tag "$($zip.FullName)#$($zip.BaseName) Build $n.zip" --prerelease --target $sha --title "Build $n" --notes-file $notesFile
+gh release create $tag "$($zip.FullName)#$($zip.BaseName) Build $n.zip" --latest --target $sha --title "Build $n" --notes-file $notesFile
 if ($LASTEXITCODE) { throw 'gh release create failed (signed in? gh auth status).' }
 $url = gh release view $tag --json url --jq .url
 Ok $url

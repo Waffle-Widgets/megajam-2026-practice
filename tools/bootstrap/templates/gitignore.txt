@@ -46,3 +46,6 @@ Art/Blender/export/
 Art/Blender/cache/
 # Personal reference photos (may show number plates or people)
 Art/Reference/
+
+# local image generator output (tools/gen_images.py)
+Art/Refs/gen/

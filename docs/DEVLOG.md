@@ -865,3 +865,15 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
 - **What we learned:** Pick roles per computer, not per person. Never name a PowerShell function after a command. Commit messages on the test branch must not say "Fixes #n", or GitHub closes the issue before anyone has checked it.
 - **Media:** (none)
 
+### 2026-11-09 — Bringing in what our other projects learned (main PC)
+- **What we tried:** Looking through every project on the main PC for lessons that would help in the jam: the Deep Archive HD-2D test (Unreal 5.8, same tools as ours), Coreatures (a browser game), Bixi Soup (Godot, made with a friend) and Formicide.
+- **Prompt(s) we gave the agent:** "Is there anything in any of the chats that we have learned that could help us during the MegaJam?" / "Yes, bring them in"
+- **What happened:**
+  - Claude read each project's CLAUDE.md and notes rather than whole chats, and checked each finding against ours: about 30 were missing.
+  - The Unreal lessons went into the skills where they're used, not into CLAUDE.md (already about 330 lines). `unreal-blueprint`: keyboard and gamepad input polled in Tick, so no hand-wiring of Enhanced Input; placing the pawn instead of setting it on the game mode; overriding parent events; spawning; testing live actors; effects without Niagara and light levels; a map-duplicate crash. `asset-import`: rigging on Meshy's website (free) plus `meshy_character.py`, and the hidden "re-import?" box. `playtest-capture`: `HighResShot` for full-size game-camera pictures. `trellis-model`: local reference pictures.
+  - Scripts copied and made to work here: `Art/Blender/meshy_character.py`, `meshy_prop_bake.py` (fine texture by default now, pixel texture with `PROP_PIXEL=1`), `fx3d_kit.py` + `tools/unreal_make_fx3d.py` (fire, sparks, smoke, beams), and `tools/gen_images.py` (ComfyUI + Qwen-Image on the 3090, no Gemini copy-paste).
+  - From Bixi Soup: a closing comment on every fixed issue (what was wrong, what changed, how it was tested), and one link that always opens the newest build. Bixi keeps a fixed "latest" release; we switched our builds from pre-releases to normal releases, so GitHub's own `releases/latest` link does it with no extra upload.
+  - Left out: Bixi's in-game F8 report button (needs a server, and would be game code made before the jam) and the project-specific scripts.
+- **What we learned:** Each project quietly collects lessons the others need. Check the other repos' CLAUDE.md files before a big push, and put lessons in skills so CLAUDE.md stays short.
+- **Media:** (none)
+

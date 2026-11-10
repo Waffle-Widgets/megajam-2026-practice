@@ -51,14 +51,16 @@ Batch: do a few quick fixes, then publish once. A build takes 4-5 minutes, so do
 powershell -ExecutionPolicy Bypass -File tools\publish_build.ps1 -Issues 12,15 -Notes "plain words"
 ```
 Run it in the background. It refuses unless this is the builder and everything is committed and pushed. It packages,
-makes a pre-release "Build N" on GitHub, comments on each issue and labels it `ready-to-check`. Give the user the
+makes a release "Build N" on GitHub (the fixed link `<repo>/releases/latest` always opens the newest), comments on each issue and labels it `ready-to-check`. Give the user the
 release link. `-DryRun` shows what it would do; `-SkipPackage` reuses the last zip if nothing changed since.
 
 ### 5. Merge what testers confirmed
 When every `ready-to-check` issue in a build is confirmed (or the user says to merge anyway):
 1. `git switch main`, `git pull --rebase`, `git merge --ff-only playtest` (if it can't fast-forward, show the user).
-2. Close the confirmed issues through the merge: an empty commit
-   `git commit --allow-empty -m "Playtest round: fixes #12, fixes #15"` (with the Co-Authored-By line), then push.
+2. **Write a closing comment on each confirmed issue** first (from Bixi Soup): what was wrong, what changed (with the
+   commit), and how it was tested (the tester's "works", captures, what Claude couldn't test). Then close them through
+   the merge: an empty commit `git commit --allow-empty -m "Playtest round: fixes #12, fixes #15"` (with the
+   Co-Authored-By line), then push.
 3. Devlog entry for the round (`devlog-entry`): which issues, what was tried, what testers said.
 4. `git switch playtest` and keep going.
 Issues confirmed only partly: leave them open with a comment saying what's left.
@@ -72,8 +74,8 @@ publishes when a batch is ready. Never edit while Play mode runs; if PIE is on, 
   `gh issue create --label playtest,<kind> --title "<short>" --body "<the form's sections>"`. Screenshots can't be
   attached from the command line: give the user the issue link (`gh issue view <n> --web`) to paste the picture in.
 - **"Get the latest build":**
-  - Windows: `gh release list --limit 1`, then `gh release download <tag> --dir <Downloads>`; unzip it and say which
-    .exe to run.
+  - Windows: `gh release download --pattern "*.zip" --dir <Downloads>` (no tag = the newest build), unzip it and
+    say which .exe to run. By hand, the fixed link `https://github.com/<owner>/<repo>/releases/latest` always opens it.
   - Mac: `git fetch`, `git switch playtest`, `git pull`. Unreal must be closed while pulling. Then the user opens the
     project and presses Play. **Never save in Unreal on a tester computer**; on close, choose "Don't Save". If
     something got saved by accident, `git restore` it before the next pull.

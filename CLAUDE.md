@@ -162,6 +162,10 @@ learn something, and copy it into the jam repo (the bootstrap does). Allowed bef
   actor's full transform afterwards, then save and check `git status`.
 - To test untested `.uasset` work on another PC, push it to a branch (`<name>/<topic>`), play it there, then merge.
 
+- More Unreal patterns live in the skills: keyboard/gamepad input without wiring, effects without Niagara and
+  light levels (`unreal-blueprint`), Meshy rigging and prop baking (`asset-import`), full-size game-camera shots with
+  `HighResShot` (`playtest-capture`), local reference pictures with `tools/gen_images.py` (`trellis-model`).
+
 ## AI-generated 3D models (Hunyuan3D 2.1 and TRELLIS.2, both local)
 - **TRELLIS.2** (Microsoft, MIT licence, `D:\AI\TRELLIS2` on the main PC, `C:\AI\TRELLIS2` on GameStation) is the one to use: one photo with the background cut out ->
   `venv\Scripts\python.exe run_image_to_3d.py <cutout.png> out\<name> 1024_cascade` (about 5 minutes on the 3090) -> a GLB

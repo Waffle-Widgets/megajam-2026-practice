@@ -14,7 +14,8 @@ GitHub issues. Which computer does what: the Computers table in `docs/TEAM.md`. 
 ## Get the latest build
 Just ask Claude on your computer: **"Get me the latest build."**
 - **Windows:** it downloads the newest "Build N" from the repo's Releases page and unzips it. Run the `.exe`.
-  (By hand: the repo on GitHub > Releases > the newest Build > download the zip.)
+  (By hand: open `https://github.com/Waffle-Widgets/<repo>/releases/latest`, which always shows the newest build;
+  bookmark it, or save it on your phone. Download the zip there.)
 - **Mac:** a Windows build won't run on a Mac, so you play in Unreal. With Unreal closed, Claude switches the repo
   to the `playtest` branch and pulls. Open the project and press **Play**. **Never save** on a tester computer; if
   Unreal asks when you close it, choose **Don't Save**.

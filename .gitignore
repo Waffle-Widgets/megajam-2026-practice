@@ -52,3 +52,6 @@ Art/Reference/
 
 # baked maps and lamp points from the TRELLIS pipeline
 Art/Blender/cache/
+
+# local image generator output (tools/gen_images.py)
+Art/Refs/gen/
