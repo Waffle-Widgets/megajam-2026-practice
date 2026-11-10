@@ -43,6 +43,9 @@ Full guide: [`PLAYTEST.md`](PLAYTEST.md).
 touching someone else's. If one builder can't keep up, a second person can get `builder (UI)` and change Unreal files
 in that area only.
 
+Talking between Claudes on different accounts: the plan is a sync tool a friend made (to be set up). The backup,
+GitHub issues as a mailbox and how to split the work, is in [`TEAM_SYNC_BACKUP.md`](TEAM_SYNC_BACKUP.md).
+
 ## 4. Git, the short version (Claude does this for you)
 - Before working and before every commit: get the latest (`git pull --rebase`).
 - Before changing an Unreal file: lock it (`git lfs lock`). If a teammate holds the lock, wait or make a new file.
