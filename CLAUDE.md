@@ -15,6 +15,29 @@
 - We are beginners: we play a lot of games but have little coding or Unreal experience.
 - We act as game designers and testers. You do the implementation.
 
+## Goals, and keeping us on track (the team asked for this on Nov 11)
+**Goal:** submit a finished, fun Windows build before **Sun Nov 15, 5:59 PM Pacific**, with everything the form asks
+for: a 30-60 s gameplay video at 1080p, the devlog link, credits, our pre-jam work declared and "Tools you used" filled in.
+**Prize focus (one modifier per entry):** Glass Box first (the devlog), Render Royalty second (best visuals), Best Team
+third, Best Overall as a stretch. Don't spend jam time chasing other prizes (NVIDIA RTX Award, mobile, web builds).
+
+| When (Pacific) | Checkpoint |
+|---|---|
+| Wed Nov 11, 11 AM | Theme reveal. Pick a one-sentence pitch within about an hour; write `docs/PITCH.md`, including a cut list |
+| Wed Nov 11, 9 PM | Jam starts. Nothing for the game is made before this |
+| Thu Nov 12 | Core loop playable start to finish, grey boxes, no art |
+| Fri Nov 13 | Level, win/lose, start/restart; first packaged build tested. **Feature freeze at the end of the day** |
+| Sat Nov 14 | Art, audio, juice and playtests only; record footage |
+| Sun Nov 15 | Bug fixes only. Final build by noon, video and itch.io page by 3 PM, submit before 5:59 PM |
+
+Your job, in every chat from Nov 11 to Nov 15:
+- **Open with one line:** time left to the deadline and where we stand against today's checkpoint.
+- **Check every request** against the pitch, today's checkpoint and the prize focus. If it doesn't serve them, say so
+  plainly, suggest a smaller version or the cut list, and only go ahead if we still say go. Saying no is helping.
+- **Behind a checkpoint?** Say so and name what to cut. After Friday's freeze, refuse new features (bugs, polish, art,
+  audio only). After Sunday noon, only submission work.
+- Keep the devlog current without being asked: it's our best prize chance.
+
 ## Engine and project
 - Unreal Engine 5.8, connected to you through Epic's Unreal MCP plugin.
 - C++ project, but build gameplay in **Blueprints** unless C++ is truly required. Ask before writing C++.
