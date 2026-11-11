@@ -34,6 +34,21 @@ This is for **one person moving between their own PCs**, and for handing an area
 3. Wait until the Unreal MCP at `http://127.0.0.1:8000/mcp` answers (Blender: port 9876), then tell the user it's ready.
 4. If MCP tools are missing in the chat: check the apps are running and listening, relaunch, then start a new chat.
 
+## Switching branches on the Unreal PC (learned Nov 11, M Station)
+- **Close Unreal before `git checkout`.** If it must be force-closed, first list unsaved packages
+  (`tools/unreal_find_new_assets.py`): only force-close when none of ours hold real changes. The next start then waits
+  behind a hidden **"Restore Packages"** window (the log stops at frame 0): find it with `EnumWindows` on the
+  UnrealEditor process and send it `WM_CLOSE` (0x0010), which skips the restore.
+- After switching to a branch that doesn't have an asset, the editor can still list that asset as unsaved (ours was
+  `NS_FireBlastReal3D` on a branch from main). **Never save it**: it would write a file the branch shouldn't have.
+- A script that rebuilds assets it doesn't own a lock on leaves them unsaved (read-only). If they didn't really change,
+  that's harmless: close without saving.
+- **Text-only commits (skills, docs, notes) to another branch while Unreal is open:** use a second checkout instead of
+  switching: `GIT_LFS_SKIP_SMUDGE=1 git worktree add <scratch folder> origin/main -b <temp>`, commit there,
+  `git push origin HEAD:main`, then `git worktree remove --force <folder>` and delete the temp branch. Bring a file from
+  another branch with `git checkout origin/<branch> -- <path>`, or apply a commit with `git cherry-pick <sha>` (no `-q`).
+- Always `git fetch` and look at every branch tip first: another chat (or the other PC) may have pushed.
+
 ## After every push that someone else must pick up
 - Your own other PC: message its chat (same Claude account) with the asset names, folders and import notes.
 - A teammate: their chat is on another Claude account and can't receive messages from yours. Write the hand-off where
