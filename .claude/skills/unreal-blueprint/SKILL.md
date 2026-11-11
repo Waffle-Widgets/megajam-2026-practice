@@ -36,6 +36,24 @@ Follow these steps in order. Every one of them comes from a bug we actually hit.
 - `IsValid` has two versions; make sure you got the one you meant (one silently deleted the honk).
 - After deleting a function, **compile before** re-adding one with the same name, or it becomes `Name_0`.
 
+## Graph language details (learned Nov 11 building the beam that melts walls)
+- **Multi-output nodes:** `(bind (a b c ...) (Node ...))`, names in the node's output-pin order (`get_node_type_pins`).
+  `(Collision|BreakHitResult hit)` has 18 outputs, so bind all 18. The reader prints these as repeated calls; the
+  real wiring is fine. Check it with `find_nodes` (title = the function's name, e.g. `MegaBeamTrace`) + `get_node_infos`.
+- **Casts and calling another Blueprint's function:** `(bind w (Utilities|Casting|CastToBP_MeltWall :Object a)
+  (:then (Class|BPMeltWall|MeltWallBurn :self w :Loc at :Dir d)) (:CastFailed))`. Find the exact ids with
+  `find_node_types` (needs `context_pins: []`). A cast ends the exec flow, so put it last; chain a second cast in `:CastFailed`.
+- `get_node_type_pins` leaves a stray node in the graph each time; the next `write_graph_dsl` clears them.
+- The construction graph is written `(fn ConstructionScript ...)` (its graph is `UserConstructionScript`); Begin Play is
+  `(event EventBeginPlay ...)`. There is no `None` literal.
+- Function inputs and outputs: `add_function_param` (`Vector`, `float`, ...; `input_param: false` for an output),
+  then `(return x)` fills the output.
+- Inside `execute_tool_script`: `def run()` must return a dict, and its dicts don't take `.get(key, default)`.
+- `ObjectTools.set_properties` takes `values` as a JSON **string**.
+- **Python placing actors:** `unreal.Rotator(a, b, c)` is (roll, pitch, yaw): name them. `LevelEditorSubsystem.new_level`
+  fails if the map exists and the script carries on in the open level: check its return and the world name, and give
+  script-made actors unique labels (a test once deleted a real level's "Sun" by label).
+
 ## After writing
 1. **Compile, then `read_graph_dsl` and compare** with what you meant. "It compiled" isn't "it works".
 2. **Save now**, after every batch, not at the end. Then `git status` to confirm the file really changed.
