@@ -69,7 +69,7 @@ moves). If no row matches `hostname`, ask which computer this is and fix its nam
 Step-by-step checklists Claude loads when a task matches (or type `/<name>`). Use them; update the skill when we
 learn something, and copy it into the jam repo (the bootstrap does). Allowed before the jam: they're prompts (§7h).
 `unreal-blueprint`, `asset-import`, `trellis-model`, `make-sound`, `playtest-capture`, `package-build`,
-`playtest-issues`, `devlog-entry`, `pc-handoff`, `jam-rules-check`.
+`playtest-issues`, `devlog-entry`, `pc-handoff`, `jam-rules-check`, `niagara-fx`.
 
 ## Lessons from practice (Unreal + MCP)
 - **Lock before you edit.** Git LFS marks committed `.uasset`/`.umap` files read-only. Run `git lfs lock <file>` before changing
@@ -188,6 +188,12 @@ learn something, and copy it into the jam repo (the bootstrap does). Allowed bef
 - More Unreal patterns live in the skills: keyboard/gamepad input without wiring, effects without Niagara and
   light levels (`unreal-blueprint`), Meshy rigging and prop baking (`asset-import`), full-size game-camera shots with
   `HighResShot` (`playtest-capture`), local reference pictures with `tools/gen_images.py` (`trellis-model`).
+- **Real particle effects (Niagara), learned on the Deep Archive Mega Beam (Nov 10):** see the `niagara-fx` skill. In short:
+  solid shapes with outlines read at the game camera, painted texture doesn't; mock up 2-3 options in Blender before
+  building; use an unlit Masked material (Niagara's default adds light, so red over white turns white); make ribbons
+  `Tube`, not flat; drive the effect with a few `User.` numbers from the Blueprint; and judge it with freeze-frame
+  captures from the game camera **and** a side angle. Toolset traps: new ribbons have no material, DirectionalBurst
+  systems run once for 1 s, number ribbon points with `ExecIndex()`. Effects are art: build them during the jam.
 
 ## AI-generated 3D models (Hunyuan3D 2.1 and TRELLIS.2, both local)
 - **TRELLIS.2** (Microsoft, MIT licence, `D:\AI\TRELLIS2` on the main PC, `C:\AI\TRELLIS2` on GameStation) is the one to use: one photo with the background cut out ->
