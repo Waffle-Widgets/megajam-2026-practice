@@ -14,6 +14,7 @@ Test script: `tools/unreal_chaos_test.py` (builds a test level, then `throw` or 
 - **Destruction** (walls, pillars, crates that smash): a **Geometry Collection** (GC), a mesh pre-cut into pieces that
   hold together until something breaks them. This skill is mostly about these.
 - **Fields** (explosions that push and break everything in a radius): the Field System plugin. Untested here.
+- **Melting holes** (lasers burning through walls): not Chaos but Geometry Script booleans; see "Beams and lasers".
 - **Ragdolls:** a Physics Asset on a skeletal mesh (`PhysicsToolsets.PhysicsAssetToolset.CreateFromMesh`, constraints,
   bodies). Untested here.
 - **Vehicles:** the Chaos Vehicles plugin (the Vehicle template). Untested here; it's a big system, so ask before using it.
@@ -58,6 +59,23 @@ Test script: `tools/unreal_chaos_test.py` (builds a test level, then `throw` or 
   (500000, 50000, 5000) per cluster level; a placed component keeps its own copy (`damage_threshold`), so changing the
   asset afterwards doesn't reach placed ones. Set the component's.
 - Broken pieces are removed after they settle (`allow_removal_on_break`/`on_sleep` default on): good for performance.
+
+## Beams and lasers: chew, or melt through (tested Nov 11 in Deep Archive, branch `mstation/beam-destruction`)
+Pictures in the Deep Archive repo: `docs/captures/55_beam_destruction_sheet.png`. Graph text there:
+`tools/beam_destruction_graphs.py`, `tools/meltwall_graphs.py`, `tools/unreal_make_melt_mat.py`.
+- **Stop the beam at walls:** a `Collision|LineTraceByChannel` (`bTraceComplex` true) along the beam every frame; the beam
+  ends at the hit. Skip the shooter and the intended target.
+- **Chew (Chaos):** each frame the beam rests on a Geometry Collection: `ApplyExternalStrain` (radius 20 cm, strain
+  3,000,000) at the hit point, plus a tiny radial push along the beam (40 cm/s velocity change, radius 35 cm). The push
+  happens every frame and adds up: 350 flung a 60-piece pillar away in a quarter second.
+- **Melt a hole (Geometry Script, plugin `GeometryScripting`):** the wall is a `DynamicMeshActor` Blueprint that builds its
+  box in the construction script and BeginPlay (`DynamicMesh|Reset`, `GeometryScript|Primitives|AppendBox`,
+  complex-as-simple collision). Every 0.07 s of contact: `AllocateComputeMesh` -> `AppendSphereBox` (24 cm) ->
+  `ApplyMeshBoolean` Subtract at the hit point + 6 cm -> `ReleaseComputeMesh` -> `UpdateCollision`. The next trace hits
+  the new pit's bottom, so the tunnel digs itself. Glow: pass the bite's position and game time as custom primitive
+  data; the material glows near it and cools over time. About 100 fps while melting.
+- In the Blueprint DSL the construction graph is written `(fn ConstructionScript ...)`, and multi-output nodes bind as
+  `(bind (out1 out2 ...) (Node ...))`. The reader prints them as repeated calls: check real wiring with `find_nodes`.
 
 ## Testing it
 - `py <repo>/tools/unreal_chaos_test.py build <GC path> [level]` (in the editor console box, Slate inspector) makes a
