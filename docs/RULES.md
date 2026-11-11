@@ -1,8 +1,27 @@
 # Official jam rules
 
-_Summarized from the [Official Rules PDF](https://epicgames.box.com/s/svkmfifwv7336vyq1h0y7eucdr9d6ooc) (version of Oct 30, 2026; 14 pages)
-and the [jam's itch.io page](https://itch.io/jam/2026-epic-ai-megajam), read Nov 1, 2026. Section numbers (§) point to the PDF.
-The PDF wins if anything here disagrees; it may be updated, so check its change log before the jam._
+_Summarized from the [Official Rules PDF](https://epicgames.box.com/s/svkmfifwv7336vyq1h0y7eucdr9d6ooc) (English, last updated
+Nov 5, 2026; 16 pages) and the [jam's itch.io page](https://itch.io/jam/2026-epic-ai-megajam). First read Nov 1, re-checked Nov 10.
+Section numbers (§) point to the PDF. The PDF wins if anything here disagrees; its change log is on the last page._
+
+## What changed since Nov 1 (re-checked Nov 10)
+
+- **The PDF's rules are the same for us.** Its change log lists only eligibility changes: Oct 26 (Brazil, Russia and Turkey
+  may enter; Brazil gets no cash prizes) and Nov 5 (Italy may enter, with its own terms in §21).
+- **Declare what we made before the jam.** The itch.io page now says to declare anything made before Nov 12, and its FAQ
+  names prompts, scripts and assets. At submission, list our pre-jam tools: the setup and packaging scripts, `tools/`,
+  `Art/Blender/*.py`, `CLAUDE.md` and the Claude skills. Bringing them is allowed (§7h); declaring them is now asked for.
+- **The submission form has a "Tools you used" field.** It's optional but needed for partner prizes, such as Hyper3D's
+  cash pool for winners who used Rodin and the NVIDIA RTX Award. List every AI tool we used (Claude, Meshy, TRELLIS.2 and so on).
+- **Partner credits were emailed on Nov 10** to everyone who pressed "Join jam" on itch.io (check spam). Useful for us:
+  $25 of Claude API credits, Tripo (3,000 credits and Pro, Nov 11–17), Hyper3D Rodin, PBRgen (AI materials), fal and
+  WeLoveIndies sounds (non-commercial licence, sourced, so not scored). Meshy's free Pro month needs a *new* account and a card.
+- **More modifier prizes**, still one per entry (§10): Solo Driver, Render Royalty (best visuals), Pocket Powerhouse
+  (mobile), Glass Box and Walkie-Talkie (UEFN only), plus an NVIDIA RTX Award (RTX 5090) for a Render Royalty entry that
+  uses NvRTX, DLSS 4.5 or NVIDIA ACE. Best Team and Glass Box are still our targets.
+- **Builds:** besides Windows, macOS, Android and iOS development builds are accepted, and web builds are experimental
+  (UE 5.9 MegaJam Preview). A desktop zip over 1 GB can be uploaded with butler. We stay with a Windows zip under 1 GB.
+- **An in-person event** at Digital Jungle, San Francisco, on Nov 14–15 (ticket needed). Online entries are judged the same.
 
 ## Answers we need
 
@@ -17,7 +36,7 @@ The PDF wins if anything here disagrees; it may be updated, so check its change 
   itch.io tip: show gameplay in the first five seconds.
 - **How Glass Box devlogs are submitted and judged:** Best devlog documenting how we created the game. To qualify it **must be
   submitted with the game, before the deadline** (§10); there's a devlog link field on the itch.io form. No scoring rubric is given.
-- **Team submission — one entry, or every member registered:** One entry per team of 1–5 (§2). It lists every member's full name
+- **Team submission — one entry, or every member registered:** One entry per team of 1–5 (§1a, §2). It lists every member's full name
   and email (the one on their Epic account), and names one **Team Owner**, who submits and receives any prize money for the team
   (§1c, §13). Everyone must be 18+ with an active Epic account. A human must submit, not an AI agent (§17).
 

@@ -331,7 +331,8 @@ Only one machine should have a given person's working copy of the project open a
 ## Jam rules to enforce
 Full summary in `docs/RULES.md`. Warn us if a request would break one of these:
 - Only tools, agent configs, MCP settings, prompts and scripts may be prepared before the jam. Gameplay, levels and art must be
-  made between Nov 12 and 15, and Epic may check our Git history.
+  made between Nov 12 and 15, and Epic may check our Git history. **Declare** everything we prepared before the jam
+  (scripts, skills, prompts, `CLAUDE.md`) when we submit, and fill in the form's "Tools you used" field.
 - Sourced assets (Fab, sound libraries) are allowed but not scored. Assets we make or generate with AI are scored, so prefer those.
 - Everything in English, suitable for ages 13+, and no trademarks or logos except the Unreal Engine logo.
 - The game must use the theme and go well beyond the Third Person template.
