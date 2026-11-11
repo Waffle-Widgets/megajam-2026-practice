@@ -49,6 +49,16 @@ The worked example is the Mega Beam in the Deep Archive HD-2D repo (`Waffle-Widg
   before the beam even fired. Keep `Loop Behavior` **Once** and set `Loop Duration` longer than the effect lives (5 s for
   a fireball). Setting it to Infinite *before* adding the emitters made every SpawnRate emitter spawn nothing (bursts
   still worked) with no error anywhere (Fire Blast drill, Nov 11). Infinite set *after* the emitters worked on the beam.
+- **A freshly made system can stay silent** (SpawnRate emitters spawn nothing, no error), even with Once set and spawn
+  modules toggled. What reliably worked: **duplicate a system that works** (`AssetTools.duplicate`) and re-tune the copy.
+- Realistic (not cartoon) fire: see-through (Translucent) soft noisy wisps with a heat ramp beat Additive on a bright
+  daylit floor (additive washed to cream). Keep ramp colours near 1-3. Truly photo-real fire needs flipbook textures.
+- For realistic fire, smoke or explosions load the **`niagara-fluids`** skill (simulation, tuning through Slate, baking).
+- **Make the flipbook from our own Niagara Fluids sim** (no downloads): Niagara editor > Baker, Source Binding
+  "SceneColor (HDR) in RGB, Inv Opacity in A", camera Front + Ortho Width with a margin (too tight cuts the fire into
+  squares), 8x8 frames of 256 px. Play it with `tools/unreal_make_fire_flipbook_mat.py`. The saved alpha is *opacity*
+  (1 - A drew black squares). Best on many small long-lived puffs (a trail); a big short-lived sprite flashes through
+  the smoke frames too. A moving fluid grid can't follow a fast projectile (it smears or stays a faint puff).
 - **Is it the system or the Blueprint?** `tools/unreal_fx_spawn_test.py <system>` (in Play) spawns the system on its own
   beside the player and takes a frozen picture. Then swap one thing at a time (default material, emitters off) to corner it.
 - Minimal emitters use the system's life cycle, so their own `Inactive Response` is hidden and can't be set.

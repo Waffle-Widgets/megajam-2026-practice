@@ -34,6 +34,12 @@ This is for **one person moving between their own PCs**, and for handing an area
 3. Wait until the Unreal MCP at `http://127.0.0.1:8000/mcp` answers (Blender: port 9876), then tell the user it's ready.
 4. If MCP tools are missing in the chat: check the apps are running and listening, relaunch, then start a new chat.
 
+## Untested work
+- Push it to its own branch (`<pc>/<topic>`), not main, and say in the message that it's untested.
+- `git push origin HEAD:refs/heads/<branch>` **without** `-u`: `-u` from main made local main track the new branch
+  (fix: `git branch -u origin/main main`).
+- The other PC: `git fetch`, `git switch <branch>`, play it, then merge into main once the owner OKs it.
+
 ## Switching branches on the Unreal PC (learned Nov 11, M Station)
 - **Close Unreal before `git checkout`.** If it must be force-closed, first list unsaved packages
   (`tools/unreal_find_new_assets.py`): only force-close when none of ours hold real changes. The next start then waits
