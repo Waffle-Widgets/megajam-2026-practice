@@ -66,6 +66,18 @@ The worked example is the Mega Beam in the Deep Archive HD-2D repo (`Waffle-Widg
 - An actor that removes itself (DestroyActor) cuts its effects off. If a fade needs more time, keep the actor alive
   longer but stop driving shared things (night sky, lights) at the old time, so a second shot isn't overwritten.
 
+- **Per-particle randomness in an HLSL expression:** hash the spawn time, `frac(sin(Engine.Time * 12.9898) * 43758.5453)`,
+  in a spawn-script Set Variables (one value per particle when fewer than one spawns a frame). `Particles.UniqueID` gave
+  the same value to every particle on an emitter without persistent IDs. **Never toggle `bRequiresPersistentIDs`** with
+  `SetEmitterData`: turning it on and off again crashed the editor on the next spawn (VectorVM `OldNumFreeIDs`
+  assertion), even after a restart. Restore the `.uasset` from Git with the editor closed.
+- **Don't set InitializeParticle's Sprite UV Mode to Random X** on an emitter whose material reads TexCoord (our
+  flipbooks): the sprites disappeared, and setting it back to Unset didn't bring them back (the head drew as solid
+  yellow boxes once `Particles.UVScale` was forced to 1). Fix: `git checkout` the asset and reload it
+  (`EditorLoadingAndSavingUtils.reload_packages([pkg], ReloadPackagesInteractionMode.ASSUME_POSITIVE)`, no prompt).
+- `GetSystemCompileState` waits for the compile on the game thread. Right after an editor start the compile can't finish
+  while it waits, so it times out after 120 s. Skip it then: save, wait outside, and capture.
+
 ## Judging it (the owner plays it last)
 - **Freeze-frame captures** (`tools/unreal_capture_megabeam.py <seconds> [game|side] [attack event]`, e.g.
   `... 0.75 game FireFireBlast`; the beam by default; typed into the console box in

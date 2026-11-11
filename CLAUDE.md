@@ -69,7 +69,7 @@ moves). If no row matches `hostname`, ask which computer this is and fix its nam
 Step-by-step checklists Claude loads when a task matches (or type `/<name>`). Use them; update the skill when we
 learn something, and copy it into the jam repo (the bootstrap does). Allowed before the jam: they're prompts (§7h).
 `unreal-blueprint`, `asset-import`, `trellis-model`, `make-sound`, `playtest-capture`, `package-build`,
-`playtest-issues`, `devlog-entry`, `pc-handoff`, `jam-rules-check`, `niagara-fx`.
+`playtest-issues`, `devlog-entry`, `pc-handoff`, `jam-rules-check`, `niagara-fx`, `chaos-physics` (things that break: Geometry Collections cut by a Dataflow graph, broken from code).
 
 ## Lessons from practice (Unreal + MCP)
 - **Lock before you edit.** Git LFS marks committed `.uasset`/`.umap` files read-only. Run `git lfs lock <file>` before changing
