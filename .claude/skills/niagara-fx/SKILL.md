@@ -46,10 +46,20 @@ The worked example is the Mega Beam in the Deep Archive HD-2D repo (`Waffle-Widg
 ## Traps that each cost us a round
 - A ribbon renderer added by the toolset has **no material** and draws nothing. Set `Material` with `SetRendererData`.
 - New systems from the `DirectionalBurst` template run **once for 1 s** (System State). Continuous emitters stopped
-  before the beam even fired. Set `Loop Behavior` Infinite and a long `Loop Duration` (30 s) so bursts don't repeat.
+  before the beam even fired. Keep `Loop Behavior` **Once** and set `Loop Duration` longer than the effect lives (5 s for
+  a fireball). Setting it to Infinite *before* adding the emitters made every SpawnRate emitter spawn nothing (bursts
+  still worked) with no error anywhere (Fire Blast drill, Nov 11). Infinite set *after* the emitters worked on the beam.
+- **Is it the system or the Blueprint?** `tools/unreal_fx_spawn_test.py <system>` (in Play) spawns the system on its own
+  beside the player and takes a frozen picture. Then swap one thing at a time (default material, emitters off) to corner it.
 - Minimal emitters use the system's life cycle, so their own `Inactive Response` is hidden and can't be set.
-- `ObjectTools.set_properties` returned false on a Blueprint's Niagara component template. Set `asset` and
-  `auto_activate` from an editor Python script on `.../BP_X.BP_X_C:Comp_GEN_VARIABLE`, then compile and save.
+- `ObjectTools.set_properties` returned false on a Blueprint's Niagara component template. Use
+  `tools/unreal_fx_component_setup.py <BP> <component> <system> <auto 0|1>` (editor Python on
+  `.../BP_X.BP_X_C:Comp_GEN_VARIABLE`; compiles and saves). Add the component with `ActorTools.add_component` first.
+- The editor may open on the template's default map: load the game's level (`SceneTools.load_level`) before Play tests.
+- Round sprite flames: `M_FlameParticle3D` (`tools/unreal_make_flame_particle_mat.py`): masked circle, 4 cartoon bands
+  from the particle colour. Keep the light centre small: a big white one made the blobs look like coins.
+- **Drill result (Nov 11):** Fire Blast flight + explosion rebuilt as particles in about 10 minutes of building with
+  these scripts: the copied builder functions do most of the work. Trails need time to build up; picture them later in the flight.
 - `get_node_type_pins` can leave stray nodes in the graph; the next `write_graph_dsl` replaces them.
 - `GetModuleInputValues` input names are the display names (`Lifetime`, `Spawn Count`, `Particles.Color` for a
   SetParameters entry). Inputs hidden by a static switch refuse to be set: change the switch first.
@@ -57,7 +67,8 @@ The worked example is the Mega Beam in the Deep Archive HD-2D repo (`Waffle-Widg
   longer but stop driving shared things (night sky, lights) at the old time, so a second shot isn't overwritten.
 
 ## Judging it (the owner plays it last)
-- **Freeze-frame captures** (`tools/unreal_capture_megabeam.py <seconds> [game|side]`, typed into the console box in
+- **Freeze-frame captures** (`tools/unreal_capture_megabeam.py <seconds> [game|side] [attack event]`, e.g.
+  `... 0.75 game FireFireBlast`; the beam by default; typed into the console box in
   Play): it fires the attack, waits in game time with a Slate tick callback (never `sleep`), freezes time
   (`set_global_time_dilation` 0.0001) and takes `HighResShot 1920x1080`. Take shots at several moments: mid-fire, the
   hit, partway through the fade.
