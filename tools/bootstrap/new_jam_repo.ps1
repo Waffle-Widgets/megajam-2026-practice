@@ -88,6 +88,8 @@ if (-not $VerifyOnly) {
             [ordered]@{ Name = 'ModelContextProtocol'; Enabled = $true },
             [ordered]@{ Name = 'AllToolsets'; Enabled = $true },
             [ordered]@{ Name = 'Terminal'; Enabled = $true },
+            # Chaos Destruction (Geometry Collections: things that break), off by default in 5.8 (chaos-physics skill)
+            [ordered]@{ Name = 'GeometryCollectionPlugin'; Enabled = $true },
             # an AI denoiser for offline movie renders, on by default; it adds ~130 MB to every packaged game
             [ordered]@{ Name = 'NNEDenoiser'; Enabled = $false }
         )
@@ -105,7 +107,7 @@ if (-not $VerifyOnly) {
     $epp = Join-Path $cfg 'DefaultEditorPerProjectUserSettings.ini'
     Write-Text $epp (([IO.File]::ReadAllText($epp)).TrimEnd() + "`r`n" + (From-Template 'DefaultEditorPerProjectUserSettings.add.ini'))
     Write-Text (Join-Path $cfg 'DefaultEditorSettings.ini') (From-Template 'DefaultEditorSettings.ini')
-    Ok "$Name.uproject (UE 5.8, MCP + toolsets + Terminal plugins), project name and a new project ID"
+    Ok "$Name.uproject (UE 5.8, MCP + toolsets + Terminal + Geometry Collection plugins), project name and a new project ID"
     Ok 'MCP auto-start on port 8000, Interchange without import windows, background throttling off, auto-import on'
 
     # ------------------------------------------------------------ 3. repo files

@@ -20,7 +20,7 @@ Test script: `tools/unreal_chaos_test.py` (builds a test level, then `throw` or 
 - **Cloth:** Chaos Cloth on a skeletal mesh. Untested here.
 
 ## Plugins (project setup: allowed before the jam)
-- **Geometry Collection** (`GeometryCollectionPlugin`, the Chaos Destruction plugin) is **off by default** in the engine.
+- **Geometry Collection** (`GeometryCollectionPlugin`, the Chaos Destruction plugin) is **off by default** in the engine; `tools/bootstrap/new_jam_repo.ps1` turns it on for the jam project.
   Something (our toolsets) loaded it in the Deep Archive project, but turn it on in the `.uproject` explicitly so the
   jam project doesn't depend on that. Add `FieldSystemPlugin` only if we use Fields, `ChaosVehiclesPlugin` only for cars.
 - `Dataflow` (the graph that does the cutting) and `ChaosSolverPlugin` are on by default.
