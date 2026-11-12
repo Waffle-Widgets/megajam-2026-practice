@@ -43,7 +43,10 @@ $settings = if (Test-Path $settingsPath) {
     [pscustomobject]@{}
 }
 $settings | Add-Member -NotePropertyName 'enableAllProjectMcpServers' -NotePropertyValue $true -Force
-$settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding utf8
+# Set-Content -Encoding utf8 writes a BOM on PowerShell 5.1, and a BOM breaks strict JSON
+# parsers. Write UTF-8 without one. $settingsPath is absolute, which .NET needs.
+$json = $settings | ConvertTo-Json -Depth 10
+[System.IO.File]::WriteAllText($settingsPath, $json, (New-Object System.Text.UTF8Encoding($false)))
 Say "approved shared .mcp.json servers -> .claude/settings.local.json"
 
 # --- 2. uv must be on PATH ----------------------------------------------------

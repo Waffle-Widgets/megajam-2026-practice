@@ -32,19 +32,25 @@ echo "repo: $repo"
 # --- 1. Approve the shared servers on this computer (per-machine, gitignored) ---
 mkdir -p "$repo/.claude"
 settings="$repo/.claude/settings.local.json"
-if [ -f "$settings" ]; then
-  python3 - "$settings" <<'PY'
+if [ ! -f "$settings" ]; then
+  printf '%s\n' '{' '  "enableAllProjectMcpServers": true' '}' > "$settings"
+elif grep -q '"enableAllProjectMcpServers"' "$settings"; then
+  : # already set; leave the rest of the file alone
+elif command -v python3 >/dev/null 2>&1; then
+  # Merge rather than overwrite: this file also holds each person's permission allowlist.
+  python3 - "$settings" <<'JSONEDIT'
 import json, sys
-p = sys.argv[1]
-with open(p) as f:
-    d = json.load(f)
-d["enableAllProjectMcpServers"] = True
-with open(p, "w") as f:
-    json.dump(d, f, indent=2)
-    f.write("\n")
-PY
+path = sys.argv[1]
+with open(path) as f:
+    data = json.load(f)
+data["enableAllProjectMcpServers"] = True
+with open(path, "w") as f:
+    json.dump(data, f, indent=2)
+    print(file=f)
+JSONEDIT
 else
-  printf '{\n  "enableAllProjectMcpServers": true\n}\n' > "$settings"
+  echo "  !! $settings exists but python3 is missing, so it was left untouched."
+  echo '     Add this to it by hand:  "enableAllProjectMcpServers": true'
 fi
 say "approved shared .mcp.json servers -> .claude/settings.local.json"
 
