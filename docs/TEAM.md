@@ -28,7 +28,7 @@ table, commits and pushes. A computer can have more than one role (`tester, make
 
 | Computer (`hostname`) | Person | OS | Role | Notes |
 |---|---|---|---|---|
-| GameStation | Team Owner | Windows | builder | Unreal edits, packaging, fixes playtest issues |
+| Gamestation | Team Owner | Windows | builder | Unreal edits, packaging, fixes playtest issues |
 | M_Station | Team Owner | Windows | maker | TRELLIS, Blender, Meshy, sounds |
 | _(Owner's Mac: hostname to add)_ | Team Owner | macOS | tester | |
 | Justins-Mac-mini | Justin | macOS | tester, maker | Mac mini, Apple silicon. git-lfs, gh, uv and the Blender MCP set up Nov 9; Blender is 5.1.2 (team uses 5.2) |
