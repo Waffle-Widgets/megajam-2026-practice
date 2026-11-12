@@ -278,14 +278,18 @@ learn something, and copy it into the jam repo (the bootstrap does). Allowed bef
   Plan credits are monthly and reset each month (no carry-over); bought credit packs never expire.
 
 ## Blender (for building our own 3D models)
-- Blender **5.2 LTS** with Blender's official MCP (Blender Lab). It is registered in `.mcp.json` as `blender`.
-- Setup on a new PC:
+- Blender **5.2 LTS** with Blender's official MCP (Blender Lab), from
+  `https://projects.blender.org/lab/blender_mcp.git`. **Not** the `blender-mcp` package on PyPI: that name belongs to
+  a different, third-party project (ahujasid), so never install it with a bare `uvx blender-mcp`.
+- `blender` is **not** in the shared `.mcp.json`, because it needs a real folder path and that path differs on every
+  computer. Each machine registers it at **user scope** instead. See "Where each MCP server is configured" below.
+- Setup on a new computer:
   1. In Blender 5.2, enable online access, then drag the add-on link from blender.org/lab/mcp-server in twice
      (repository, then add-on), enable it, and click Start (it listens on port 9876).
-  2. Install `uv` (`irm https://astral.sh/uv/install.ps1 | iex`), run
-     `git clone https://projects.blender.org/lab/blender_mcp.git C:\blender_mcp`, then `uv --directory C:\blender_mcp\mcp sync`.
-  3. `.mcp.json` runs plain `uv`, so `uv` must be on the PATH (the installer puts it in `%USERPROFILE%\.local\bin`). Check with `uv --version` in a new terminal.
-  4. Start a new Claude Code session so the server is picked up.
+  2. Install `uv` (`irm https://astral.sh/uv/install.ps1 | iex`, or `curl -LsSf https://astral.sh/uv/install.sh | sh`).
+  3. Run `tools\setup_mcp.ps1 -Clone` (Windows) or `./tools/setup_mcp.sh --clone` (Mac). It clones blender_mcp, runs
+     `uv sync`, registers both servers at user scope, and writes `.claude/settings.local.json`.
+  4. Start a new Claude Code session so the servers are picked up, and check with `claude mcp list`.
 - Blender warns that the MCP runs AI-written code with no guards: keep only scratch/project files open while connected.
 - **Open Unreal and Blender yourselves** (Start menu, or Claude launches them with `explorer.exe <path>`), never as a
   child of a chat. An app a chat starts closes when that chat is deleted, and its MCP tools vanish from every chat.
@@ -293,13 +297,31 @@ learn something, and copy it into the jam repo (the bootstrap does). Allowed bef
 - The Claude desktop app keeps a private copy of `AppData\Roaming`: anything a chat installs there (e.g. a Python from
   `uv python install`) is invisible to the user's own terminal. Install tools outside `AppData` (e.g. `C:\AI\...`).
 - `.claude/settings.local.json` (per PC, gitignored) holds `"enableAllProjectMcpServers": true` so the servers in
-  `.mcp.json` load without an approval prompt. Create it on each new PC.
+  `.mcp.json` load without an approval prompt. `tools/setup_mcp.*` writes it; create it on each new PC.
 - Models made in Blender count as our own (scored) art in the jam. Export FBX into `Content/Game/Imported/<Name>/`.
 - With our FBX settings (forward -Z, up Y, scale 1), Blender's +Y becomes Unreal's **-Y** (X and Z stay). Check a mesh's
   bounds after import before rotating it in a Blueprint.
 - When building meshes from script, add the material slots **before** writing faces, and never `materials.clear()` later.
   Either one silently resets every face to material 0. `Art/Blender/log_kit_materials.py` is a worked example of
   procedural materials baked to textures, including bark that tiles seamlessly.
+
+### Where each MCP server is configured
+- **Shared `.mcp.json` is for what is true on every computer.** Only `unreal` qualifies: `http://127.0.0.1:8000/mcp`
+  means "this machine's editor" on Windows and Mac alike. Never put a machine path in it (see the team rules below).
+- **User scope is for what differs per computer.** `claude mcp add <name> -s user ...` writes `~/.claude.json` on that
+  machine only, so each person points `blender` at wherever their own clone lives. `tools/setup_mcp.*` does this.
+- User scope also loads in **whatever folder a session starts in**, not just the repo, which matters when a chat lands
+  somewhere else (the ClaudeThought peer starts in `Documents` unless its working root is set).
+- `/mcp` in a session **lists and re-authenticates** servers that session already loaded; it cannot attach one that
+  was not in the config at startup. MCP servers are read when the session starts.
+- Gotchas, all found the hard way:
+  - **Quote the `--`** when calling `claude mcp add` from PowerShell: `claude mcp add blender -s user '--' uv ...`.
+    PowerShell 5.1 swallows a bare `--` as its own end-of-parameters marker, and `claude` then fails with
+    `unknown option '--directory'`.
+  - `claude mcp remove` **writes to stderr** when the server isn't there. Under `$ErrorActionPreference = 'Stop'`
+    PowerShell treats a native command's stderr as fatal, so an idempotent remove-then-add aborts the script.
+  - `blender: Connected` in `claude mcp list` only means the bridge process started. Blender itself must be running
+    with the add-on listening on **9876** before any Blender tool actually answers.
 
 ## Starting a new repo (Nov 11)
 - `tools/bootstrap/new_jam_repo.ps1 -Repo <new folder> -Name <Game> [-Verify]` makes the jam repo: the Third Person BP
@@ -331,8 +353,9 @@ or through the humans. New teammate setup: `docs/SETUP_TEAMMATE.md`.
 - **Commit small, commit often, pull first:** `git pull --rebase` before every commit and before starting work. Text
   files (scripts, docs, `.ini`) merge normally; if a rebase stops on a conflict, show the user both sides.
 - **Teammates on a Mac** (Justin): the project is Blueprint-only, so it opens without Xcode. Packaging, TRELLIS.2 and
-  the bootstrap stay on Windows PCs. Their Blender MCP is a local-scope override (`docs/SETUP_TEAMMATE.md`, "On a
-  Mac"); never put a Mac path in the shared `.mcp.json`. Use forward slashes and no `C:\` paths in anything shared.
+  the bootstrap stay on Windows PCs. Their Blender MCP is registered at user scope by `tools/setup_mcp.sh`, exactly
+  like everyone else's; no machine path goes in the shared `.mcp.json`. Use forward slashes and no `C:\` paths in
+  anything shared.
 - **Git identity:** every commit must be under the teammate's own name (`git config user.name` / `user.email`, their
   GitHub address). Epic may read our Git history, and it shows who built what.
 - Push only tested work to `main` (see "How to work with us"). Bigger experiments go on a branch named

@@ -27,3 +27,7 @@
 *.h    text
 *.cs   text
 *.uproject text
+*.py   text
+*.ps1  text
+# Shell scripts must keep LF: a Mac runs them; CRLF makes bash fail at the shebang with a carriage-return error.
+*.sh   text eol=lf

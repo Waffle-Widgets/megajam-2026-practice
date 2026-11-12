@@ -18,8 +18,7 @@ Do this **before the jam** (Nov 12), and open the project once so the first long
 2. **Git** (git-scm.com) and **Git LFS** (`git lfs install` once).
 3. **GitHub CLI** (`winget install GitHub.cli`), then `gh auth login` with *your* account.
 4. Optional, if you'll make art: **Blender 5.2** and its MCP (see CLAUDE.md, "Blender"), and **uv**:
-   `irm https://astral.sh/uv/install.ps1 | iex`. The repo's `.mcp.json` runs plain `uv`, so it must be on your PATH
-   (open a new terminal and check `uv --version`).
+   `irm https://astral.sh/uv/install.ps1 | iex` (open a new terminal and check `uv --version`).
 
 ## 3. Clone and identify yourself
 ```
@@ -33,13 +32,19 @@ git config lfs.locksverify true
 Use the email on your GitHub account: Epic may check our Git history, and it should show who built what.
 `lfs.locksverify` makes Git refuse a push that would overwrite a file a teammate has locked.
 
-## 4. Claude Code settings for this repo
-Create `.claude\settings.local.json` (it's per PC and not committed):
+## 4. Claude Code MCP servers (run once on this computer)
+From the repo folder:
 ```
-{
-  "enableAllProjectMcpServers": true
-}
+.\tools\setup_mcp.ps1 -Clone      # Windows   (drop -Clone if you already have blender_mcp)
+./tools/setup_mcp.sh --clone      # Mac
 ```
+That writes `.claude\settings.local.json` (per PC, not committed) so the shared `.mcp.json` loads without an approval
+prompt, and registers `unreal` and `blender` at **user scope** on this computer.
+
+Only `unreal` is in the shared `.mcp.json`, because `http://127.0.0.1:8000/mcp` means "this machine's editor"
+everywhere. `blender` needs a real folder path and that path is different on every computer, so it is never committed
+to the repo — the script points it at your own clone. Check with `claude mcp list`.
+
 Start a new Claude Code chat in the repo folder. Type `/` and check our skills are listed (`unreal-blueprint`,
 `asset-import`, ...).
 
@@ -57,12 +62,9 @@ yet: tell the Team Owner what happens at each step. Do sections 1-7 with these c
   - Git: `xcode-select --install` (Apple's command line tools; not the full Xcode).
   - [Homebrew](https://brew.sh), then `brew install git-lfs gh`, `git lfs install`, `gh auth login`.
   - uv, if you'll use Blender: `curl -LsSf https://astral.sh/uv/install.sh | sh`.
-- **Settings (section 4):** the same `.claude/settings.local.json`, with forward slashes in the path.
-- **Blender MCP:** the shared `.mcp.json` points at `C:\blender_mcp`, which doesn't exist on a Mac. Clone it into
-  your home folder (`git clone https://projects.blender.org/lab/blender_mcp.git ~/blender_mcp`, then
-  `uv --directory ~/blender_mcp/mcp sync`) and ask Claude to run
-  `claude mcp add --scope local blender -- uv --directory ~/blender_mcp/mcp run blender-mcp` in the repo folder.
-  A local server with the same name replaces the shared one on your machine only. Never change `.mcp.json` for this.
+- **Settings and MCP (section 4):** run `./tools/setup_mcp.sh --clone`. It clones blender_mcp into `~/blender_mcp`,
+  runs `uv sync`, writes `.claude/settings.local.json`, and registers `blender` at user scope pointing at your own
+  path. No Mac path ever goes into the shared `.mcp.json`.
 - **What stays on the Windows PCs:**
   - Packaging the game (`tools/package_build.ps1`): the jam wants a Windows build, and a Mac can't make one.
   - TRELLIS.2 (needs an NVIDIA GPU). Meshy works in any browser.

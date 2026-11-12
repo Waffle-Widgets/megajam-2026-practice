@@ -114,17 +114,18 @@ if (-not $VerifyOnly) {
     Step 'Repo files (.gitignore, .gitattributes, .mcp.json, per-PC Claude settings)'
     Write-Text (Join-Path $Repo '.gitignore') (From-Template 'gitignore.txt')
     Copy-Item (Join-Path $Src '.gitattributes') (Join-Path $Repo '.gitattributes')
-    # .mcp.json is committed and shared by every teammate, so it names plain 'uv' (found on each PC's PATH),
-    # never one person's C:\Users\<name>\... path.
-    if (-not (Get-Command uv -ErrorAction SilentlyContinue)) { Warn "uv isn't on this PC's PATH: the Blender MCP won't start until it's installed (docs/SETUP_TEAMMATE.md)" }
-    if (-not (Test-Path 'C:\blender_mcp\mcp')) { Warn 'C:\blender_mcp\mcp not found: clone the Blender MCP there (see CLAUDE.md, Blender setup)' }
+    # .mcp.json is committed and shared by every teammate, so it holds ONLY what is true on every computer:
+    # http://127.0.0.1:8000/mcp means "this machine's editor" on Windows and Mac alike. Blender's server needs a
+    # real folder path, and that path differs on every computer, so it is NOT written here - each machine registers
+    # it at user scope by running tools\setup_mcp.ps1 (Windows) or tools/setup_mcp.sh (Mac). See CLAUDE.md,
+    # "Where each MCP server is configured".
     $mcp = [ordered]@{ mcpServers = [ordered]@{
-            unreal  = [ordered]@{ type = 'http'; url = 'http://127.0.0.1:8000/mcp' }
-            blender = [ordered]@{ type = 'stdio'; command = 'uv'; args = @('--directory', 'C:\blender_mcp\mcp', 'run', 'blender-mcp') }
+            unreal = [ordered]@{ type = 'http'; url = 'http://127.0.0.1:8000/mcp' }
         } }
     Write-Text (Join-Path $Repo '.mcp.json') ($mcp | ConvertTo-Json -Depth 5)
     Write-Text (Join-Path $Repo '.claude\settings.local.json') "{`r`n  `"enableAllProjectMcpServers`": true`r`n}`r`n"
-    Ok '.gitignore, .gitattributes (LFS + locking), .mcp.json, .claude/settings.local.json'
+    Ok '.gitignore, .gitattributes (LFS + locking), .mcp.json (unreal only), .claude/settings.local.json'
+    Warn 'Blender MCP: run tools\setup_mcp.ps1 -Clone in the new repo on each computer that needs it'
 
     # ------------------------------------------------------------ 4. tools and scripts (never art)
     Step 'Copying tools and scripts (no .blend kits, models, textures or practice content)'
