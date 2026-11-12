@@ -877,3 +877,14 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
 - **What we learned:** Each project quietly collects lessons the others need. Check the other repos' CLAUDE.md files before a big push, and put lessons in skills so CLAUDE.md stays short.
 - **Media:** (none)
 
+
+### 2026-11-12 — Last sweep for lessons before the jam repo is made (M Station)
+- **What we tried:** Before creating the real jam repo, checking every computer and sister project for rules, skills or scripts the practice repo was missing.
+- **Prompt(s) we gave the agent:** "Do it and let's get the repo up. Make sure to check all machines for any new rules or skills or info we can use"
+- **What happened:**
+  - Claude compared the practice repo's skills and CLAUDE.md with Deep Archive (both of its newest branches) and the other game repos, and asked the GameStation chat what it had learned and not written down.
+  - The skills were already level. But 12 helper scripts that the `niagara-fx`, `niagara-fluids` and `chaos-physics` skills point at only existed in Deep Archive: copied in (`tools/unreal_make_*_mat.py`, `tools/fx3d_graphs.py`, `tools/beam_destruction_graphs.py`, `tools/meltwall_graphs.py`, `Art/Blender/beam_mockup.py` and others). Two had Deep Archive's project folder written in; they now find the `.uproject` themselves.
+  - GameStation reported three lessons from its first jam hours: Tripo makes cleaner anime characters than TRELLIS, Unreal's automatic retarget recognises our own skeleton (free idle, walk and jog), and Render CustomDepth lets one post-process treat characters and backgrounds differently. Added to CLAUDE.md.
+  - Small fixes: the builder's real computer name is `Gamestation`; player-facing text is American English.
+- **What we learned:** A skill that names a script is only useful if the script travelled with it. Check that every file a skill mentions exists in the repo.
+- **Media:** (none)

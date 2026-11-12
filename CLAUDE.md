@@ -255,6 +255,15 @@ learn something, and copy it into the jam repo (the bootstrap does). Allowed bef
   anim together), then point the slot at the character's `MI_`. `SkeletalMeshTools.import_file` onto the existing
   skeleton does NOT work: the old FBX importer read the bones differently from Interchange (first 1/100 size, then
   twisted) and the walk crushed the man. Test an animation on a placed `SkeletalMeshActor` next to a plain copy.
+- **Learned on GameStation in the jam's first hours (Nov 12):**
+  - **Tripo** (a jam partner; image-to-3D on its website, then its Retopology) gives a much cleaner anime-style
+    character than TRELLIS. Try it first for stylised people; add it to `CREDITS.md` and "Tools you used".
+  - **Free animations for our own rigs:** `IKRigController.apply_auto_generated_retarget_definition` recognises the
+    skeleton `trellis_character.py` makes (UE mannequin bone names), so an `IKRetargetBatchOperation` copies the
+    template mannequin's idle, walk and jog onto it. No hand-keyed walk needed for humans.
+  - **One post-process, two looks:** switch on Render CustomDepth for characters, and a single post-process material
+    can cel-shade them and treat the background differently (it reads the custom depth as a mask).
+- **Player-facing text is American English** (color, defense). Docs can stay as they are.
 - **Grid games: put decoration (posts, lamps, props) on tile corners, never tile centres.** The frog lands on centres and
   hops along the lines between them; a corner is 50 cm from every path. Street lamps on tile centres had the frog jumping through them.
 - **Judge art from the real game camera** (Simulate, pause, `CaptureViewport` from the game's height), not from
