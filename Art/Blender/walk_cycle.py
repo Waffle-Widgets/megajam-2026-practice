@@ -1,5 +1,5 @@
 # Looping walk (human) or trot (dog) for a character rigged by trellis_character.py. Headless:
-#   blender -b --factory-startup --python Art/Blender/walk_cycle.py -- <Name> human|dog
+#   blender -b --factory-startup --python Art/Blender/walk_cycle.py -- <Name> human|dog [idle]
 # Opens Art/Blender/cache/<Name>.blend, keys one loop on the rig, writes
 #   Art/Blender/export/Characters/SK_<Name>_Walk.fbx  (mesh + rig + the "Walk" action, outside Content/ on purpose)
 #   Art/Blender/cache/<Name>_walk_sheet.png           (8 frames from the side, to check the motion)
@@ -111,6 +111,26 @@ for f in range(N + 1):
         b.keyframe_insert('rotation_quaternion', frame=f); b.keyframe_insert('location', frame=f)
 log['frames'] = N + 1
 
+# Optional third argument "idle" (humans): a second action, "Idle" - standing with the arms down, breathing, 2 s a
+# loop - exported in the same FBX, so a game can cut between standing and walking.
+IDLE = len(args) > 2 and args[2] == 'idle' and KIND == 'human'
+if IDLE:
+    walk_act = act
+    idle_act = bpy.data.actions.new('Idle'); rig.animation_data.action = idle_act
+    NI = 60
+    for f in range(NI + 1):
+        p = 2 * math.pi * (f % NI) / NI
+        reset()
+        for u, l, e, ph in arms:
+            pb[u].rotation_quaternion = local_q(u, FWD, s_ad[u] * AD)
+            pb[l].rotation_quaternion = local_q(l, SIDE, s_el[l] * 6)
+        pb['spine_01'].rotation_quaternion = local_q('spine_01', SIDE, 1.2 * math.sin(p))
+        pel.location = pm @ Vector((0, 0, -0.004 * H * (0.5 - 0.5 * math.cos(p))))
+        for b in pb:
+            b.keyframe_insert('rotation_quaternion', frame=f); b.keyframe_insert('location', frame=f)
+    rig.animation_data.action = walk_act
+    log['actions'] = [ac.name for ac in bpy.data.actions]
+
 # side-view check sheet: 8 frames of one loop
 w = bpy.data.worlds.get('W') or bpy.data.worlds.new('W'); sc.world = w
 cams = [o for o in sc.objects if o.type == 'CAMERA']
@@ -152,7 +172,7 @@ fbx = os.path.join(OUTD, 'SK_%s_Walk.fbx' % NAME)
 bpy.ops.export_scene.fbx(filepath=fbx, use_selection=True, object_types={'ARMATURE', 'MESH'}, axis_forward='-Z', axis_up='Y',
                          global_scale=1.0, apply_unit_scale=True, apply_scale_options='FBX_SCALE_ALL', mesh_smooth_type='FACE',
                          add_leaf_bones=False, primary_bone_axis='Y', secondary_bone_axis='X', bake_anim=True,
-                         bake_anim_use_all_actions=False, bake_anim_use_nla_strips=False, bake_anim_force_startend_keying=True,
+                         bake_anim_use_all_actions=IDLE, bake_anim_use_nla_strips=False, bake_anim_force_startend_keying=True,
                          bake_anim_simplify_factor=0.0, path_mode='STRIP', embed_textures=False)
 log['fbx'] = fbx
 print('WALK ' + json.dumps(log))

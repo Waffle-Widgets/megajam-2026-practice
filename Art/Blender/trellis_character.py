@@ -13,7 +13,9 @@ GLB, NAME, KIND, HEIGHT = argv[0], argv[1], argv[2], float(argv[3])
 TRIS = int(argv[4]) if len(argv) > 4 else 40000
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 CACHE = os.path.join(REPO, 'Art', 'Blender', 'cache'); os.makedirs(CACHE, exist_ok=True)
-OUTD = os.path.join(REPO, 'MegaJamPractice', 'Content', 'Game', 'Imported', NAME); os.makedirs(OUTD, exist_ok=True)
+# CHAR_OUT=<folder> writes somewhere else (outside Content/, so an open Unreal doesn't import the rest-pose mesh
+# and its PNG together: that pair pops a window that freezes the MCP).
+OUTD = os.environ.get('CHAR_OUT') or os.path.join(REPO, 'MegaJamPractice', 'Content', 'Game', 'Imported', NAME); os.makedirs(OUTD, exist_ok=True)
 TEX = 2048
 log = {}
 
@@ -65,6 +67,11 @@ for m in src.data.materials:
     for n in m.node_tree.nodes:
         if n.type == 'TEX_IMAGE' and n.image and any(l.to_socket.name == 'Base Color' for l in n.outputs['Color'].links):
             img = n.image
+if img is None:      # Tripo puts a Mix node between the texture and Base Color: take the image feeding it, or the one named basecolor
+    for m in src.data.materials:
+        for n in m.node_tree.nodes:
+            if n.type == 'TEX_IMAGE' and n.image and (img is None or 'basecolor' in n.image.name.lower()) and                     any(l.to_node.type in ('MIX', 'MIX_RGB') for l in n.outputs['Color'].links):
+                img = n.image
 log['src_faces'] = len(src.data.polygons); log['src_image'] = img.name if img else None
 
 def verts(o):
@@ -106,7 +113,9 @@ V = verts(src); log['size_m'] = [round(float(v), 3) for v in (V.max(0) - V.min(0
 
 # ---------- 3. game mesh: decimated copy with clean UVs, bake the generator colour ----------
 sc = bpy.context.scene
-DIRECT = len(src.data.polygons) < TRIS * 1.5     # TRELLIS exported a game-size mesh itself (run with DEC=30000): use it as is
+# CHAR_REUV=1: a game-size mesh that still has the generator's atlas of tiny UV islands (Tripo after its Retopology):
+# keep every triangle, but give it clean UVs and re-bake the colour, or mipmaps smear the islands into each other
+DIRECT = len(src.data.polygons) < TRIS * 1.5 and os.environ.get('CHAR_REUV') != '1'   # TRELLIS exported a game-size mesh itself (DEC=30000): use it as is
 if DIRECT:
     SIZE = float((V.max(0) - V.min(0)).max())
     lowo = src; lowo.name = NAME; log['direct'] = True
@@ -198,11 +207,30 @@ if KIND == 'human':
     bone('neck_01', (0, 0, 0.83 * H), (0, 0, 0.88 * H), 'spine_03')
     bone('head', (0, 0, 0.88 * H), (0, 0, H), 'neck_01', True)
     torso = slab(0.68 * H, 0.74 * H); half = np.percentile(np.abs(torso[:, 0]), 97)   # chest half-width
+    # With the arms out (A- or T-pose) that slab also cuts through both arms, which put the shoulder joint halfway
+    # down the upper arm: the sleeve then followed the collarbone and the arms never came down. So measure the body
+    # at chest and at waist height, walking outwards from the spine and stopping at the first clear gap (between
+    # body and arm), and take the narrower of the two. At chest height an A-pose sleeve still touches the armpit.
+    def body_half(z0, z1):
+        ax_ = np.sort(np.abs(slab(z0, z1)[:, 0])); gap_ = np.nonzero(np.diff(ax_) > 0.02 * H)[0]
+        return float(ax_[gap_[0]]) if len(gap_) else float(np.percentile(ax_, 97))
+    half = min(half, body_half(0.68 * H, 0.74 * H), body_half(0.58 * H, 0.66 * H)); log['chest_half_m'] = round(half, 3)
     for sgn, sd in ((1, 'l'), (-1, 'r')):
         side = V[V[:, 0] * sgn > half * 1.15]                     # arms: everything wider than the chest
         side = side[(side[:, 2] > 0.30 * H) & (side[:, 2] < 0.85 * H)]
-        tip = side[np.argmax(side[:, 0] * sgn - 0.3 * side[:, 2])]  # fingertips: far out and low
-        sh = np.array([sgn * (half * 0.95), 0.0, 0.81 * H])
+        if len(side) >= 20:
+            tip = side[np.argmax(side[:, 0] * sgn - 0.3 * side[:, 2])]  # fingertips: far out and low
+            sh = np.array([sgn * (half * 0.95), 0.0, 0.81 * H])
+        else:
+            # arms hanging straight down beside the body (Tripo, Meshy without A-pose): nothing is wider than the
+            # chest slab, because that slab already includes the upper arms. The hand is whatever sticks out past
+            # the thighs below the waist; the shoulder comes from the width just under the neck.
+            thigh = slab(0.30 * H, 0.38 * H); tw = np.percentile(np.abs(thigh[:, 0]), 99)
+            cand = V[(V[:, 0] * sgn > tw * 1.18) & (V[:, 2] > 0.30 * H) & (V[:, 2] < 0.62 * H)]
+            tip = cand[cand[:, 2] < cand[:, 2].min() + 0.01 * H].mean(0)
+            top = slab(0.79 * H, 0.82 * H)
+            sh = np.array([sgn * np.percentile(np.abs(top[:, 0]), 97) * 0.80, float(np.median(cand[:, 1])), 0.81 * H])
+            log['arms'] = 'hanging'
         d = tip - sh; L = np.linalg.norm(d); dn = d / L
         wr = sh + dn * (L - 0.105 * H)
         el = (sh + wr) / 2 + np.array([0, 0.015 * H, 0])            # elbows bend backwards slightly
@@ -291,6 +319,31 @@ if un > 0.02 * len(lowo.data.vertices):
     bpy.data.objects.remove(proxy)
     un = count_unweighted()
 log['unweighted_verts'] = un
+
+# CHAR_ARM_DROP=<degrees>: lower both arms by this much and make THAT the rest pose (humans). A model drawn with its
+# arms well out (a T- or wide A-pose) keeps them out when it borrows the Unreal mannequin's animations, because
+# those only turn each arm by the difference from the mannequin's own A-pose. The skin weights were made in the
+# wide pose, where sleeves and body are clearly apart, so nothing sticks.
+DROP = float(os.environ.get('CHAR_ARM_DROP', '0'))
+if DROP and KIND == 'human':
+    for o in sc.objects: o.select_set(o is rig)
+    bpy.context.view_layer.objects.active = rig
+    bpy.ops.object.mode_set(mode='POSE')
+    for sgn, sd in ((1, 'l'), (-1, 'r')):
+        pb = rig.pose.bones['upperarm_' + sd]
+        head = pb.head.copy()
+        pb.matrix = Matrix.Translation(head) @ Matrix.Rotation(math.radians(DROP) * sgn, 4, 'Y') @ Matrix.Translation(-head) @ pb.matrix
+        bpy.context.view_layer.update()
+    bpy.ops.object.mode_set(mode='OBJECT')
+    for o in sc.objects: o.select_set(o is lowo)
+    bpy.context.view_layer.objects.active = lowo
+    for m_ in [m_ for m_ in lowo.modifiers if m_.type == 'ARMATURE']:
+        bpy.ops.object.modifier_apply(modifier=m_.name)          # the mesh keeps the lowered-arm shape
+    for o in sc.objects: o.select_set(o is rig)
+    bpy.context.view_layer.objects.active = rig
+    bpy.ops.object.mode_set(mode='POSE'); bpy.ops.pose.armature_apply(selected=False); bpy.ops.object.mode_set(mode='OBJECT')
+    am = lowo.modifiers.new('Armature', 'ARMATURE'); am.object = rig
+    log['arm_drop_deg'] = DROP
 
 # ---------- 6. export ----------
 for o in sc.objects: o.select_set(o in (lowo, rig))

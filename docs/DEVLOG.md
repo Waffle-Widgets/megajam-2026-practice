@@ -877,3 +877,80 @@ Raw notes for our Glass Box entry. Write fast, clean up later. Link screenshots 
 - **What we learned:** Each project quietly collects lessons the others need. Check the other repos' CLAUDE.md files before a big push, and put lessons in skills so CLAUDE.md stays short.
 - **Media:** (none)
 
+
+### 2026-11-10 — Re-reading the rules ten days in
+_Backfilled 7:35 PM Pacific, Nov 11, from the commits and files — the asks we typed that day weren't recorded, so this
+entry is reconstructed rather than quoted._
+- **What we tried:** Reading the Official Rules PDF again, ten days after the first pass, to catch anything that moved.
+- **What happened:**
+  - The PDF's change log only touched eligibility (Oct 26: Brazil, Russia, Turkey; Nov 5: Italy). Nothing about how we work.
+  - The itch.io page had grown a real requirement though: **declare anything made before Nov 12**, and its FAQ names
+    prompts, scripts and assets. So our practice week has to be listed at submission — the setup and packaging scripts,
+    `tools/`, `Art/Blender/*.py`, `CLAUDE.md` and the Claude skills. Bringing them is allowed (§7h); saying so is now asked for.
+  - The form also has a **"Tools you used"** field — optional, but it's what partner prizes read.
+  - Partner credits were emailed on Nov 10 to everyone who pressed "Join jam": $25 of Claude API credits, Tripo, Rodin,
+    PBRgen, fal, WeLoveIndies sounds. The sound library is non-commercial and **sourced, so it isn't scored** (§15c) —
+    which is the whole reason we generate our own with `make_sfx.py`.
+  - Prize list grew: Solo Driver, Pocket Powerhouse, Walkie-Talkie, an NVIDIA RTX Award. Still one modifier per entry, so
+    we wrote down our order instead of chasing them: Glass Box, then Render Royalty, then Best Team.
+- **What we learned:** The PDF is not the only rulebook — the itch.io page and its FAQ added a requirement the PDF never
+  mentions. Re-read both, not just the one with section numbers. Also: a free asset pack with a non-commercial licence
+  costs us points even when it costs no money.
+- **Media:** (none)
+
+### 2026-11-11 — We gave Claude a clock (main PC, 12:24 AM)
+- **What we tried:** Making the agent responsible for the schedule, not just the work. We're beginners; our failure mode
+  is building something lovely on Saturday that has no ending by Sunday.
+- **What happened:**
+  - `CLAUDE.md` gained a "Goals, and keeping us on track" section: the deadline, the per-day checkpoints (core loop
+    Thursday, feature freeze Friday night, art and juice Saturday, bug fixes only Sunday), and the prize order.
+  - Its instructions to the agent are the interesting part: open every chat with time left and where we stand; check
+    every request against the pitch, today's checkpoint and the prize focus; **refuse new features after Friday's
+    freeze**; and keep the devlog current without being asked. The line we put in deliberately: _"Saying no is helping."_
+- **What we learned:** Scope control is a thing you can delegate, but only if you write down what "behind" means before
+  you're behind. An agent with a checkpoint table will tell you to cut; an agent without one will happily help you drown.
+- **Media:** (none)
+
+### 2026-11-11 — Things that break, and the trap that makes them invisible (M Station, 10:20 AM – 10:53 AM)
+- **What we tried:** Finding out, before the jam, whether we can make and smash breakable objects entirely through the
+  MCP — in a scratch level, since breakable assets are art and would have to be remade during the jam anyway.
+- **What happened:**
+  - A Geometry Collection built from the engine's `DF_GC_Template_StaticMesh` Dataflow template: mesh in, Voronoi
+    fracture, collection out. Worked on the first try — and was **completely invisible, with no collision**. Our test
+    ball rolled straight through a 2 m block. The missing step is `regenerate_asset_from_dataflow(gc)`: without it the
+    asset exists, has a graph, reports no error, and contains nothing.
+  - Breaking it from code took two calls, in order: `apply_external_strain` at the hit point, then a **small**
+    `add_radial_impulse`. Our first impulse was 20,000 cm/s and threw the block out of sight.
+  - The result we didn't want: **collision damage did not break it.** A 200 kg ball at 25 m/s bounced off, even with the
+    damage threshold dropped to 50. Thresholds also live on the *placed component*, not just the asset, which is why
+    editing the asset looked like it did nothing.
+  - The plugin is the other half: **Geometry Collection is off by default in 5.8**. Our toolsets had quietly loaded it in
+    the other project, which is exactly the kind of luck that doesn't survive a fresh repo — so `new_jam_repo.ps1` now
+    writes `GeometryCollectionPlugin` into the generated `.uproject`.
+- **What we learned:** Write the negative result down. "It breaks when you ram it" is a sentence we would have promised a
+  designer on Thursday and spent Friday failing to deliver; now the skill says to break things with an explicit strain
+  call at the hit point. And never trust a plugin that's enabled on the machine you tested on.
+- **Media:** ![a 2 m block in 20 chunks, broken by one call from code](media/chaos_test_break.png)
+
+### 2026-11-11 — Real fire, a beam that melts walls, and the rules for talking to a graph (11:37 AM – 3:25 PM)
+- **What we tried:** Pulling the effects work out of our other Unreal project (Deep Archive HD-2D) and into skills we can
+  bring to the jam — plus the Blueprint-graph details we only learned by getting them wrong.
+- **What happened:**
+  - **Fire, honestly:** Niagara Fluids is excellent for an explosion that stays in one place (start from
+    `Grid3D_Gas_Explosion`). For a **fast projectile it failed** — the moving grid either smears the fire into a box or
+    leaves a soft puff, and ten rounds of source/swirl/wind tuning didn't fix it. What finally looked real was **baking
+    the explosion to a flipbook** and playing it on many small long-lived trail particles. Procedural noise on round
+    sprites always reads as puffs from the game camera.
+  - **Beams:** a beam that chews through a Geometry Collection, or melts a real hole in a wall with Geometry Script
+    booleans, at about 100 fps.
+  - **The graph language rules that cost us the most time:** a multi-output node has to be bound as
+    `(bind (a b c …) (Node …))` and you must bind **all** of them — `BreakHitResult` has 18. A cast ends the exec flow,
+    so it goes last. `unreal.Rotator` is **(roll, pitch, yaw)**, not the order the editor shows.
+  - **Moving between PCs:** the `pc-handoff` skill grew a rule we needed after the Toshi branch — untested work gets
+    pushed to `<pc>/<topic>`, never `main`, and is labelled untested. Plus the branch-switch trap: close Unreal first, and
+    if a hidden "Restore Packages" window is waiting, close it with `WM_CLOSE` rather than clicking it. For a text-only
+    commit while Unreal is open, use a `GIT_LFS_SKIP_SMUDGE=1 git worktree` instead of switching branches under the editor.
+- **What we learned:** Three of today's four lessons are "the thing that looks right is the thing that doesn't work":
+  live fluid on a moving projectile, a cast placed early, clicking the editor's own save prompt. Our skills are turning
+  into a list of plausible-looking mistakes, which may be the most valuable thing we own going into Thursday.
+- **Media:** (in the Deep Archive repo: `docs/realistic-3d-test.md`, captures `31_*`–`52_*`)

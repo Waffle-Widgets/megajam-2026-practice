@@ -1,43 +1,66 @@
-# Practice game pitch
+# Pitch
 
-_Fill in at the start of each practice jam. Practice 1 (Sat Nov 7): remake a tiny arcade game we both know.
-Practice 2 (Sun Nov 8): a random theme. Overwrite this file for each one; Git keeps the history._
+_Theme revealed Wed Nov 11, 11:00 AM Pacific. Written 7:30 PM Pacific, Wed Nov 11 — **a draft, pending the team's go.**
+Nothing for the game itself gets made before the jam opens at 9:00 PM Pacific tonight (`docs/RULES.md`, §7h).
+When the jam repo exists, this file is copied into it and this one goes back to being the practice pitch._
 
-**Practice round:** 1 (Sat Nov 7) — remake a tiny arcade game
+**Theme:** Director's Cut
 
-**Theme:** Frogger, in 3D
+**Working title:** That's a Wrap — project/repo name `ThatsAWrap`, itch zip `WaffleWidgets_ThatsAWrap.zip`
 
-**One-sentence pitch:** Hop your character across lanes of traffic and a river of floating logs to reach the goal, as many times as you can before you run out of lives.
+**One-sentence pitch:** You're the stunt double on a doomed movie set: wreck the shot exactly the way the director asked
+before he yells "CUT!" — and every new take is filmed in the rubble of your last one.
 
-**Core mechanic (the one thing that has to feel great):** The hop. Each button press moves exactly one tile forward, back, left or right with a quick, snappy jump. It should feel instant, readable and fair, so every death feels like your mistake.
+**Core mechanic (the one thing that has to feel great):** **The slam.** One button throws you shoulder-first into the set
+and breaks whatever you hit — pillars into chunks, walls into holes, prop crates into splinters. It has to land with
+weight: a short wind-up, a hard stop, screen shake, a dust burst, and a half-beat of slow motion on the biggest break of
+each take. If the slam feels good, the game works; if it doesn't, nothing else saves it.
 
 **How you win / how you lose:**
-- Win: fill all 3 lily pads on each of 3 levels.
-- Lose: run out of lives. You start with 3; cars, water and running out of time each cost one; each new level gives +1.
-- Score: +10 per new row, +50 per lily pad, +2 per second left on the clock, +100 for the bonus fly, +100 per level.
+- A **take** is one 30-second shot with 2–3 **director's notes** on screen: _"both pillars down"_, _"end the shot on the
+  balcony"_, _"nothing left standing on the left side"_.
+- **"CUT!"** ends the take. Notes you filled are printed. Notes you missed come back as a re-shoot — and **the set does
+  not reset**, so take 2 starts in the wreckage of take 1. Fewer things left to break, and new ways through.
+- **Win:** all notes printed before the film runs out (4 takes). The wrap screen prints _The Director's Cut_: your takes,
+  your score and a one-line review.
+- **Lose:** film runs out with notes unfilled — the director recasts you.
+- **Score:** +100 a printed note, +50 if it was printed in a single take, a debris bonus for how much of the set is on the
+  floor, plus time left on the shot clock.
 
-**The twist — Sundown (added Nov 3):** every lily pad you fill moves the day on: afternoon → sunset → night. The sun sinks
-and turns orange, then street lamps, headlight beams, glowing lily pads and fireflies take over, and the cars speed up
-each time. You read danger by light by the last crossing.
+**How it uses the theme:** Literally and as the verb. The director's cut is the film he keeps, and the game is you
+earning it. "CUT!" is how a take ends, his notes are the goal, the set that never resets between takes is the continuity
+error nobody edits out, and the last thing you see is the cut he releases.
 
-**Full-game update (Nov 3, morning):**
-- Title screen (PLAY / QUIT, best score) over a bird's-eye view of the live board.
-- 3 levels: filling all three pads brings sunrise, fireworks and the next level (faster cars and faster logs, +1 life).
-- 30-second crossing timer; spare seconds become bonus points, and the last 5 seconds tick and blink.
-- Bonus fly: hops to a random empty pad every 7 seconds, worth +100.
-- Pause on P or Esc, best score saved between sessions, Play Again skips the title.
+**Length of a playthrough:** 3–5 minutes (4 takes × 30 s, plus notes and the wrap screen).
 
-**Endless mode (Nov 3, afternoon):** a separate map (`Lvl_Endless`) that builds itself as you hop forward, Crossy Road style.
-- Five landscapes (meadow, autumn forest, desert, snowfields, city) with roads, highways, rivers, ice floes, lily ponds and railway crossings.
-- Checkpoints on grass rows, an 18-second "keep moving" clock, golden flies (+50), and a saved best distance marked with a gold line.
+**Art style in a few words:** A film soundstage — fake stone, visible rigging, light stands and a boom mic at the edges,
+hard movie key-light with deep shadows and dust in the beam. Grey-box first, dressed on Saturday.
 
-**Length of a playthrough:** 3–5 minutes
+## Why this one, for this team, in four days
 
-**Art style in a few words:** Chunky, bright, toy-like blocks (grey-box shapes with bold colors), top-down-ish camera angled from behind.
+- **The one mechanic is already proven.** Breakables through the MCP were tested on Nov 11 (`chaos-physics` skill):
+  Geometry Collections made from a Dataflow template, broken from code with strain plus a small impulse. The jam
+  bootstrap turns the plugin on. The honest limit is in the skill too — **ramming a Geometry Collection did not break
+  it** (a 200 kg ball at 25 m/s bounced), so the slam breaks things by an explicit strain call at the hit point, not by
+  collision damage. Design around the tested path.
+- **One soundstage = one level.** Matches our own rule: one mechanic, one level, 3–5 minutes.
+- **Render Royalty (prize #2) is free here.** Destruction, dust and a hard key light photograph well, and we have real
+  fire if a take calls for it (`niagara-fluids`).
+- **Glass Box (prize #1) writes itself.** "We built a game about re-shooting a scene by re-shooting it" — and the devlog
+  already has the negative results to show.
+- **The director's notes are data, not AI.** A note is a condition on the level (is this actor broken, did the player
+  reach this volume, is this half of the set clear). No enemy AI, no pathfinding, no dialogue system.
 
-**Cut list (things we will NOT build):**
-- No crocodiles or diving turtles. Story mode's 3 levels reuse one board; endless mode has its own generated map
-- No settings menu (volume, key rebinding)
-- No multiplayer or online leaderboard (the best score is local only)
-- _Originally cut, then added on Nov 3 when we had spare time: crossing timer, bonus fly, levels, best-score saving, a
-  title screen. The frog is our own sphere model, not the template mannequin._
+## Cut list (things we will NOT build)
+
+- **No replay/highlight reel.** The wrap screen is a still "poster" of the final wreckage with the scores on it, not
+  recorded footage. (First thing to add back if Saturday is calm — it would be a great trailer, and a terrible Thursday.)
+- **No second set, no scene select.** One soundstage, dressed once.
+- **No enemies, no NPCs, no other actors on set.** The director is a voice and a note card, never a character to model.
+- **No voice acting.** Four or five synthesized barks ("CUT!", "AGAIN", "PRINT IT", "that's a wrap") from `make_sfx.py`,
+  plus on-screen text. Everything in English (§7i).
+- **No settings menu, no key rebinding, no volume sliders.** Title screen is PLAY / QUIT and the best score.
+- **No physics puzzles, no stacking, no carrying objects.** You slam. That's the verb.
+- **No Fields, no vehicles, no ragdolls, no cloth** — all untested in `chaos-physics`.
+- **No mobile, no web, no macOS build.** Windows zip under 1 GB (§7f).
+- **No multiplayer, no leaderboard.** Best score is local.
