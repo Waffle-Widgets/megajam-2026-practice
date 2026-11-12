@@ -151,11 +151,15 @@ if (-not $VerifyOnly) {
     Copy-Tree (Join-Path $Src '.github') (Join-Path $Repo '.github')
     foreach ($f in 'PLAN.md', 'RULES.md', 'SETUP_TEAMMATE.md', 'TEAM.md', 'PLAYTEST.md', 'HOW_WE_WORK.md') { Copy-Item (Join-Path $Src "docs\$f") (Join-Path $Repo "docs\$f") }
     Write-Text (Join-Path $Repo 'docs\PITCH.md') (From-Template 'PITCH.md')
+    # Devlog is one file per entry (docs/devlog/), so two people writing at once never collide.
+    # docs/DEVLOG.md stays as a pointer: old links and the bare filename still land somewhere useful.
     Write-Text (Join-Path $Repo 'docs\DEVLOG.md') (From-Template 'DEVLOG.md')
+    Write-Text (Join-Path $Repo 'docs\devlog\README.md') (From-Template 'devlog_README.md')
+    Write-Text (Join-Path $Repo "docs\devlog\$Today-jam-repo-is-born.md") (From-Template 'devlog_first_entry.md')
     Write-Text (Join-Path $Repo 'docs\media\.gitkeep') ''
     Write-Text (Join-Path $Repo 'CREDITS.md') (From-Template 'CREDITS.md')
     Write-Text (Join-Path $Repo 'README.md') (From-Template 'README.md')
-    Ok 'CLAUDE.md, GEMINI.md, .claude/skills, README, CREDITS, docs/ (PLAN, RULES, SETUP_TEAMMATE, TEAM, PLAYTEST, HOW_WE_WORK, empty PITCH, fresh DEVLOG), .github issue form'
+    Ok 'CLAUDE.md, GEMINI.md, .claude/skills, README, CREDITS, docs/ (PLAN, RULES, SETUP_TEAMMATE, TEAM, PLAYTEST, HOW_WE_WORK, empty PITCH, devlog/ with its first entry), .github issue form'
 
     # ------------------------------------------------------------ 6. git
     Step 'Git'

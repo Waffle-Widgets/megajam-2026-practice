@@ -26,7 +26,7 @@ Almost everything is done by asking Claude in a chat opened on this repo folder.
 | `docs/PITCH.md` | The game we're making |
 | `docs/PLAN.md` | Team plan and schedule |
 | `docs/RULES.md` | The official jam rules we follow |
-| `docs/DEVLOG.md` | Our devlog (Glass Box) |
+| `docs/devlog/` | Our devlog (Glass Box), one file per entry |
 | `CREDITS.md` | Every asset we didn't make ourselves |
 | `CLAUDE.md` / `GEMINI.md` | Standing instructions for our AI agents |
 | `tools/`, `Art/Blender/*.py` | Scripts prepared before the jam (sound generator, AI 3D model cleanup, rigging, walk cycles) |

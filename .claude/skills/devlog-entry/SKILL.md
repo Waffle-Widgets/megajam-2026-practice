@@ -1,6 +1,6 @@
 ---
 name: devlog-entry
-description: Write the Glass Box devlog entry in docs/DEVLOG.md for a change the user tested, with a screenshot, and commit it together with the change. Use after every tested change, and whenever something broke or a setup problem was solved.
+description: Write the Glass Box devlog entry for a change the user tested, with a screenshot, and commit it together with the change. One file per entry in docs/devlog/ if that folder exists, otherwise appended to docs/DEVLOG.md. Use after every tested change, and whenever something broke or a setup problem was solved.
 ---
 
 # Devlog entry (Glass Box prize)
@@ -12,7 +12,13 @@ dead ends) are worth the most. Write one entry per tested change without being a
 1. **Only after the user confirmed it works** in Play mode (or confirmed a non-game change is fine).
 2. Save all assets in the editor. If Unreal is open, capture a picture (`playtest-capture` skill) into
    `docs/media/<short-name>.png`.
-3. Append to the end of `docs/DEVLOG.md` using its template:
+3. **Check which layout this repo uses, because they are not the same job:**
+   - **`docs/devlog/` exists** (the jam repo): add a **new file**, `docs/devlog/YYYY-MM-DD-what-happened.md`.
+     Naming rules are in `docs/devlog/README.md`. Never append to someone else's entry or to `docs/DEVLOG.md` —
+     one file per entry is what stops two people colliding on a shared file. Media links are `../media/<file>.png`,
+     and the title line is a single `#`.
+   - **It doesn't** (this practice repo): append to the end of `docs/DEVLOG.md`, title line `###`, media links
+     `media/<file>.png`.
 
 ```
 ### YYYY-MM-DD — short title (which PC, if it matters)
